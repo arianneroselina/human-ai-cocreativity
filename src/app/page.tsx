@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Workflow = "human" | "ai" | "human_ai" | "ai_human";
 
@@ -30,12 +29,18 @@ export default function StartPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <div className="mx-auto max-w-4xl p-6">
+      <div className="mx-auto max-w-4xl p-6 space-y-4">
+        {/* Top title */}
+        <div className="text-center">
+          <h1 className="text-3xl font-semibold tracking-tight">Human–AI Co-Creativity</h1>
+          <p className="mt-1 text-sm text-slate-600">Experimental study interface</p>
+        </div>
+
         {/* Hero */}
         <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
             Choose your workflow
-          </h1>
+          </h2>
           <p className="mt-1 text-sm text-slate-600">
             You’ll confirm your choice before starting. Estimated duration: ~10 minutes.
           </p>
@@ -82,8 +87,8 @@ export default function StartPage() {
         </section>
 
         {/* Help / info row */}
-        <section className="mt-4 text-xs text-slate-500">
-          Need to switch later? Use the “Change workflow” button on the work page to come back here.
+        <section className="text-xs text-slate-500">
+          Need to switch later? Use “Change workflow” on the work page to come back here.
         </section>
       </div>
 
@@ -111,9 +116,6 @@ export default function StartPage() {
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
             <Button onClick={() => {
               setOpen(false);
-              // navigate to specific work page
-              // /work/human, /work/ai, /work/human_ai, /work/ai_human
-              // NOTE: route folder names must exist
               router.push(`/work/${choice}`);
             }}>
               Start now

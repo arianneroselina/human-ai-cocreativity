@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TimerBadge } from "@/components/ui/timer";
+import { ConfirmDialog } from "@/components/ui/confirm";
 
 function countWords(s: string) {
   return s.trim() ? s.trim().split(/\s+/).length : 0;
@@ -15,6 +16,9 @@ export default function HumanWorkPage() {
   const router = useRouter();
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
+
+  const [backOpen, setBackOpen] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
 
   const readOnly = useMemo(() => locked, [locked]);
   const words = countWords(text);
@@ -34,9 +38,20 @@ export default function HumanWorkPage() {
       {/* Sticky Header */}
       <div className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur">
         <div className="mx-auto max-w-4xl p-4 flex items-center gap-3">
-          <Button variant="ghost" onClick={() => router.push("/")} aria-label="Change workflow">
+          <Button variant="ghost" onClick={() => setBackOpen(true)} aria-label="Change workflow">
             ← Back
           </Button>
+
+          <ConfirmDialog
+            open={backOpen}
+            onOpenChange={setBackOpen}
+            title="Leave this session?"
+            description="Your current draft won't be saved (prototype). Go back to the workflow selection?"
+            confirmLabel="Go back"
+            cancelLabel="Stay here"
+            onConfirm={() => router.push("/")}
+          />
+
           <div className="mr-auto">
             <h1 className="text-xl font-semibold tracking-tight">Human–AI Co-Creativity</h1>
             <p className="text-xs text-gray-500">Workflow: <span className="font-medium text-gray-800">Human only</span></p>
@@ -83,9 +98,24 @@ export default function HumanWorkPage() {
                 >
                   Clear
                 </Button>
-                <Button onClick={submit} disabled={submitDisabled}>
+
+                <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                   Submit
                 </Button>
+
+                <ConfirmDialog
+                  open={submitOpen}
+                  onOpenChange={setSubmitOpen}
+                  title="Submit your draft?"
+                  description="You won't be able to edit after submitting."
+                  confirmLabel="Submit"
+                  cancelLabel="Cancel"
+                  onConfirm={() => {
+                    setLocked(true);
+                    console.log("[submitted]", { workflow: "human", length: text.length, text });
+                    alert("Submitted (stub). Check console for payload.");
+                  }}
+                />
               </div>
             </div>
           </div>
