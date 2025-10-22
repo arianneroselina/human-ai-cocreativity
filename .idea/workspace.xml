@@ -4,19 +4,25 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="52de9637-4256-4455-b646-8da426ca4c38" name="Changes" comment="">
+    <list default="true" id="52de9637-4256-4455-b646-8da426ca4c38" name="Changes" comment="finish setting up next and tailwind">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/postcss.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/postcss.config.mjs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/tailwind.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -48,6 +54,13 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\components\ui" />
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src" />
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity" />
+    </key>
+  </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -79,9 +92,22 @@
       <updated>1761160002583</updated>
       <workItem from="1761160004364" duration="42000" />
     </task>
+    <task id="LOCAL-00001" summary="finish setting up next and tailwind">
+      <option name="closed" value="true" />
+      <created>1761161241984</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1761161241985</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="finish setting up next and tailwind" />
+    <option name="LAST_COMMIT_MESSAGE" value="finish setting up next and tailwind" />
   </component>
 </project>
