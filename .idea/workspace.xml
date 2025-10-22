@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="52de9637-4256-4455-b646-8da426ca4c38" name="Changes" comment="minimal prototype:&#10;- using shadcn/ui&#10;- add timer component">
+    <list default="true" id="52de9637-4256-4455-b646-8da426ca4c38" name="Changes" comment="correct behavior of each workflow">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -42,7 +41,7 @@
     "git-widget-placeholder": "main",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
-    "last_opened_file_path": "C:/Users/ArianneRoselinaPrana/Downloads/adacor-customopenaisettings.json",
+    "last_opened_file_path": "C:/DATA/TU Darmstadt/Master/Masterarbeit/human-ai-cocreativity/src/app/work",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
@@ -52,7 +51,11 @@
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\app\work" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\app\start" />
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\components\ui" />
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src" />
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity" />
@@ -105,7 +108,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761163756101</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="correct behavior of each workflow">
+      <option name="closed" value="true" />
+      <created>1761165201609</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1761165201609</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -114,6 +125,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="finish setting up next and tailwind" />
     <MESSAGE value="minimal prototype:&#10;- using shadcn/ui&#10;- add timer component" />
-    <option name="LAST_COMMIT_MESSAGE" value="minimal prototype:&#10;- using shadcn/ui&#10;- add timer component" />
+    <MESSAGE value="correct behavior of each workflow" />
+    <option name="LAST_COMMIT_MESSAGE" value="correct behavior of each workflow" />
   </component>
 </project>
