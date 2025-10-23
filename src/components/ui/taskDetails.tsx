@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/shadcn_ui/button";
 
 export default function TaskDetails() {
   const [taskDetailsOpen, setTaskDetailsOpen] = useState(true);

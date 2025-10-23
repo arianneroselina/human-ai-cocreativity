@@ -2,12 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { TimerBadge } from "@/components/ui/timer";
+import { Button } from "@/components/shadcn_ui/button";
+import { Label } from "@/components/shadcn_ui/label";
+import { Textarea } from "@/components/shadcn_ui/textarea";
 import { ConfirmDialog } from "@/components/ui/confirm";
-import TaskDetails from "@/components/task/taskDetails";
+import TaskDetails from "@/components/ui/taskDetails";
+import Header from "@/components/ui/header";
 
 function countWords(s: string) {
   return s.trim() ? s.trim().split(/\s+/).length : 0;
@@ -18,11 +18,9 @@ export default function AIHumanWorkPage() {
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
   const [aiGenerated, setAiGenerated] = useState(false);
-
-  const [backOpen, setBackOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
-  // readOnly until AI generates; afterwards editable (unless locked)
+  // readOnly until AI generates; afterward editable (unless locked)
   const readOnly = useMemo(() => locked || !aiGenerated, [locked, aiGenerated]);
   const words = countWords(text);
 
@@ -52,29 +50,7 @@ export default function AIHumanWorkPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Sticky Header */}
-      <div className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur">
-        <div className="mx-auto max-w-4xl p-4 flex items-center gap-3">
-          <Button variant="ghost" onClick={() => setBackOpen(true)} aria-label="Change workflow">
-            ← Back
-          </Button>
-
-          <ConfirmDialog
-            open={backOpen}
-            onOpenChange={setBackOpen}
-            title="Leave this session?"
-            description="Your current draft won't be saved (prototype). Go back to the workflow selection?"
-            confirmLabel="Go back"
-            cancelLabel="Stay here"
-            onConfirm={() => router.push("/")}
-          />
-
-          <div className="mr-auto">
-            <h1 className="text-xl font-semibold tracking-tight">Human–AI Co-Creativity</h1>
-            <p className="text-xs text-gray-500">Workflow: <span className="font-medium text-gray-800">AI → Human</span></p>
-          </div>
-          <TimerBadge seconds={600} onDone={() => setLocked(true)} running={!locked} />
-        </div>
-      </div>
+      <Header workflow="AI → Human"/>
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}

@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/shadcn_ui/dialog";
+import { Button } from "@/components/shadcn_ui/button";
 
 type ConfirmProps = {
   open: boolean;
