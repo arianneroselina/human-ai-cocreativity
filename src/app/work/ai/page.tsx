@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TimerBadge } from "@/components/ui/timer";
 import { ConfirmDialog } from "@/components/ui/confirm";
+import TaskDetails from "@/components/task/taskDetails";
 
 function countWords(s: string) {
   return s.trim() ? s.trim().split(/\s+/).length : 0;
@@ -76,21 +77,23 @@ export default function AIWorkPage() {
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <section className="rounded-lg border bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-600">
-            Generate a single AI draft and <span className="font-medium">submit without editing</span>.
-          </p>
-        </section>
+        <TaskDetails/>
 
         {/* Actions */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-4 shadow-sm flex items-center gap-2">
-            <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
-              {aiUsed ? "AI Draft Generated" : "Generate AI Draft"}
-            </Button>
-            <span className="ml-auto text-sm text-gray-500">
-              {aiUsed ? "Review the AI draft and submit." : "Generate the AI draft to proceed."}
-            </span>
+          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
+            <p className="text-sm text-gray-600">
+              Generate a single AI draft and <span className="font-medium">submit without editing</span>.
+            </p>
+
+            <div className="flex items-center gap-2 pt-4">
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
+                {aiUsed ? "AI Draft Generated" : "Generate AI Draft"}
+              </Button>
+              <span className="ml-auto text-sm text-gray-500">
+                {aiUsed ? "Review the AI draft and submit." : "Generate the AI draft to proceed."}
+              </span>
+            </div>
           </div>
         </section>
 

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TimerBadge } from "@/components/ui/timer";
 import { ConfirmDialog } from "@/components/ui/confirm";
+import TaskDetails from "@/components/task/taskDetails";
 
 function countWords(s: string) {
   return s.trim() ? s.trim().split(/\s+/).length : 0;
@@ -63,10 +64,15 @@ export default function HumanWorkPage() {
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <section className="rounded-lg border bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-600">
-            Write entirely by yourself. <span className="font-medium">No AI available.</span> Submit before time runs out.
-          </p>
+        <TaskDetails/>
+
+        {/* Actions */}
+        <section className="mt-4">
+          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
+            <p className="text-sm text-gray-600">
+              Write entirely by yourself. <span className="font-medium">No AI available.</span> Submit before time runs out.
+            </p>
+          </div>
         </section>
 
         {/* Editor */}

@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TimerBadge } from "@/components/ui/timer";
 import { ConfirmDialog } from "@/components/ui/confirm";
+import TaskDetails from "@/components/task/taskDetails";
 
 function countWords(s: string) {
   return s.trim() ? s.trim().split(/\s+/).length : 0;
@@ -77,28 +78,30 @@ export default function AIHumanWorkPage() {
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <section className="rounded-lg border bg-white p-4 shadow-sm">
-          <p className="text-sm text-gray-600">
-            Generate an AI draft <span className="font-medium">once</span>, then edit freely. AI is disabled afterwards.
-          </p>
-        </section>
+        <TaskDetails/>
 
         {/* Actions */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-4 shadow-sm flex items-center gap-2">
-            <Button onClick={generateAiDraft} disabled={locked || aiGenerated}>
-              {aiGenerated ? "AI Draft Generated (AI Disabled)" : "Generate AI Draft"}
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={clearDraft}
-              disabled={locked || text.length === 0}
-            >
-              Clear
-            </Button>
-            <span className="ml-auto text-sm text-gray-500">
-              {aiGenerated ? "You can edit now. AI is disabled." : "Generate the AI draft to begin."}
-            </span>
+          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
+            <p className="text-sm text-gray-600">
+              Generate an AI draft <span className="font-medium">once</span>, then edit freely. AI is disabled afterwards.
+            </p>
+
+            <div className="flex items-center gap-2 pt-4">
+              <Button onClick={generateAiDraft} disabled={locked || aiGenerated}>
+                {aiGenerated ? "AI Draft Generated (AI Disabled)" : "Generate AI Draft"}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={clearDraft}
+                disabled={locked || text.length === 0}
+              >
+                Clear
+              </Button>
+              <span className="ml-auto text-sm text-gray-500">
+                {aiGenerated ? "You can edit now. AI is disabled." : "Generate the AI draft to begin."}
+              </span>
+            </div>
           </div>
         </section>
 
