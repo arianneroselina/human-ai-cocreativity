@@ -27,8 +27,9 @@ export default function HumanWorkPage() {
 
   const submit = () => {
     setLocked(true);
-    console.log("[submitted]", { workflow: "human", length: text.length, words, text });
+    console.log("[submitted]", { workflow: "human", length: text.length, text });
     alert("Submitted (stub). Check console for payload.");
+    router.push("/result");
   };
 
   const submitDisabled = locked || text.trim().length === 0;
@@ -110,11 +111,7 @@ export default function HumanWorkPage() {
                   description="You won't be able to edit after submitting."
                   confirmLabel="Submit"
                   cancelLabel="Cancel"
-                  onConfirm={() => {
-                    setLocked(true);
-                    console.log("[submitted]", { workflow: "human", length: text.length, text });
-                    alert("Submitted (stub). Check console for payload.");
-                  }}
+                  onConfirm={submit}
                 />
               </div>
             </div>
