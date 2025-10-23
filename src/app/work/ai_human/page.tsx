@@ -5,13 +5,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import { ConfirmDialog } from "@/components/ui/confirm";
 import TaskDetails from "@/components/ui/taskDetails";
 import Header from "@/components/ui/header";
-
-function countWords(s: string) {
-  return s.trim() ? s.trim().split(/\s+/).length : 0;
-}
+import ConfirmDialog from "@/components/ui/confirm";
+import { countWords, checkWords } from "@/utils/check";
+import { submitData } from "@/utils/submit";
 
 export default function AIHumanWorkPage() {
   const router = useRouter();
@@ -23,6 +21,7 @@ export default function AIHumanWorkPage() {
   // readOnly until AI generates; afterward editable (unless locked)
   const readOnly = useMemo(() => locked || !aiGenerated, [locked, aiGenerated]);
   const words = countWords(text);
+  const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
   const generateAiDraft = () => {
     if (aiGenerated) return;
@@ -40,9 +39,7 @@ export default function AIHumanWorkPage() {
 
   const submit = () => {
     setLocked(true);
-    console.log("[submitted]", { workflow: "human", length: text.length, text });
-    alert("Submitted (stub). Check console for payload.");
-    router.push("/result");
+    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
   };
 
   const submitDisabled = locked || text.trim().length === 0 || !aiGenerated;

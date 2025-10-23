@@ -14,7 +14,7 @@ type ConfirmProps = {
   onConfirm?: () => void;
 };
 
-function ConfirmDialog({
+export default function ConfirmDialog({
                                 open,
                                 onOpenChange,
                                 title = "Are you sure?",
@@ -51,5 +51,3 @@ function ConfirmDialog({
     </Dialog>
   );
 }
-
-export { ConfirmDialog }

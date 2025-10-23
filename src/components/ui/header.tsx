@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { TimerBadge } from "@/components/shadcn_ui/timer";
-import { ConfirmDialog } from "@/components/ui/confirm";
+import ConfirmDialog from "@/components/ui/confirm";
 import {useState} from "react";
 
 interface HeaderProps {
