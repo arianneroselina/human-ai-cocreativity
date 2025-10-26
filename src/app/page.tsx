@@ -19,6 +19,7 @@ function DevResetButton() {
     (useExperiment as any).persist?.clearStorage?.();
     router.replace('/');
     send({ type: 'RESET' });
+    alert("Resetted.");
   };
 
   return (
