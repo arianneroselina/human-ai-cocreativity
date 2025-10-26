@@ -10,6 +10,5 @@ export function submitData(
   localStorage.setItem("meetsAvoidWords", JSON.stringify(meetsAvoidWords));
 
   console.log("[submitted]", { workflow: "human", length: text.length, text });
-
-  router.push("/result");
+  router.push("/submit");
 }

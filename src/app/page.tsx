@@ -1,128 +1,128 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/shadcn_ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/shadcn_ui/dialog";
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useExperiment } from '@/stores/useExperiment';
+import { Button } from '@/components/shadcn_ui/button';
+import { RotateCcw, Play, Loader2 } from 'lucide-react';
+import Progress from '@/components/ui/progress';
+import Rules from "@/components/ui/rules";
 
-type Workflow = "human" | "ai" | "human_ai" | "ai_human";
-
-const workflows: {
-  key: Workflow;
-  label: string;
-  title: string;
-  desc: string;
-  icon: string;
-}[] = [
-  { key: "human", label: "Human", title: "Human only", desc: "Write everything yourself. No AI involved.", icon: "✍️" },
-  { key: "ai", label: "AI", title: "AI only", desc: "Generate a single AI draft, then submit (read-only).", icon: "🤖" },
-  { key: "human_ai", label: "Human→AI", title: "You then AI", desc: "Write first, then AI edits once. Locks after AI.", icon: "🧠→🤖" },
-  { key: "ai_human", label: "AI→Human", title: "AI then you", desc: "Start with AI draft once, then you can edit.", icon: "🤖→🧠" },
-];
-
-export default function StartPage() {
-  const [choice, setChoice] = useState<Workflow>("human");
-  const [open, setOpen] = useState(false);
+function DevResetButton() {
+  const { send } = useExperiment();
   const router = useRouter();
 
-  const selected = workflows.find(w => w.key === choice)!;
+  const resetAll = () => {
+    (useExperiment as any).persist?.clearStorage?.();
+    router.replace('/');
+    send({ type: 'RESET' });
+  };
+
+  return (
+    <button
+      onClick={resetAll}
+      className="inline-flex items-center gap-2 text-xs rounded border px-2.5 py-1 hover:bg-gray-50"
+      title="Reset experiment state (dev only)"
+    >
+      <RotateCcw className="h-3.5 w-3.5" />
+      Reset
+    </button>
+  );
+}
+
+export default function Page() {
+  const router = useRouter();
+  const { run, send } = useExperiment();
+  const [starting, setStarting] = useState(false);
+
+  // Prefetch choose page to reduce visual delay
+  useEffect(() => {
+    router.prefetch?.('/choose');
+  }, [router]);
+
+  // Active session means user must Resume
+  const hasActiveSession = useMemo(
+    () => run.phase !== 'idle' && run.phase !== 'feedback',
+    [run.phase]
+  );
+
+  const resumeTarget = useMemo(() => {
+    if (starting) return null; // avoid flicker just after clicking Start
+    switch (run.phase) {
+      case 'choose_workflow': return '/choose';
+      case 'task':            return `/task/${run.workflow}`;
+      case 'submit':          return '/submit';
+      case 'feedback':        return '/feedback';
+      default:                return null;
+    }
+  }, [run.phase, run.workflow, starting]);
+
+  const start = () => {
+    setStarting(true);
+    send({ type: 'START_SESSION', totalTrials: 3 });
+    router.replace('/choose');
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <div className="mx-auto max-w-4xl p-6 space-y-4">
-        {/* Top title */}
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">Human–AI Co-Creativity</h1>
+      <Progress />
+      <div className="mx-auto max-w-4xl p-6 space-y-6">
+        {/* Header */}
+        <header className="text-center">
+          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+            Human–AI Co-Creativity
+          </h1>
           <p className="mt-1 text-sm text-slate-600">Experimental study interface</p>
-        </div>
+        </header>
 
-        {/* Hero */}
+        {/* Hero card */}
         <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-            Choose your workflow
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            You’ll confirm your choice before starting. Estimated duration: ~10 minutes.
-          </p>
-
-          {/* Selectable cards */}
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {workflows.map((w) => {
-              const active = w.key === choice;
-              return (
-                <button
-                  key={w.key}
-                  type="button"
-                  onClick={() => setChoice(w.key)}
-                  className={[
-                    "text-left rounded-lg border bg-white p-4 shadow-sm transition",
-                    active ? "border-sky-400 ring-2 ring-sky-200" : "hover:border-slate-300"
-                  ].join(" ")}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="text-xl">{w.icon}</div>
-                    <div>
-                      <div className="font-medium">{w.title}</div>
-                      <div className="text-sm text-slate-600">{w.desc}</div>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Tiny rules + Start */}
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <ul className="text-xs text-slate-500 list-disc pl-4">
-              <li>No personal data is collected.</li>
-              <li>You can’t change workflow after starting.</li>
-              <li>Please submit before time runs out.</li>
-            </ul>
-            <div className="ml-auto">
-              <Button onClick={() => setOpen(true)}>
-                Start with {selected.label}
-              </Button>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+                Start a new session
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Each session contains <span className="font-medium">3 trials</span>.
+              </p>
             </div>
+            <DevResetButton />
           </div>
-        </section>
 
-        {/* Help / info row */}
-        <section className="text-xs text-slate-500">
-          Need to switch later? Use “Change workflow” on the work page to come back here.
+          <Rules/>
+
+          {/* CTA row */}
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            {resumeTarget && (
+              <Button
+                variant="secondary"
+                onClick={() => router.replace(resumeTarget)}
+                className="inline-flex items-center gap-2"
+                title="Resume where you left off"
+              >
+                <Play className="h-4 w-4" />
+                Resume
+              </Button>
+            )}
+
+            <Button
+              onClick={start}
+              disabled={hasActiveSession || starting}
+              className="inline-flex items-center gap-2"
+              title={hasActiveSession ? "Session in progress — Resume instead" : "Start session"}
+            >
+              {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              Start session
+            </Button>
+
+            {hasActiveSession && (
+              <span className="ml-1 text-xs text-slate-500">
+                Session in progress — please <span className="font-medium">Resume</span>.
+              </span>
+            )}
+          </div>
         </section>
       </div>
-
-      {/* Confirm dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirm workflow</DialogTitle>
-          </DialogHeader>
-
-          <div className="rounded-lg border bg-white p-4">
-            <div className="flex items-start gap-3">
-              <div className="text-xl">{selected.icon}</div>
-              <div>
-                <div className="font-medium">{selected.title}</div>
-                <div className="text-sm text-slate-600">{selected.desc}</div>
-              </div>
-            </div>
-            <div className="mt-3 text-xs text-slate-500">
-              After you start, this choice will be locked for this session.
-            </div>
-          </div>
-
-          <DialogFooter className="mt-3">
-            <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={() => {
-              setOpen(false);
-              router.push(`/work/${choice}`);
-            }}>
-              Start now
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </main>
   );
 }

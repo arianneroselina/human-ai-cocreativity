@@ -4,13 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="52de9637-4256-4455-b646-8da426ca4c38" name="Changes" comment="start page and work pages">
+    <list default="true" id="52de9637-4256-4455-b646-8da426ca4c38" name="Changes" comment="local storage for checks, survey and feedback">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/work/ai/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/work/ai/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/work/ai_human/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/work/ai_human/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/work/human/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/work/human/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/work/human_ai/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/work/human_ai/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/result/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/feedback/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/work/ai/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/task/ai/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/work/ai_human/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/task/ai_human/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/work/human/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/task/human/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/work/human_ai/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/task/human_ai/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/header.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/header.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/check.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/check.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/submit.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/submit.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +33,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "arianneroselina"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/arianneroselina/human-ai-cocreativity.git",
+    "accountId": "f34e853b-6744-4a69-a1d6-2ba37f92291b"
+  }
+}]]></component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 4
@@ -50,6 +68,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "npm.Next.js: server-side.executor": "Run",
     "ts.external.directory.path": "C:\\DATA\\TU Darmstadt\\Master\\Masterarbeit\\human-ai-cocreativity\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -59,9 +78,10 @@
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\app\work" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\lib" />
+      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src" />
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\app\start" />
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src\components\ui" />
-      <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity\src" />
       <recent name="C:\DATA\TU Darmstadt\Master\Masterarbeit\human-ai-cocreativity" />
     </key>
   </component>
@@ -95,6 +115,7 @@
       <option name="presentableId" value="Default" />
       <updated>1761160002583</updated>
       <workItem from="1761160004364" duration="42000" />
+      <workItem from="1761489467595" duration="10146000" />
     </task>
     <task id="LOCAL-00001" summary="finish setting up next and tailwind">
       <option name="closed" value="true" />

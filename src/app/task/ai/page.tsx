@@ -8,50 +8,56 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails from "@/components/ui/taskDetails";
 import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
-import { countWords, checkWords } from "@/utils/check";
-import { submitData } from "@/utils/submit";
+import { countWords, checkWords } from "@/lib/check";
+import { submitData } from "@/lib/submit";
+import { usePreventBack } from "@/lib/usePreventBack";
+import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
+import { useExperiment } from "@/stores/useExperiment";
+import {useRouteGuard} from "@/lib/useRouteGuard";
+import Rules from "@/components/ui/rules";
 
-export default function HumanAIWorkPage() {
+export default function AIPage() {
+  useRouteGuard(['task']);
+  useWorkflowGuard();
+  usePreventBack(true);
+
+  const { run, send } = useExperiment();
   const router = useRouter();
+
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
-  const [aiEdited, setAiEdited] = useState(false);
+  const [aiUsed, setAiUsed] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
-  const readOnly = useMemo(() => locked || aiEdited, [locked, aiEdited]);
+  const readOnly = useMemo(() => true, []);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
-  const askAIToEdit = () => {
-    if (aiEdited) return;
-    if (!text.trim()) {
-      alert("Please write something first before asking AI to edit.");
-      return;
-    }
-    const edited = [
-      "AI Edit — Revised Draft",
+  const generateAiDraft = () => {
+    if (aiUsed) return;
+    const draft = [
+      "AI Draft — Outline",
+      "1) Hook the reader with a compelling opener.",
+      "2) Develop the main argument with 2–3 supporting points.",
+      "3) End with a crisp, memorable conclusion.",
       "",
-      text.trim(),
-      "",
-      "— Suggested improvements: clarify the hook, tighten transitions, add a concrete example."
+      "Tip: Keep sentences active and specific.",
     ].join("\n");
-    setText(edited);
-    setAiEdited(true); // lock editor
+    setText(draft);
+    setAiUsed(true);
   };
-
-  const clearDraft = () => setText("");
 
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
+    send({ type: 'SUBMIT_TRIAL' });
   };
 
-  const submitDisabled = locked || text.trim().length === 0 || !aiEdited;
+  const submitDisabled = locked || !aiUsed || text.trim().length === 0;
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Sticky Header */}
-      <Header workflow="Human → AI"/>
+      <Header workflow="AI only" trial={run.trialIndex}/>
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
@@ -61,34 +67,25 @@ export default function HumanAIWorkPage() {
         <section className="mt-4">
           <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
             <p className="text-sm text-gray-600">
-              Write first. Then ask AI to edit <span className="font-medium">once</span>. After AI edits, editing is locked.
+              Generate a single AI draft and <span className="font-medium">submit without editing</span>.
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={askAIToEdit} disabled={locked || aiEdited || text.trim().length === 0}>
-                {aiEdited ? "AI Edit Applied (Locked)" : "Ask AI to Edit"}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={clearDraft}
-                disabled={locked || text.length === 0 || aiEdited}
-              >
-                Clear
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
+                {aiUsed ? "AI Draft Generated" : "Generate AI Draft"}
               </Button>
               <span className="ml-auto text-sm text-gray-500">
-                {aiEdited ? "AI edited your text. Editing is locked." : "Write your draft, then ask AI to edit."}
+                {aiUsed ? "Review the AI draft and submit." : "Generate the AI draft to proceed."}
               </span>
             </div>
           </div>
         </section>
 
-        {/* Editor */}
+        {/* Editor (read-only) */}
         <section className="mt-4">
           <div className="rounded-lg border bg-white p-4 shadow-sm">
             <div className="mb-2 flex items-center justify-between">
-              <Label htmlFor="draft" className="text-sm font-medium">
-                {aiEdited ? "AI-edited draft (locked)" : "Your draft"}
-              </Label>
+              <Label htmlFor="draft" className="text-sm font-medium">AI draft (read-only)</Label>
               <span className="text-xs text-gray-500">
                 {words} words • {text.length} chars
               </span>
@@ -97,12 +94,14 @@ export default function HumanAIWorkPage() {
               id="draft"
               rows={14}
               value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder="Write here… then click 'Ask AI to Edit'."
+              onChange={() => {}}
+              placeholder="Click 'Generate AI Draft' to see the output…"
               readOnly={readOnly}
-              className={readOnly ? "bg-gray-100" : ""}
+              className="bg-gray-100"
             />
-            <div className="mt-3 flex items-center justify-end gap-2">
+            <div className="mt-3 flex items-center justify-between gap-2">
+              <Rules/>
+
               <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                 Submit
               </Button>
@@ -119,10 +118,6 @@ export default function HumanAIWorkPage() {
             </div>
           </div>
         </section>
-
-        <footer className="mt-6 text-center text-xs text-gray-400">
-          Prototype UI — no data is saved yet.
-        </footer>
       </div>
     </main>
   );

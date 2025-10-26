@@ -8,11 +8,22 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails from "@/components/ui/taskDetails";
 import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
-import { countWords, checkWords } from "@/utils/check";
-import { submitData } from "@/utils/submit";
+import { countWords, checkWords } from "@/lib/check";
+import { submitData } from "@/lib/submit";
+import { usePreventBack } from "@/lib/usePreventBack";
+import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
+import { useExperiment } from "@/stores/useExperiment";
+import {useRouteGuard} from "@/lib/useRouteGuard";
+import Rules from "@/components/ui/rules";
 
 export default function AIHumanWorkPage() {
+  useRouteGuard(['task']);
+  useWorkflowGuard();
+  usePreventBack(true);
+
+  const { run, send } = useExperiment();
   const router = useRouter();
+
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
   const [aiGenerated, setAiGenerated] = useState(false);
@@ -40,14 +51,14 @@ export default function AIHumanWorkPage() {
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
+    send({ type: 'SUBMIT_TRIAL' });
   };
 
   const submitDisabled = locked || text.trim().length === 0 || !aiGenerated;
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Sticky Header */}
-      <Header workflow="AI → Human"/>
+      <Header workflow="AI → Human" trial={run.trialIndex}/>
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
@@ -99,6 +110,8 @@ export default function AIHumanWorkPage() {
               className={readOnly ? "bg-gray-100" : ""}
             />
             <div className="mt-3 flex items-center justify-end gap-2">
+              <Rules/>
+
               <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                 Submit
               </Button>
@@ -115,10 +128,6 @@ export default function AIHumanWorkPage() {
             </div>
           </div>
         </section>
-
-        <footer className="mt-6 text-center text-xs text-gray-400">
-          Prototype UI — no data is saved yet.
-        </footer>
       </div>
     </main>
   );

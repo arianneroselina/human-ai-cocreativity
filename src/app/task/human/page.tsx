@@ -8,11 +8,22 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails from "@/components/ui/taskDetails";
 import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
-import { countWords, checkWords } from "@/utils/check";
-import { submitData } from "@/utils/submit";
+import { countWords, checkWords } from "@/lib/check";
+import { submitData } from "@/lib/submit";
+import { usePreventBack } from "@/lib/usePreventBack";
+import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
+import { useExperiment } from "@/stores/useExperiment";
+import {useRouteGuard} from "@/lib/useRouteGuard";
+import Rules from "@/components/ui/rules";
 
-export default function HumanWorkPage() {
+export default function HumanPage() {
+  useRouteGuard(['task']);
+  useWorkflowGuard();
+  usePreventBack(true);
+
+  const { run, send } = useExperiment();
   const router = useRouter();
+
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
@@ -26,14 +37,14 @@ export default function HumanWorkPage() {
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
+    send({ type: 'SUBMIT_TRIAL' });
   };
 
   const submitDisabled = locked || text.trim().length === 0;
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <Header workflow="Human only"/>
+      <Header workflow="Human only" trial={run.trialIndex}/>
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
@@ -67,9 +78,8 @@ export default function HumanWorkPage() {
               className={readOnly ? "bg-gray-100" : ""}
             />
             <div className="mt-3 flex items-center justify-between gap-2">
-              <span className="text-xs text-gray-500">
-                {locked ? "Locked: time is up or already submitted." : "Editing enabled."}
-              </span>
+              <Rules/>
+
               <div className="flex gap-2">
                 <Button
                   variant="secondary"
@@ -96,10 +106,6 @@ export default function HumanWorkPage() {
             </div>
           </div>
         </section>
-
-        <footer className="mt-6 text-center text-xs text-gray-400">
-          Prototype UI — no data is saved yet.
-        </footer>
       </div>
     </main>
   );
