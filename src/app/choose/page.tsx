@@ -6,22 +6,9 @@ import Progress from '@/components/ui/progress';
 import { Button } from "@/components/shadcn_ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/shadcn_ui/dialog";
 import { useExperiment } from '@/stores/useExperiment';
-import type { Workflow } from '@/lib/experiment';
+import { Workflow, Workflows } from '@/lib/experiment';
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
-
-const workflows: Array<{
-  key: Workflow;
-  label: string;
-  title: string;
-  desc: string;
-  icon: string;
-}> = [
-  { key: "human", label: "Human", title: "Human only", desc: "Write everything yourself. No AI involved.", icon: "✍️" },
-  { key: "ai", label: "AI", title: "AI only", desc: "Generate a single AI draft, then submit (read-only).", icon: "🤖" },
-  { key: "human_ai", label: "Human→AI", title: "You then AI", desc: "Write first, then AI edits once. Locks after AI.", icon: "🧠→🤖" },
-  { key: "ai_human", label: "AI→Human", title: "AI then you", desc: "Start with AI draft once, then you can edit.", icon: "🤖→🧠" },
-];
 
 export default function Choose() {
   useRouteGuard(['choose_workflow']);
@@ -30,7 +17,7 @@ export default function Choose() {
   const [choice, setChoice] = useState<Workflow>("human");
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const selected = workflows.find(w => w.key === choice)!;
+  const selected = Workflows.find(w => w.key === choice)!;
 
   const pick = (wf: Workflow) => {
     setChoice(wf)
@@ -63,7 +50,7 @@ export default function Choose() {
 
           {/* Selectable cards */}
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {workflows.map((w) => {
+            {Workflows.map((w) => {
               const active = w.key === choice;
               return (
                 <button
