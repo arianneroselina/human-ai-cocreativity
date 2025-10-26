@@ -1,146 +1,306 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { useRouteGuard } from "@/lib/useRouteGuard";
+import { useExperiment } from "@/stores/useExperiment";
+import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, RefreshCw, ChevronDown } from "lucide-react";
+import { Workflow, Workflows } from "@/lib/experiment";
+
+type Likert = 1 | 2 | 3 | 4 | 5;
 
 export default function FeedbackPage() {
-  useRouteGuard(['feedback']);
+  useRouteGuard(["feedback"]);
 
-  const [satisfaction, setSatisfaction] = useState<number | null>(null);
-  const [clarity, setClarity] = useState<number | null>(null);
-  const [workflowRating, setWorkflowRating] = useState<number | null>(null);
-  const [recommendation, setRecommendation] = useState<number | null>(null);
+  const router = useRouter();
+  const { run, send } = useExperiment();
+
+  const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
+  const [clarity, setClarity] = useState<Likert | null>(null);
+  const [recommendation, setRecommendation] = useState<Likert | null>(null);
+  const [workflowBest, setWorkflowBest] = useState<Workflow | null>(null);
   const [feedback, setFeedback] = useState("");
 
-  const handleFeedbackChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFeedback(e.target.value);
+  const [submitted, setSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const canSubmit =
+    satisfaction !== null &&
+    clarity !== null &&
+    recommendation !== null &&
+    workflowBest !== null;
+
+  const sessionCode = useMemo(() => run.sessionId ?? "—", [run.sessionId]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(sessionCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
   };
 
-  const handleSubmit = () => {
-    console.log("Survey submitted:", { satisfaction, clarity, workflowRating, recommendation, feedback });
-    alert("Thank you for your feedback!");
+  const handleDownload = () => {
+    const payload = {
+      sessionId: run.sessionId,
+      participantId: run.participantId,
+      totalTrials: run.totalTrials,
+      submittedAt: new Date().toISOString(),
+      feedback: {
+        satisfaction,
+        clarity,
+        recommendation,
+        workflowBest,
+        comments: feedback || null,
+      },
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `study-receipt-${run.sessionId ?? "session"}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
+
+  const handleSubmit = async () => {
+    // (Optional) Call your /api/rating endpoint here later
+    // await fetch('/api/rating', {...})
+
+    console.log("Survey submitted:", {
+      sessionId: run.sessionId,
+      satisfaction,
+      clarity,
+      recommendation,
+      workflowBest,
+      feedback,
+    });
+    setSubmitted(true);
+  };
+
+  const startNew = () => {
+    // Clear store & persisted state, then go home
+    (useExperiment as any).persist?.clearStorage?.();
+    send({ type: "RESET" });
+    router.replace("/");
+  };
+
+  // Likert helper
+  const LikertRow = ({
+                       label,
+                       value,
+                       onChange,
+                       left = "Very low",
+                       right = "Very high",
+                     }: {
+    label: string;
+    value: Likert | null;
+    onChange: (v: Likert) => void;
+    left?: string;
+    right?: string;
+  }) => (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-sm text-gray-700">{label}</span>
+        <div className="text-[11px] text-gray-500">{value ?? "—"}</div>
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] text-gray-500">{left}</span>
+        <div className="flex-1 grid grid-cols-5 gap-2">
+          {[1, 2, 3, 4, 5].map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => onChange(v as Likert)}
+              aria-pressed={value === v}
+              className={[
+                "h-9 rounded-md border text-sm",
+                value === v
+                  ? "border-black bg-black text-white"
+                  : "border-gray-300 hover:bg-gray-50",
+              ].join(" ")}
+            >
+              {v}
+            </button>
+          ))}
+        </div>
+        <span className="text-[11px] text-gray-500">{right}</span>
+      </div>
+    </div>
+  );
+
+  if (submitted) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+        <div className="mx-auto max-w-3xl p-6">
+          <section className="rounded-xl border bg-white p-6 shadow-sm">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="h-6 w-6 text-green-600 mt-0.5" />
+              <div className="flex-1">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Thank you for your feedback!
+                </h1>
+                <p className="mt-1 text-sm text-gray-600">
+                  Your responses were recorded. Below are a few options for your records.
+                </p>
+
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Button
+                    variant="secondary"
+                    onClick={handleCopy}
+                    className="inline-flex items-center gap-2"
+                    title="Copy anonymous session code"
+                  >
+                    {copied ? (
+                      <>
+                        <ClipboardCheck className="h-4 w-4" />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Clipboard className="h-4 w-4" />
+                        Copy session code
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={handleDownload}
+                    className="inline-flex items-center gap-2"
+                    title="Download a JSON receipt"
+                  >
+                    <FileDown className="h-4 w-4" />
+                    Download receipt
+                  </Button>
+                  <Button
+                    onClick={startNew}
+                    className="inline-flex items-center gap-2"
+                    title="Start a new session"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Start new session
+                  </Button>
+                </div>
+
+                <details className="mt-6 group">
+                  <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-gray-700 hover:underline">
+                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                    Debrief & what happens next
+                  </summary>
+                  <div className="mt-3 text-sm text-gray-700">
+                    <p>
+                      We’re studying how people collaborate with AI under time limits and how this affects
+                      efficiency, quality, and trust. In some conditions, AI responses may intentionally include minor
+                      mistakes to study trust dynamics.
+                    </p>
+                    <p className="mt-2">
+                      If you have questions or want to withdraw your data, contact the study team with your session code:
+                      <span className="ml-1 font-mono text-xs bg-gray-100 px-1 py-0.5 rounded">{sessionCode}</span>.
+                    </p>
+                  </div>
+                </details>
+
+                <p className="mt-6 text-xs text-gray-400">
+                  ❤ Thanks again for helping research in Human-AI Co-Creativity.
+                </p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="mx-auto max-w-4xl p-6">
         {/* Header */}
         <header className="mb-6 text-center">
-          <h1 className="text-3xl font-semibold">Final Feedback</h1>
-          <p className="text-sm text-gray-600 mt-2">Tell us about your experience.</p>
+          <h1 className="text-3xl font-semibold">Final feedback</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Thanks for completing all {run.totalTrials} trials. A few short questions:
+          </p>
         </header>
 
-        {/* Survey */}
-        <section className="rounded-xl border bg-white p-6 shadow-md mb-6">
-          <h2 className="font-semibold text-xl text-gray-800">Your Feedback</h2>
-          <p className="text-sm text-gray-600 mt-4">Please answer the following questions about your experience:</p>
+        {/* Feedback form */}
+        <section className="rounded-xl border bg-white p-6 shadow-sm">
+          <h2 className="font-semibold text-xl text-gray-800">Your experience</h2>
+          <p className="text-sm text-gray-600 mt-2">
+            Please rate and tell us which workflow worked best for you.
+          </p>
 
           <div className="mt-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 w-1/3">1. How satisfied were you with the task?</span>
-              <div className="flex gap-4 w-2/3">
-                {[5, 4, 3, 2, 1].map(value => (
-                  <label key={value} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="satisfaction"
-                      value={value}
-                      onChange={() => setSatisfaction(value)}
-                      checked={satisfaction === value}
-                      className="text-gray-600"
-                    />
-                    <span className="text-sm">
-                      {value === 1 ? "Very Satisfied" : value === 2 ? "Satisfied" : value === 3 ? "Neutral" : value === 4 ? "Dissatisfied" : "Very Dissatisfied"}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 w-1/3">2. Was the task clear and easy to follow?</span>
-              <div className="flex gap-4 w-2/3">
-                {[5, 4, 3, 2, 1].map(value => (
-                  <label key={value} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="clarity"
-                      value={value}
-                      onChange={() => setClarity(value)}
-                      checked={clarity === value}
-                      className="text-gray-600"
-                    />
-                    <span className="text-sm">
-                      {value === 1 ? "Very Clear" : value === 2 ? "Clear" : value === 3 ? "Neutral" : value === 4 ? "Unclear" : "Very Unclear"}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 w-1/3">3. Which workflow did you find most useful?</span>
-              <div className="flex gap-4 w-2/3">
-                {[5, 4, 3, 2, 1].map(value => (
-                  <label key={value} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="workflowRating"
-                      value={value}
-                      onChange={() => setWorkflowRating(value)}
-                      checked={workflowRating === value}
-                      className="text-gray-600"
-                    />
-                    <span className="text-sm">
-                      {value === 5 ? "Human Only" : value === 4 ? "AI Only" : value === 3 ? "Human → AI" : value === 2 ? "AI → Human" : "Not Sure"}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600 w-1/3">4. How likely are you to recommend this task to others?</span>
-              <div className="flex gap-4 w-2/3">
-                {[5, 4, 3, 2, 1].map(value => (
-                  <label key={value} className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="recommendation"
-                      value={value}
-                      onChange={() => setRecommendation(value)}
-                      checked={recommendation === value}
-                      className="text-gray-600"
-                    />
-                    <span className="text-sm">
-                      {value === 1 ? "Very Likely" : value === 2 ? "Likely" : value === 3 ? "Neutral" : value === 4 ? "Unlikely" : "Very Unlikely"}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-6">
-            <label htmlFor="feedback" className="block text-sm text-gray-600">Additional comments</label>
-            <input
-              id="feedback"
-              type="text"
-              className="mt-2 w-full p-3 border border-gray-300 rounded-lg"
-              placeholder="Enter your comments here..."
-              value={feedback}
-              onChange={handleFeedbackChange}
+            <LikertRow
+              label="1) Overall satisfaction"
+              value={satisfaction}
+              onChange={setSatisfaction}
+              left="Very dissatisfied"
+              right="Very satisfied"
             />
+
+            <LikertRow
+              label="2) Task clarity"
+              value={clarity}
+              onChange={setClarity}
+              left="Very unclear"
+              right="Very clear"
+            />
+
+            <LikertRow
+              label="3) Likely to recommend similar tasks"
+              value={recommendation}
+              onChange={setRecommendation}
+              left="Very unlikely"
+              right="Very likely"
+            />
+
+            {/* Workflow picker */}
+            <div className="space-y-2">
+              <div className="text-sm text-gray-700">4) Which workflow felt most useful?</div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {Workflows.map((w) => {
+                  const active = workflowBest === w.key;
+                  return (
+                    <button
+                      key={w.key}
+                      type="button"
+                      onClick={() => setWorkflowBest(w.key)}
+                      aria-pressed={active}
+                      className={[
+                        "rounded-md border px-3 py-2 text-sm text-left",
+                        active
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 hover:bg-gray-50",
+                      ].join(" ")}
+                    >
+                      <div className="font-medium">{w.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Comments */}
+            <div className="space-y-2">
+              <label htmlFor="feedback" className="block text-sm text-gray-700">
+                Additional comments (optional)
+              </label>
+              <input
+                id="feedback"
+                type="text"
+                className="w-full rounded-lg border border-gray-300 p-3 text-sm"
+                placeholder="Anything that stood out, suggestions, etc."
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+            </div>
           </div>
 
-          <div className="flex justify-center mt-6">
-            <Button
-              onClick={handleSubmit}
-              disabled={satisfaction === null || clarity === null || workflowRating === null || recommendation === null}
-            >
-              Submit Feedback
-            </Button>
+          <div className="mt-6 flex justify-center">
+            <Button onClick={handleSubmit} disabled={!canSubmit}>Submit feedback</Button>
           </div>
         </section>
       </div>

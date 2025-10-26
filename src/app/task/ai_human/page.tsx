@@ -109,7 +109,7 @@ export default function AIHumanWorkPage() {
               readOnly={readOnly}
               className={readOnly ? "bg-gray-100" : ""}
             />
-            <div className="mt-3 flex items-center justify-end gap-2">
+            <div className="mt-3 flex items-center justify-between gap-2">
               <Rules/>
 
               <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
