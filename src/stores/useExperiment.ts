@@ -7,7 +7,7 @@ import { Workflow } from "@/lib/experiment";
 
 type Event =
   | { type: 'START_SESSION'; totalTrials?: number }
-  | { type: 'SELECT_WORKFLOW'; workflow: Workflow; taskId?: string }
+  | { type: 'SELECT_WORKFLOW'; workflow: Workflow }
   | { type: 'LOCK_WORKFLOW' }
   | { type: 'SUBMIT_TRIAL' }
   | { type: 'NEXT_TRIAL' }
@@ -66,7 +66,6 @@ export const useExperiment = create<Store>()(
                 s.phase = 'choose_workflow';
                 s.locked = false;
                 s.workflow = undefined;
-                s.taskId = undefined; // you’ll assign when selecting the workflow
               }
               return { run: s };
             }
@@ -74,7 +73,6 @@ export const useExperiment = create<Store>()(
             case 'SELECT_WORKFLOW': {
               if (state.can('SELECT_WORKFLOW')) {
                 s.workflow = event.workflow;
-                s.taskId = event.taskId ?? s.taskId ?? `task-${s.trialIndex}`;
                 // still in choose_workflow; user can review once before locking
               }
               return { run: s };
@@ -102,7 +100,6 @@ export const useExperiment = create<Store>()(
                   s.phase = 'choose_workflow';
                   s.locked = false;
                   s.workflow = undefined;
-                  s.taskId = undefined;
                 } else {
                   // safety: if someone presses next after last, finish
                   s.phase = 'feedback';

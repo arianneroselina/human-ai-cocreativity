@@ -19,7 +19,7 @@ export default function FeedbackPage() {
   const [clarity, setClarity] = useState<Likert | null>(null);
   const [recommendation, setRecommendation] = useState<Likert | null>(null);
   const [workflowBest, setWorkflowBest] = useState<Workflow | null>(null);
-  const [feedback, setFeedback] = useState("");
+  const [comment, setComment] = useState("");
 
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -51,7 +51,7 @@ export default function FeedbackPage() {
         clarity,
         recommendation,
         workflowBest,
-        comments: feedback || null,
+        comments: comment || null,
       },
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -66,8 +66,21 @@ export default function FeedbackPage() {
   };
 
   const handleSubmit = async () => {
-    // (Optional) Call your /api/rating endpoint here later
-    // await fetch('/api/rating', {...})
+    setSubmitted(true);
+
+    const { run } = useExperiment.getState();
+    await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: run.sessionId,
+        satisfaction,
+        clarity,
+        recommendation,
+        workflowBest,
+        comment,
+      }),
+    });
 
     console.log("Survey submitted:", {
       sessionId: run.sessionId,
@@ -75,9 +88,8 @@ export default function FeedbackPage() {
       clarity,
       recommendation,
       workflowBest,
-      feedback,
+      comment,
     });
-    setSubmitted(true);
   };
 
   const startNew = () => {
@@ -240,16 +252,16 @@ export default function FeedbackPage() {
 
             {/* Comments */}
             <div className="space-y-2">
-              <label htmlFor="feedback" className="block text-sm text-gray-700">
+              <label htmlFor="comment" className="block text-sm text-gray-700">
                 Additional comments (optional)
               </label>
               <input
-                id="feedback"
+                id="comment"
                 type="text"
                 className="w-full rounded-lg border border-gray-300 p-3 text-sm"
                 placeholder="Anything that stood out, suggestions, etc."
-                value={feedback}
-                onChange={(e) => setFeedback(e.target.value)}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
               />
             </div>
           </div>

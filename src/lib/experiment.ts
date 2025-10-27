@@ -9,7 +9,6 @@ export interface ExperimentRun {
   totalTrials: number;
   trialIndex: number;      // 1-based
   workflow?: Workflow;     // chosen for the *current* trial
-  taskId?: string;         // current task
   phase: Phase;
   locked: boolean;         // once true, workflow cannot be changed this trial
 }

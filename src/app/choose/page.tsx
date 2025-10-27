@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Progress from '@/components/ui/progress';
 import { Button } from "@/components/shadcn_ui/button";
@@ -21,14 +21,37 @@ export default function Choose() {
 
   const pick = (wf: Workflow) => {
     setChoice(wf)
-    send({ type: 'SELECT_WORKFLOW', workflow: wf, taskId: `task-${run.trialIndex}` });
+    send({ type: 'SELECT_WORKFLOW', workflow: wf });
   }
-  const startTrial = () => {
+
+  const startTrial = async () => {
     setOpen(false);
-    router.push(`/task/${choice}`);
     send({ type: 'LOCK_WORKFLOW' });
+    router.push(`/task/${choice}`);
+
+    const { run } = useExperiment.getState();
+    await fetch('/api/trial/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: run.sessionId,
+        trialIndex: run.trialIndex,
+        workflow: run.workflow,
+      }),
+    });
+
+    console.log("Trial started:", {
+      sessionId: run.sessionId,
+      trialIndex: run.trialIndex,
+      workflow: run.workflow,
+    });
   };
 
+  useEffect(() => {
+    setChoice(choice)
+    send({ type: 'SELECT_WORKFLOW', workflow: choice });
+  }, [choice, run.trialIndex, send]);
+  
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <Progress />

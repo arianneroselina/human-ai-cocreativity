@@ -62,10 +62,27 @@ export default function Page() {
     }
   }, [run.phase, run.workflow, starting]);
 
-  const start = () => {
+  const start = async () => {
     setStarting(true);
     send({ type: 'START_SESSION', totalTrials: 3 }); // fixed to 3 (pilot)
     router.replace('/choose');
+
+    const { run } = useExperiment.getState();
+    await fetch('/api/session/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        participantId: run.participantId,
+        sessionId: run.sessionId,
+        totalTrials: run.totalTrials,
+      }),
+    }).catch(console.error);
+
+    console.log("Starting session:", {
+      participantId: run.participantId,
+      sessionId: run.sessionId,
+      totalTrials: run.totalTrials,
+    });
   };
 
   return (
