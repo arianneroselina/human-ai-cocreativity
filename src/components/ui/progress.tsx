@@ -27,7 +27,7 @@ export default function Progress() {
   if (run.phase === 'idle') return null;
 
   return (
-    <div className="w-full max-w-3xl mx-auto mt-4">
+    <div className="w-full max-w-3xl mx-auto mt-4 px-4">
       <div className="flex items-center justify-between text-sm">
         <span>Trial {run.trialIndex} / {run.totalTrials}</span>
         <span>{pct}%</span>
