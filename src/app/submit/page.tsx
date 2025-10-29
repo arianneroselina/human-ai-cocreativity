@@ -7,6 +7,7 @@ import { useRouteGuard } from '@/lib/useRouteGuard';
 import Progress from '@/components/ui/progress';
 import { Button } from '@/components/shadcn_ui/button';
 import { CheckCircle2, Timer as TimerIcon, ArrowRight, Trophy, Loader2, ClipboardList } from 'lucide-react';
+import Header from "@/components/ui/header";
 
 export default function AfterTrial() {
   useRouteGuard(['submit']);
@@ -75,7 +76,9 @@ export default function AfterTrial() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <Header workflow="" trial={0}/>
       <Progress />
+
       <div className="mx-auto max-w-3xl p-6">
         <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
           <div className="flex items-start gap-3">
@@ -120,7 +123,7 @@ export default function AfterTrial() {
                 </div>
 
                 <div className="ml-auto flex items-center gap-2">
-                  <Button onClick={next} className="inline-flex items-center gap-2" disabled={navigating}>
+                  <Button onClick={next} className="inline-flex items-center gap-2 bg-[var(--purple)]" disabled={navigating}>
                     {navigating ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : finishing ? (

@@ -15,6 +15,7 @@ import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
 import {useRouteGuard} from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
+import Progress from "@/components/ui/progress";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
@@ -59,6 +60,7 @@ export default function AIHumanWorkPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <Header workflow="AI → Human" trial={run.trialIndex}/>
+      <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}

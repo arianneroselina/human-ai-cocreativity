@@ -8,6 +8,8 @@ import { useExperiment } from "@/stores/useExperiment";
 import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, RefreshCw, ChevronDown } from "lucide-react";
 import { Workflow, Workflows } from "@/lib/experiment";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
+import Header from "@/components/ui/header";
+import Progress from "@/components/ui/progress";
 
 export default function FeedbackPage() {
   useRouteGuard(["feedback"]);
@@ -102,6 +104,8 @@ export default function FeedbackPage() {
   if (submitted) {
     return (
       <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+        <Header workflow="" trial={0}/>
+
         <div className="mx-auto max-w-3xl p-6">
           <section className="rounded-xl border bg-white p-6 shadow-sm">
             <div className="flex items-start gap-3">
@@ -144,7 +148,7 @@ export default function FeedbackPage() {
                   </Button>
                   <Button
                     onClick={startNew}
-                    className="inline-flex items-center gap-2"
+                    className="inline-flex items-center gap-2 bg-[var(--purple)]"
                     title="Start a new session"
                   >
                     <RefreshCw className="h-4 w-4" />
@@ -267,7 +271,9 @@ export default function FeedbackPage() {
           </div>
 
           <div className="mt-6 flex justify-center">
-            <Button onClick={handleSubmit} disabled={!canSubmit}>Submit feedback</Button>
+            <Button onClick={handleSubmit} disabled={!canSubmit} className="bg-[var(--purple)]">
+              Submit feedback
+            </Button>
           </div>
         </section>
       </div>

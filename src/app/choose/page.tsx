@@ -9,6 +9,7 @@ import { useExperiment } from '@/stores/useExperiment';
 import { Workflow, Workflows } from '@/lib/experiment';
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
+import Header from "@/components/ui/header";
 
 export default function Choose() {
   useRouteGuard(['choose_workflow']);
@@ -54,14 +55,10 @@ export default function Choose() {
   
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <Header workflow={""} trial={0}/>
       <Progress />
-      <div className="mx-auto max-w-4xl p-6 space-y-4">
-        {/* Top title */}
-        <div className="text-center">
-          <h1 className="text-3xl font-semibold tracking-tight">Human–AI Co-Creativity</h1>
-          <p className="mt-1 text-sm text-slate-600">Experimental study interface</p>
-        </div>
 
+      <div className="mx-auto max-w-4xl p-6 space-y-4">
         {/* Hero */}
         <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
@@ -99,7 +96,7 @@ export default function Choose() {
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Rules/>
             <div className="ml-auto">
-              <Button onClick={() => setOpen(true)}>
+              <Button onClick={() => setOpen(true)} className="bg-[var(--purple)]">
                 Start with {selected.label}
               </Button>
             </div>
@@ -129,7 +126,7 @@ export default function Choose() {
 
           <DialogFooter className="mt-3">
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={startTrial}>Start now</Button>
+            <Button onClick={startTrial} className="bg-[var(--purple)]">Start now</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

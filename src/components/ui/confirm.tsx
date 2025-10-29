@@ -24,7 +24,7 @@ export default function ConfirmDialog({
                                 onConfirm,
                               }: ConfirmProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
@@ -43,6 +43,7 @@ export default function ConfirmDialog({
               onOpenChange(false);
               onConfirm?.();
             }}
+            className="bg-[var(--purple)]"
           >
             {confirmLabel}
           </Button>

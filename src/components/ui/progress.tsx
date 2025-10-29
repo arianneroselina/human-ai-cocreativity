@@ -33,7 +33,7 @@ export default function Progress() {
         <span>{pct}%</span>
       </div>
       <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-full bg-black" style={{ width: `${pct}%` }} />
+        <div className="h-full bg-[var(--purple)]" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

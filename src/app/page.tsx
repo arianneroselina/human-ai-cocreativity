@@ -10,6 +10,7 @@ import { Workflows } from "@/lib/experiment";
 import {
   RotateCcw, Play, Loader2, ArrowLeftRight, Users, Timer as TimerIcon, ClipboardList, ShieldCheck, EyeOff,
 } from 'lucide-react';
+import Header from "@/components/ui/header";
 
 function DevResetButton() {
   const { send } = useExperiment();
@@ -87,17 +88,10 @@ export default function Page() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+      <Header workflow={""} trial={0}/>
       <Progress />
 
       <div className="mx-auto max-w-5xl p-6 space-y-6">
-        {/* Header */}
-        <header className="text-center">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-            Human–AI Co-Creativity
-          </h1>
-          <p className="mt-1 text-sm text-slate-600">Experimental study interface</p>
-        </header>
-
         {/* Hero / Start card */}
         <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -131,7 +125,7 @@ export default function Page() {
             <Button
               onClick={start}
               disabled={hasActiveSession || starting}
-              className="inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 bg-[#632E62]"
               title={hasActiveSession ? "Session in progress — Resume instead" : "Start session"}
             >
               {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}

@@ -15,6 +15,7 @@ import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
 import {useRouteGuard} from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
+import Progress from "@/components/ui/progress";
 
 export default function HumanPage() {
   useRouteGuard(['task']);
@@ -45,6 +46,7 @@ export default function HumanPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <Header workflow="Human only" trial={run.trialIndex}/>
+      <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
@@ -89,7 +91,7 @@ export default function HumanPage() {
                   Clear
                 </Button>
 
-                <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
+                <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
                   Submit
                 </Button>
 

@@ -15,6 +15,7 @@ import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
 import {useRouteGuard} from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
+import Progress from "@/components/ui/progress";
 
 export default function AIPage() {
   useRouteGuard(['task']);
@@ -58,6 +59,7 @@ export default function AIPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <Header workflow="AI only" trial={run.trialIndex}/>
+      <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
@@ -71,7 +73,7 @@ export default function AIPage() {
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed} className="bg-[var(--purple)]">
                 {aiUsed ? "AI Draft Generated" : "Generate AI Draft"}
               </Button>
               <span className="ml-auto text-sm text-gray-500">
@@ -102,7 +104,7 @@ export default function AIPage() {
             <div className="mt-3 flex items-center justify-between gap-2">
               <Rules/>
 
-              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
+              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
                 Submit
               </Button>
 
