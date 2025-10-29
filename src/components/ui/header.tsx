@@ -57,7 +57,7 @@ export default function Header({ workflow, trial }: HeaderProps) {
 
           <div className="text-center">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
-              Human–AI Co-Creativity
+              Human-AI Co-Creativity
             </h1>
             <p className="mt-1 text-sm text-gray-200">Experimental study interface</p>
           </div>
