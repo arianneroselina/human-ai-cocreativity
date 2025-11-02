@@ -28,12 +28,23 @@ export default function Progress() {
 
   return (
     <div className="w-full max-w-3xl mx-auto mt-4 px-4">
-      <div className="flex items-center justify-between text-sm">
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>Trial {run.trialIndex} / {run.totalTrials}</span>
-        <span>{pct}%</span>
+        <span className="text-foreground">{pct}%</span>
       </div>
-      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-full bg-[var(--purple)]" style={{ width: `${pct}%` }} />
+
+      <div
+        className="mt-2 h-2 w-full rounded-full overflow-hidden bg-muted"
+        role="progressbar"
+        aria-label="Session progress"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+      >
+        <div
+          className="h-full bg-primary rounded-full transition-[width] duration-300"
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

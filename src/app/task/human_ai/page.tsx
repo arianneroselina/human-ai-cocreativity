@@ -13,12 +13,12 @@ import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
-import {useRouteGuard} from "@/lib/useRouteGuard";
+import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 
 export default function HumanAIPage() {
-  useRouteGuard(['task']);
+  useRouteGuard(["task"]);
   useWorkflowGuard();
   usePreventBack(true);
 
@@ -83,31 +83,30 @@ export default function HumanAIPage() {
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: 'SUBMIT_TRIAL' });
+    send({ type: "SUBMIT_TRIAL" });
   };
 
   const submitDisabled = locked || text.trim().length === 0 || !aiEdited;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Header workflow="Human → AI" trial={run.trialIndex}/>
+    <main className="min-h-dvh bg-background">
+      <Header workflow="Human → AI" trial={run.trialIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <TaskDetails/>
+        <TaskDetails />
 
         {/* Actions */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
-            <p className="text-sm text-gray-600">
-              Write first. Then ask AI to edit <span className="font-medium">once</span>. After AI edits, editing is locked.
+          <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <p className="text-sm text-muted-foreground">
+              Write first. Then ask AI to edit <span className="font-medium text-foreground">once</span>. After AI
+              edits, editing is locked.
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={askAIToEdit} disabled={locked || aiEdited || text.trim().length === 0}
-                      className="bg-[var(--purple)]"
-              >
+              <Button onClick={askAIToEdit} disabled={locked || aiEdited || text.trim().length === 0}>
                 {aiEdited ? "AI Edit Applied (Locked)" : "Ask AI to Edit"}
               </Button>
               <Button
@@ -117,7 +116,7 @@ export default function HumanAIPage() {
               >
                 Clear
               </Button>
-              <span className="ml-auto text-sm text-gray-500">
+              <span className="ml-auto text-sm text-muted-foreground">
                 {aiEdited ? "AI edited your text. Editing is locked." : "Write your draft, then ask AI to edit."}
               </span>
             </div>
@@ -126,12 +125,12 @@ export default function HumanAIPage() {
 
         {/* Editor */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <Label htmlFor="draft" className="text-sm font-medium">
                 {aiEdited ? "AI-edited draft (locked)" : "Your draft"}
               </Label>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {words} words • {text.length} chars
               </span>
             </div>
@@ -142,12 +141,12 @@ export default function HumanAIPage() {
               onChange={(e) => setText(e.target.value)}
               placeholder="Write here… then click 'Ask AI to Edit'."
               readOnly={readOnly}
-              className={readOnly ? "bg-gray-100" : ""}
+              className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />
             <div className="mt-3 flex items-center justify-between gap-2">
-              <Rules/>
+              <Rules />
 
-              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
+              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                 Submit
               </Button>
 

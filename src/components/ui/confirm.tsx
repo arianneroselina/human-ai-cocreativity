@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/shadcn_ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/shadcn_ui/dialog";
 import { Button } from "@/components/shadcn_ui/button";
 
 type ConfirmProps = {
@@ -15,24 +22,25 @@ type ConfirmProps = {
 };
 
 export default function ConfirmDialog({
-                                open,
-                                onOpenChange,
-                                title = "Are you sure?",
-                                description,
-                                confirmLabel = "Yes",
-                                cancelLabel = "Cancel",
-                                onConfirm,
-                              }: ConfirmProps) {
+                                        open,
+                                        onOpenChange,
+                                        title = "Are you sure?",
+                                        description,
+                                        confirmLabel = "Yes",
+                                        cancelLabel = "Cancel",
+                                        onConfirm,
+                                      }: ConfirmProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          {description ? (
+            <DialogDescription className="text-muted-foreground">
+              {description}
+            </DialogDescription>
+          ) : null}
         </DialogHeader>
-
-        {description ? (
-          <p className="text-sm text-slate-600">{description}</p>
-        ) : null}
 
         <DialogFooter className="mt-3">
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
@@ -43,7 +51,6 @@ export default function ConfirmDialog({
               onOpenChange(false);
               onConfirm?.();
             }}
-            className="bg-[var(--purple)]"
           >
             {confirmLabel}
           </Button>

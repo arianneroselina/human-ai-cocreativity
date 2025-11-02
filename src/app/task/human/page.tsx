@@ -13,12 +13,12 @@ import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
-import {useRouteGuard} from "@/lib/useRouteGuard";
+import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 
 export default function HumanPage() {
-  useRouteGuard(['task']);
+  useRouteGuard(["task"]);
   useWorkflowGuard();
   usePreventBack(true);
 
@@ -38,38 +38,42 @@ export default function HumanPage() {
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: 'SUBMIT_TRIAL' });
+    send({ type: "SUBMIT_TRIAL" });
   };
 
   const submitDisabled = locked || text.trim().length === 0;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Header workflow="Human only" trial={run.trialIndex}/>
+    <main className="min-h-dvh bg-background">
+      <Header workflow="Human only" trial={run.trialIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <TaskDetails/>
+        <TaskDetails />
 
         {/* Actions */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
-            <p className="text-sm text-gray-600">
-              Write entirely by yourself. <span className="font-medium">No AI available.</span> Submit before time runs out.
+          <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <p className="text-sm text-muted-foreground">
+              Write entirely by yourself. <span className="font-medium text-foreground">No AI available.</span> Submit
+              before time runs out.
             </p>
           </div>
         </section>
 
         {/* Editor Section */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-between">
-              <Label htmlFor="draft" className="text-sm font-medium">Your draft</Label>
-              <span className="text-xs text-gray-500">
+              <Label htmlFor="draft" className="text-sm font-medium">
+                Your draft
+              </Label>
+              <span className="text-xs text-muted-foreground">
                 {words} words • {text.length} chars
               </span>
             </div>
+
             <Textarea
               id="draft"
               rows={14}
@@ -77,10 +81,11 @@ export default function HumanPage() {
               onChange={(e) => setText(e.target.value)}
               placeholder="Write here…"
               readOnly={readOnly}
-              className={readOnly ? "bg-gray-100" : ""}
+              className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />
+
             <div className="mt-3 flex items-center justify-between gap-2">
-              <Rules/>
+              <Rules />
 
               <div className="flex gap-2">
                 <Button
@@ -91,7 +96,7 @@ export default function HumanPage() {
                   Clear
                 </Button>
 
-                <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
+                <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                   Submit
                 </Button>
 

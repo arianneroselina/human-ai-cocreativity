@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -13,7 +13,7 @@ import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
-import {useRouteGuard} from "@/lib/useRouteGuard";
+import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 
@@ -75,26 +75,26 @@ export default function AIPage() {
   const submitDisabled = locked || !aiUsed || text.trim().length === 0;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Header workflow="AI only" trial={run.trialIndex}/>
+    <main className="min-h-dvh bg-background">
+      <Header workflow="AI only" trial={run.trialIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <TaskDetails/>
+        <TaskDetails />
 
         {/* Actions */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
-            <p className="text-sm text-gray-600">
-              Generate a single AI draft and <span className="font-medium">submit without editing</span>.
+          <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <p className="text-sm text-muted-foreground">
+              Generate a single AI draft and <span className="font-medium text-foreground">submit without editing</span>.
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={generateAiDraft} disabled={locked || aiUsed} className="bg-[var(--purple)]">
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
                 {aiUsed ? "AI Draft Generated" : "Generate AI Draft"}
               </Button>
-              <span className="ml-auto text-sm text-gray-500">
+              <span className="ml-auto text-sm text-muted-foreground">
                 {aiUsed ? "Review the AI draft and submit." : "Generate the AI draft to proceed."}
               </span>
             </div>
@@ -103,10 +103,10 @@ export default function AIPage() {
 
         {/* Editor (read-only) */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <Label htmlFor="draft" className="text-sm font-medium">AI draft (read-only)</Label>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {words} words • {text.length} chars
               </span>
             </div>
@@ -114,15 +114,14 @@ export default function AIPage() {
               id="draft"
               rows={14}
               value={text}
-              onChange={() => {}}
-              placeholder="Click 'Generate AI Draft' to see the output…"
               readOnly={readOnly}
-              className="bg-gray-100"
+              placeholder="Click 'Generate AI Draft' to see the output…"
+              className="bg-muted text-foreground placeholder:text-muted-foreground"
             />
             <div className="mt-3 flex items-center justify-between gap-2">
-              <Rules/>
+              <Rules />
 
-              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
+              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                 Submit
               </Button>
 

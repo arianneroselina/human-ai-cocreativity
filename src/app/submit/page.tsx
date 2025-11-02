@@ -75,69 +75,69 @@ export default function AfterTrial() {
   );
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <Header workflow="" trial={0}/>
+    <main className="min-h-dvh bg-background">
+      <Header workflow="" trial={0} />
       <Progress />
 
       <div className="mx-auto max-w-3xl p-6">
-        <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
+        <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="shrink-0">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
+              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-              <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
 
               {/* Submission Summary */}
-              <div className="mt-4 rounded-lg border bg-white p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
+              <div className="mt-4 rounded-lg border border-border bg-muted p-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                   <ClipboardList className="h-4 w-4" />
                   Submission Summary (this trial)
                 </div>
 
                 <div className="mt-3 grid grid-cols-1 gap-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-slate-700">Word Count:</span>
-                    <span className="text-slate-600">{wordCount ?? '—'} words</span>
+                    <span className="text-muted-foreground">Word Count:</span>
+                    <span className="text-foreground">{wordCount ?? '—'} words</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-700">Required Words:</span>
-                    <span className="text-slate-600">{meetsRequiredWords ? "✔️ Met" : "❌ Not Met"}</span>
+                    <span className="text-muted-foreground">Required Words:</span>
+                    <span className="text-foreground">{meetsRequiredWords ? "✔️ Met" : "❌ Not Met"}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-700">Avoid Words:</span>
-                    <span className="text-slate-600">{meetsAvoidWords ? "✔️ Met" : "❌ Not Met"}</span>
+                    <span className="text-muted-foreground">Avoid Words:</span>
+                    <span className="text-foreground">{meetsAvoidWords ? "✔️ Met" : "❌ Not Met"}</span>
                   </div>
                 </div>
               </div>
 
               {/* Countdown + CTA */}
               <div className="mt-4 flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center gap-2 rounded-md border bg-white px-3 py-1.5 text-xs text-slate-600">
+                <div className="inline-flex items-center gap-2 rounded-md border border-border bg-accent px-3 py-1.5 text-xs text-accent-foreground">
                   <TimerIcon className="h-4 w-4" />
                   <span>
-                    Continuing {finishing ? 'to feedback' : 'to next trial'} in{' '}
-                    <span className="font-medium text-slate-800">{seconds}s</span>…
+                    Continuing {finishing ? 'to feedback' : 'to next trial'} in{" "}
+                    <span className="font-medium text-foreground">{seconds}s</span>…
                   </span>
                 </div>
 
                 <div className="ml-auto flex items-center gap-2">
-                  <Button onClick={next} className="inline-flex items-center gap-2 bg-[var(--purple)]" disabled={navigating}>
+                  <Button onClick={next} className="inline-flex items-center gap-2" disabled={navigating}>
                     {navigating ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : finishing ? (
                       <Trophy className="h-4 w-4" />
-                      ) : (
+                    ) : (
                       <ArrowRight className="h-4 w-4" />
-                      )}
+                    )}
                     {finishing ? 'Go to feedback now' : 'Continue now'}
                   </Button>
                 </div>
               </div>
 
               {!finishing && (
-                <p className="mt-3 text-xs text-slate-500">
+                <p className="mt-3 text-xs text-muted-foreground">
                   You’ll choose your workflow for the next trial on the next screen.
                 </p>
               )}

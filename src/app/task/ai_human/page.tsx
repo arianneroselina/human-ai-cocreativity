@@ -13,7 +13,7 @@ import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
-import {useRouteGuard} from "@/lib/useRouteGuard";
+import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 
@@ -79,23 +79,23 @@ export default function AIHumanWorkPage() {
   const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Header workflow="AI → Human" trial={run.trialIndex}/>
+    <main className="min-h-dvh bg-background">
+      <Header workflow="AI → Human" trial={run.trialIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
         {/* Info */}
-        <TaskDetails/>
+        <TaskDetails />
 
         {/* Actions */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-6 shadow-sm items-center">
-            <p className="text-sm text-gray-600">
-              Generate an AI draft <span className="font-medium">once</span>, then edit freely. AI is disabled afterwards.
+          <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+            <p className="text-sm text-muted-foreground">
+              Generate an AI draft <span className="font-medium text-foreground">once</span>, then edit freely. AI is disabled afterwards.
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={generateAiDraft} disabled={locked || aiUsed} className="bg-[var(--purple)]">
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
                 {aiUsed ? "AI Draft Generated (AI Disabled)" : "Generate AI Draft"}
               </Button>
               <Button
@@ -105,7 +105,7 @@ export default function AIHumanWorkPage() {
               >
                 Clear
               </Button>
-              <span className="ml-auto text-sm text-gray-500">
+              <span className="ml-auto text-sm text-muted-foreground">
                 {aiUsed ? "You can edit now. AI is disabled." : "Generate the AI draft to begin."}
               </span>
             </div>
@@ -114,12 +114,12 @@ export default function AIHumanWorkPage() {
 
         {/* Editor */}
         <section className="mt-4">
-          <div className="rounded-lg border bg-white p-4 shadow-sm">
+          <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <Label htmlFor="draft" className="text-sm font-medium">
                 {aiUsed ? "Draft (you can edit)" : "AI draft will appear here"}
               </Label>
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {words} words • {text.length} chars
               </span>
             </div>
@@ -130,12 +130,12 @@ export default function AIHumanWorkPage() {
               onChange={(e) => setText(e.target.value)}
               placeholder={aiUsed ? "You can now edit the AI draft..." : "Click 'Generate AI Draft' to start..."}
               readOnly={readOnly}
-              className={readOnly ? "bg-gray-100" : ""}
+              className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />
             <div className="mt-3 flex items-center justify-between gap-2">
-              <Rules/>
+              <Rules />
 
-              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
+              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                 Submit
               </Button>
 

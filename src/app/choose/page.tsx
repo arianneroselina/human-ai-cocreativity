@@ -21,9 +21,9 @@ export default function Choose() {
   const selected = Workflows.find(w => w.key === choice)!;
 
   const pick = (wf: Workflow) => {
-    setChoice(wf)
+    setChoice(wf);
     send({ type: 'SELECT_WORKFLOW', workflow: wf });
-  }
+  };
 
   const startTrial = async () => {
     setOpen(false);
@@ -48,23 +48,23 @@ export default function Choose() {
     });
   };
 
+  // Re-announce the current choice when a new trial starts
   useEffect(() => {
-    setChoice(choice)
     send({ type: 'SELECT_WORKFLOW', workflow: choice });
-  }, [choice, run.trialIndex, send]);
-  
+  }, [run.trialIndex, send]); // intentionally not depending on `choice` to avoid double sends
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <Header workflow={""} trial={0}/>
+    <main className="min-h-dvh bg-background">
+      <Header workflow={""} trial={0} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6 space-y-4">
         {/* Hero */}
-        <section className="rounded-xl border bg-white/70 backdrop-blur p-6 shadow-sm">
+        <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
           <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight">
             Choose your workflow
           </h2>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             You’ll confirm your choice before starting. Estimated duration: ~10 minutes.
           </p>
 
@@ -77,15 +77,18 @@ export default function Choose() {
                   key={w.key}
                   onClick={() => pick(w.key)}
                   className={[
-                    "text-left rounded-lg border bg-white p-4 shadow-sm transition",
-                    active ? "border-sky-400 ring-2 ring-sky-200" : "hover:border-slate-300"
+                    "text-left rounded-lg border border-border bg-card p-4 shadow-sm transition",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    active
+                      ? "border-primary ring-2 ring-primary/30"
+                      : "hover:bg-accent"
                   ].join(" ")}
                 >
                   <div className="flex items-start gap-3">
                     <div className="text-xl">{w.icon}</div>
                     <div>
-                      <div className="font-medium">{w.title}</div>
-                      <div className="text-sm text-slate-600">{w.desc}</div>
+                      <div className="font-medium text-foreground">{w.title}</div>
+                      <div className="text-sm text-muted-foreground">{w.desc}</div>
                     </div>
                   </div>
                 </button>
@@ -94,9 +97,10 @@ export default function Choose() {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Rules/>
+            <Rules />
             <div className="ml-auto">
-              <Button onClick={() => setOpen(true)} className="bg-[var(--purple)]">
+              {/* Default Button uses bg-primary/text-primary-foreground from your tokens */}
+              <Button onClick={() => setOpen(true)}>
                 Start with {selected.label}
               </Button>
             </div>
@@ -111,22 +115,22 @@ export default function Choose() {
             <DialogTitle>Confirm workflow</DialogTitle>
           </DialogHeader>
 
-          <div className="rounded-lg border bg-white p-4">
+          <div className="rounded-lg border border-border bg-card p-4 text-card-foreground">
             <div className="flex items-start gap-3">
               <div className="text-xl">{selected.icon}</div>
               <div>
-                <div className="font-medium">{selected.title}</div>
-                <div className="text-sm text-slate-600">{selected.desc}</div>
+                <div className="font-medium text-foreground">{selected.title}</div>
+                <div className="text-sm text-muted-foreground">{selected.desc}</div>
               </div>
             </div>
-            <div className="mt-3 text-xs text-slate-500">
+            <div className="mt-3 text-xs text-muted-foreground">
               After you start, this choice will be locked for this session.
             </div>
           </div>
 
           <DialogFooter className="mt-3">
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={startTrial} className="bg-[var(--purple)]">Start now</Button>
+            <Button onClick={startTrial}>Start now</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

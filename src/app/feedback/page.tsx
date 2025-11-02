@@ -95,7 +95,6 @@ export default function FeedbackPage() {
   };
 
   const startNew = () => {
-    // Clear store & persisted state, then go home
     (useExperiment as any).persist?.clearStorage?.();
     send({ type: "RESET" });
     router.replace("/");
@@ -103,18 +102,18 @@ export default function FeedbackPage() {
 
   if (submitted) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-        <Header workflow="" trial={0}/>
+      <main className="min-h-dvh bg-background">
+        <Header workflow="" trial={0} />
 
         <div className="mx-auto max-w-3xl p-6">
-          <section className="rounded-xl border bg-white p-6 shadow-sm">
+          <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
             <div className="flex items-start gap-3">
-              <CheckCircle2 className="h-6 w-6 text-green-600 mt-0.5" />
+              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400 mt-0.5" />
               <div className="flex-1">
                 <h1 className="text-2xl font-semibold tracking-tight">
                   Thank you for your feedback!
                 </h1>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Your responses were recorded. Below are a few options for your records.
                 </p>
 
@@ -137,6 +136,7 @@ export default function FeedbackPage() {
                       </>
                     )}
                   </Button>
+
                   <Button
                     variant="secondary"
                     onClick={handleDownload}
@@ -146,9 +146,10 @@ export default function FeedbackPage() {
                     <FileDown className="h-4 w-4" />
                     Download receipt
                   </Button>
+
                   <Button
                     onClick={startNew}
-                    className="inline-flex items-center gap-2 bg-[var(--purple)]"
+                    className="inline-flex items-center gap-2"
                     title="Start a new session"
                   >
                     <RefreshCw className="h-4 w-4" />
@@ -157,11 +158,11 @@ export default function FeedbackPage() {
                 </div>
 
                 <details className="mt-6 group">
-                  <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-gray-700 hover:underline">
+                  <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-foreground hover:underline">
                     <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
                     Debrief & what happens next
                   </summary>
-                  <div className="mt-3 text-sm text-gray-700">
+                  <div className="mt-3 text-sm text-muted-foreground">
                     <p>
                       We’re studying how people collaborate with AI under time limits and how this affects
                       efficiency, quality, and trust. In some conditions, AI responses may intentionally include minor
@@ -169,12 +170,14 @@ export default function FeedbackPage() {
                     </p>
                     <p className="mt-2">
                       If you have questions or want to withdraw your data, contact the study team with your session code:
-                      <span className="ml-1 font-mono text-xs bg-gray-100 px-1 py-0.5 rounded">{sessionCode}</span>.
+                      <span className="ml-1 font-mono text-xs rounded border border-border bg-muted px-1 py-0.5">
+                        {sessionCode}
+                      </span>.
                     </p>
                   </div>
                 </details>
 
-                <p className="mt-6 text-xs text-gray-400">
+                <p className="mt-6 text-xs text-muted-foreground">
                   ❤ Thanks again for helping research in Human-AI Co-Creativity.
                 </p>
               </div>
@@ -186,20 +189,23 @@ export default function FeedbackPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+    <main className="min-h-dvh bg-background">
+      <Header workflow="" trial={0} />
+      <Progress />
+
       <div className="mx-auto max-w-4xl p-6">
         {/* Header */}
         <header className="mb-6 text-center">
-          <h1 className="text-3xl font-semibold">Final feedback</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-3xl font-semibold text-foreground">Final feedback</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Thanks for completing all {run.totalTrials} trials. A few short questions:
           </p>
         </header>
 
         {/* Feedback form */}
-        <section className="rounded-xl border bg-white p-6 shadow-sm">
-          <h2 className="font-semibold text-xl text-gray-800">Your experience</h2>
-          <p className="text-sm text-gray-600 mt-2">
+        <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
+          <h2 className="font-semibold text-xl text-foreground">Your experience</h2>
+          <p className="text-sm text-muted-foreground mt-2">
             Please rate and tell us which workflow worked best for you.
           </p>
 
@@ -230,7 +236,7 @@ export default function FeedbackPage() {
 
             {/* Workflow picker */}
             <div className="space-y-2">
-              <div className="text-sm text-gray-700">4) Which workflow felt most useful?</div>
+              <div className="text-sm text-foreground">4) Which workflow felt most useful?</div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {Workflows.map((w) => {
                   const active = workflowBest === w.key;
@@ -241,10 +247,11 @@ export default function FeedbackPage() {
                       onClick={() => setWorkflowBest(w.key)}
                       aria-pressed={active}
                       className={[
-                        "rounded-md border px-3 py-2 text-sm text-left",
+                        "rounded-md border px-3 py-2 text-sm text-left transition",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         active
-                          ? "border-black bg-black text-white"
-                          : "border-gray-300 hover:bg-gray-50",
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border hover:bg-accent"
                       ].join(" ")}
                     >
                       <div className="font-medium">{w.label}</div>
@@ -256,13 +263,14 @@ export default function FeedbackPage() {
 
             {/* Comments */}
             <div className="space-y-2">
-              <label htmlFor="comment" className="block text-sm text-gray-700">
+              <label htmlFor="comment" className="block text-sm text-foreground">
                 Additional comments (optional)
               </label>
               <input
                 id="comment"
                 type="text"
-                className="w-full rounded-lg border border-gray-300 p-3 text-sm"
+                className="w-full rounded-lg border border-border bg-background p-3 text-sm text-foreground
+                placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Anything that stood out, suggestions, etc."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
@@ -271,7 +279,7 @@ export default function FeedbackPage() {
           </div>
 
           <div className="mt-6 flex justify-center">
-            <Button onClick={handleSubmit} disabled={!canSubmit} className="bg-[var(--purple)]">
+            <Button onClick={handleSubmit} disabled={!canSubmit}>
               Submit feedback
             </Button>
           </div>
