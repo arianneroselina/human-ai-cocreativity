@@ -16,6 +16,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
@@ -28,6 +29,7 @@ export default function AIHumanWorkPage() {
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
   const [aiUsed, setAiUsed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   // readOnly until AI generates; afterward editable (unless locked)
@@ -36,8 +38,8 @@ export default function AIHumanWorkPage() {
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
   const generateAiDraft = async () => {
-    if (aiUsed) return;
-    setAiUsed(true); // AI disabled after this
+    if (aiUsed || loading) return;
+    setLoading(true);
 
     const input = [
       Task[0],
@@ -49,23 +51,25 @@ export default function AIHumanWorkPage() {
       GeneralAIRules.join("\n"),
     ].join("\n");
 
-    console.log("Generate AI Prompt:", input);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input }),
+      });
 
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input }),
-    });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error("AI error", err);
+        return;
+      }
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error("AI error", err);
-      setAiUsed(false);
-      return;
+      const data = await res.json();
+      setText(data.text || "");
+      setAiUsed(true); // enable editing
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-    setText(data.text || "");
   };
 
   const clearDraft = () => setText("");
@@ -95,18 +99,33 @@ export default function AIHumanWorkPage() {
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
-                {aiUsed ? "AI Draft Generated (AI Disabled)" : "Generate AI Draft"}
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed || loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : aiUsed ? (
+                  "AI Draft Generated (AI Disabled)"
+                ) : (
+                  "Generate AI Draft"
+                )}
               </Button>
+
               <Button
                 variant="secondary"
                 onClick={clearDraft}
-                disabled={locked || text.length === 0}
+                disabled={locked || text.length === 0 || loading}
               >
                 Clear
               </Button>
+
               <span className="ml-auto text-sm text-muted-foreground">
-                {aiUsed ? "You can edit now. AI is disabled." : "Generate the AI draft to begin."}
+                {loading
+                  ? "Generating draft..."
+                  : aiUsed
+                    ? "You can edit now. AI is disabled."
+                    : "Generate the AI draft to begin."}
               </span>
             </div>
           </div>

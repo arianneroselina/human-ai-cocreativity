@@ -118,7 +118,7 @@ export default function AfterTrial() {
                   <TimerIcon className="h-4 w-4" />
                   <span>
                     Continuing {finishing ? 'to feedback' : 'to next trial'} in{" "}
-                    <span className="font-medium text-foreground">{seconds}s</span>…
+                    <span className="font-medium text-foreground">{seconds}s</span>...
                   </span>
                 </div>
 

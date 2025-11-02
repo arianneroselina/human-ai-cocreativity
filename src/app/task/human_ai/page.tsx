@@ -16,6 +16,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
 
 export default function HumanAIPage() {
   useRouteGuard(["task"]);
@@ -28,6 +29,7 @@ export default function HumanAIPage() {
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
   const [aiEdited, setAiEdited] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   const readOnly = useMemo(() => locked || aiEdited, [locked, aiEdited]);
@@ -35,12 +37,12 @@ export default function HumanAIPage() {
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
   const askAIToEdit = async () => {
-    if (aiEdited) return;
+    if (aiEdited || loading) return;
     if (!text.trim()) {
       alert("Please write something first before asking AI to edit.");
       return;
     }
-    setAiEdited(true); // lock editor
+    setLoading(true);
 
     const input = [
       `Improve the poem under <TEXT> while preserving its core meaning and voice. This was the task:`,
@@ -59,23 +61,25 @@ export default function HumanAIPage() {
       `</TEXT>`
     ].join("\n");
 
-    console.log("Edit AI Prompt:", input);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input }),
+      });
 
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input }),
-    });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error("AI error", err);
+        return;
+      }
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error("AI error", err);
-      setAiEdited(false);
-      return;
+      const data = await res.json();
+      setText(data.text || "");
+      setAiEdited(true);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-    setText(data.text || "");
   };
 
   const clearDraft = () => setText("");
@@ -106,18 +110,33 @@ export default function HumanAIPage() {
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={askAIToEdit} disabled={locked || aiEdited || text.trim().length === 0}>
-                {aiEdited ? "AI Edit Applied (Locked)" : "Ask AI to Edit"}
+              <Button onClick={askAIToEdit} disabled={locked || aiEdited || text.trim().length === 0 || loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Editing...
+                  </>
+                ) : aiEdited ? (
+                  "AI Edit Applied (Locked)"
+                ) : (
+                  "Ask AI to Edit"
+                )}
               </Button>
+
               <Button
                 variant="secondary"
                 onClick={clearDraft}
-                disabled={locked || text.length === 0 || aiEdited}
+                disabled={locked || text.length === 0 || aiEdited || loading}
               >
                 Clear
               </Button>
+
               <span className="ml-auto text-sm text-muted-foreground">
-                {aiEdited ? "AI edited your text. Editing is locked." : "Write your draft, then ask AI to edit."}
+                {loading
+                  ? "Editing with AI..."
+                  : aiEdited
+                    ? "AI edited your text. Editing is locked."
+                    : "Write your draft, then ask AI to edit."}
               </span>
             </div>
           </div>
@@ -139,7 +158,7 @@ export default function HumanAIPage() {
               rows={14}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Write here… then click 'Ask AI to Edit'."
+              placeholder="Write here... then click 'Ask AI to Edit'."
               readOnly={readOnly}
               className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />

@@ -16,6 +16,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
+import { Loader2 } from "lucide-react";
 
 export default function AIPage() {
   useRouteGuard(['task']);
@@ -28,6 +29,7 @@ export default function AIPage() {
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
   const [aiUsed, setAiUsed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   const readOnly = useMemo(() => true, []);
@@ -35,8 +37,8 @@ export default function AIPage() {
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
   const generateAiDraft = async () => {
-    if (aiUsed) return;
-    setAiUsed(true);
+    if (aiUsed || loading) return;
+    setLoading(true);
 
     const input = [
       Task[0],
@@ -50,20 +52,25 @@ export default function AIPage() {
 
     console.log("Generate AI Prompt:", input);
 
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ input }),
-    });
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input }),
+      });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error("AI error", err);
-      return;
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error("AI error", err);
+        return;
+      }
+
+      const data = await res.json();
+      setText(data.text || "");
+      setAiUsed(true);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-    setText(data.text || "");
   };
 
   const submit = () => {
@@ -91,11 +98,24 @@ export default function AIPage() {
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={generateAiDraft} disabled={locked || aiUsed}>
-                {aiUsed ? "AI Draft Generated" : "Generate AI Draft"}
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed || loading}>
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : aiUsed ? (
+                  "AI Draft Generated"
+                ) : (
+                  "Generate AI Draft"
+                )}
               </Button>
               <span className="ml-auto text-sm text-muted-foreground">
-                {aiUsed ? "Review the AI draft and submit." : "Generate the AI draft to proceed."}
+                {loading
+                  ? "Generating draft..."
+                  : aiUsed
+                    ? "Review the AI draft and submit."
+                    : "Generate the AI draft to proceed."}
               </span>
             </div>
           </div>
@@ -115,7 +135,7 @@ export default function AIPage() {
               rows={14}
               value={text}
               readOnly={readOnly}
-              placeholder="Click 'Generate AI Draft' to see the output…"
+              placeholder="Click 'Generate AI Draft' to see the output..."
               className="bg-muted text-foreground placeholder:text-muted-foreground"
             />
             <div className="mt-3 flex items-center justify-between gap-2">

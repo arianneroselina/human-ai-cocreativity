@@ -79,7 +79,7 @@ export default function HumanPage() {
               rows={14}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Write here…"
+              placeholder="Write here..."
               readOnly={readOnly}
               className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />
