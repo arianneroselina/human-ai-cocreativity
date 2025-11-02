@@ -17,7 +17,7 @@ You can experience the **Human-AI Co-Creativity** platform in action by clicking
 
 #### [👉 **human-ai-cocreativity.vercel.app**](https://human-ai-cocreativity.vercel.app)
 
-![Platform Demo](./README.assets/choose_page.png)
+![Platform Demo](README.assets/choose_page.png)
 
 ---
 
