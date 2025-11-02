@@ -1,10 +1,37 @@
 "use client";
 
 import { TimerBadge } from "@/components/shadcn_ui/timer";
-import { Pause, Play } from "lucide-react";
+import { Bug, FileText, Moon, Pause, Play, Sun } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
-import Progress from "@/components/ui/progress";
 import Image from "next/image";
+import Link from "next/link";
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    const hasDark = document.documentElement.classList.contains("dark");
+    // TODO
+    setDark(hasDark);
+  }, []);
+
+  const toggle = () => {
+    document.documentElement.classList.toggle("dark");
+    setDark((d) => !d);
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      className="inline-flex items-center justify-center rounded-md border border-white/20 bg-white/10 p-1.5 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+      title={dark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label="Toggle theme"
+      type="button"
+    >
+      {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
+  );
+}
 
 interface HeaderProps {
   workflow: string;
@@ -42,7 +69,60 @@ export default function Header({ workflow, trial }: HeaderProps) {
 
   return (
     <>
-      <header className="w-full bg-[var(--purple)] text-white py-2">
+      <header className="relative w-full bg-[var(--purple)] text-white py-2">
+        {/* Right utilities (absolute) */}
+        <div className="absolute right-4 top-3/4 -translate-y-1/2 flex items-center gap-2">
+          {/* Version badge (from env) */}
+          {process.env.NEXT_PUBLIC_APP_TAG && (
+            <span className="hidden sm:inline rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs">
+        {process.env.NEXT_PUBLIC_APP_TAG}
+      </span>
+          )}
+
+          {/* Docs */}
+          <Link
+            href="https://github.com/arianneroselina/human-ai-cocreativity#readme"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+            title="Open README"
+            aria-label="Open README"
+          >
+            <FileText className="h-3.5 w-3.5" />
+            Docs
+          </Link>
+
+          {/* Report issue */}
+          <Link
+            href="https://github.com/arianneroselina/human-ai-cocreativity/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+            title="Report an issue"
+            aria-label="Report an issue"
+          >
+            <Bug className="h-3.5 w-3.5" />
+            Issue
+          </Link>
+
+          {/* GitHub icon */}
+          <Link
+            href="https://github.com/arianneroselina/human-ai-cocreativity"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-2 py-1 text-xs hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+            title="View source on GitHub"
+            aria-label="View source on GitHub"
+          >
+            <Image src="/github_dark.png" alt="Github" width="16" height="16" className="object-contain"/>
+            Github
+          </Link>
+
+          {/* Theme toggle */}
+          <ThemeToggle />
+        </div>
+
+        {/* Center content */}
         <div className="flex items-center justify-center gap-6">
           <div className="w-32 h-32">
             <Image
