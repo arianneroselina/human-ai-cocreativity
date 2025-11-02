@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   title: "Human-AI Co-Creativity",
   description: "Collaborate with AI on tasks in real-time.",
   icons: {
-    icon: "/human-ai-icon.ico",
+    icon: "/human-ai-icon-white.ico",
   },
 };
 
