@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails from "@/components/ui/taskDetails";
+import TaskDetails, { GeneralAIRules, Task } from "@/components/ui/taskDetails";
 import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkWords } from "@/lib/check";
@@ -34,17 +34,35 @@ export default function AIPage() {
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
-  const generateAiDraft = () => {
+  const generateAiDraft = async () => {
     if (aiUsed) return;
-    const draft = [
-      "AI Draft — Outline",
-      "1) Hook the reader with a compelling opener.",
-      "2) Develop the main argument with 2–3 supporting points.",
-      "3) End with a crisp, memorable conclusion.",
-      "",
-      "Tip: Keep sentences active and specific.",
+
+    const input = [
+      Task[0],
+      `- ${Task[1]}`,
+      `- ${Task[2]}`,
+      `- ${Task[3]}`,
+      `- ${Task[4]}`,
+      ``,
+      GeneralAIRules.join("\n"),
     ].join("\n");
-    setText(draft);
+
+    console.log("Generate AI Prompt:", input);
+
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error("AI error", err);
+      return;
+    }
+
+    const data = await res.json();
+    setText(data.text || "");
     setAiUsed(true);
   };
 

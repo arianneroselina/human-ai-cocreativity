@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails from "@/components/ui/taskDetails";
+import TaskDetails, { GeneralAIRules, HumanThenAIRules, Task } from "@/components/ui/taskDetails";
 import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkWords } from "@/lib/check";
@@ -34,20 +34,46 @@ export default function HumanAIPage() {
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
-  const askAIToEdit = () => {
+  const askAIToEdit = async () => {
     if (aiEdited) return;
     if (!text.trim()) {
       alert("Please write something first before asking AI to edit.");
       return;
     }
-    const edited = [
-      "AI Edit — Revised Draft",
-      "",
+
+    const input = [
+      `Improve the poem under <TEXT> while preserving its core meaning and voice. This was the task:`,
+      ``,
+      Task[0],
+      `- ${Task[1]}`,
+      `- ${Task[2]}`,
+      `- ${Task[3]}`,
+      `- ${Task[4]}`,
+      ``,
+      GeneralAIRules.join("\n"),
+      HumanThenAIRules.join("\n"),
+      ``,
+      `<TEXT>`,
       text.trim(),
-      "",
-      "— Suggested improvements: clarify the hook, tighten transitions, add a concrete example."
+      `</TEXT>`
     ].join("\n");
-    setText(edited);
+
+    console.log("Edit AI Prompt:", input);
+
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error("AI error", err);
+      return;
+    }
+
+    const data = await res.json();
+    setText(data.text || "");
     setAiEdited(true); // lock editor
   };
 

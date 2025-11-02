@@ -207,7 +207,6 @@ export default function Page() {
                   <ul className="mt-3 space-y-2 text-sm text-slate-700">
                     <li>Task duration and timing.</li>
                     <li>Your selected workflow each round.</li>
-                    <li>Human ↔ AI interaction logs (when/if AI is used).</li>
                     <li>The final text output.</li>
                   </ul>
                 </div>

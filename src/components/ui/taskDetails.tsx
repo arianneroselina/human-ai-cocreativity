@@ -1,6 +1,43 @@
 import { useState } from "react";
 import { Button } from "@/components/shadcn_ui/button";
 
+export const Task = [
+  `Write a short poem about a tired student at university. Use the following guidelines:`,
+  `Minimum 50 words, maximum 100 words.`,
+  `Use at least 3 of the following words:\n` +
+  `"Tired", "University", "Books", "Sleepless", "Stress", "Midnight", "Coffee", "Assignment", "Brain", "Overwhelmed".`,
+  `Do not use the word "study" or mention specific subjects.`,
+  `Your poem can be serious, humorous, or reflective. Experiment with rhyme and rhythm to convey the tired student's emotions.`
+]
+
+export const AntiTask = [
+  `Write a short poem about a tired student at university. Use the following guidelines:`,
+  `Minimum 50 words, maximum 100 words.`,
+  `Use only 2 of the following words:\n` +
+  `"Tired", "University", "Books", "Sleepless", "Stress", "Midnight", "Coffee", "Assignment", "Brain", "Overwhelmed".`,
+  `Use the word "study" or mention specific subjects.`,
+  `Your poem can be serious, humorous, or reflective. Experiment with rhyme and rhythm to convey the tired student's emotions.`
+]
+
+export const HumanThenAIRules = [
+  `Goals:`,
+  `- Strengthen imagery and specificity.`,
+  `- Improve rhythm and line breaks; prefer natural cadence over forced rhyme.`,
+  `- Remove clichés and filler; tighten wording.`,
+  `- Maintain language of the original text.`,
+  `- Keep length within ±10% of original.`,
+  `- Follow the predefined guidelines.`,
+  `Additional Rules:`,
+  `1) Do NOT invent new narrative events; refine what's there.`,
+]
+
+export const GeneralAIRules = [
+  `General Rules:`,
+  `1) Do NOT add explanations, titles, or commentary.`,
+  `2) If a requirement conflicts with goals, requirements win.`,
+  `3) Output ONLY the final edited poem—no markdown fences.`,
+]
+
 export default function TaskDetails() {
   const [taskDetailsOpen, setTaskDetailsOpen] = useState(true);
 
@@ -22,7 +59,7 @@ export default function TaskDetails() {
       {taskDetailsOpen && (
         <div className="mt-4">
           <p className="mt-2 text-sm text-gray-600">
-            Write a short poem about a tired student at university. Use the following guidelines:
+            {Task[0]}
           </p>
 
           {/* Guidelines List */}
@@ -32,7 +69,7 @@ export default function TaskDetails() {
                 <span className="text-xl text-sky-600">📝</span>
                 <div>
                   <h3 className="font-medium">Length</h3>
-                  <p className="text-sm text-gray-600">Minimum 50 words, maximum 150 words.</p>
+                  <p className="text-sm text-gray-600">{Task[1]}</p>
                 </div>
               </div>
 
@@ -40,9 +77,8 @@ export default function TaskDetails() {
                 <span className="text-xl text-sky-600">🔑</span>
                 <div>
                   <h3 className="font-medium">Required Words</h3>
-                  <p className="text-sm text-gray-600">Use at least 3 of the following words:
-                    &quot;Tired&quot;, &quot;University&quot;, &quot;Books&quot;, &quot;Sleepless&quot;, &quot;Stress&quot;,
-                    &quot;Midnight&quot;, &quot;Coffee&quot;, &quot;Assignment&quot;, &quot;Brain&quot;, &quot;Overwhelmed&quot;.
+                  <p className="text-sm text-gray-600">
+                    {Task[2]}
                   </p>
                 </div>
               </div>
@@ -53,7 +89,7 @@ export default function TaskDetails() {
                 <span className="text-xl text-sky-600">❌</span>
                 <div>
                   <h3 className="font-medium">Avoid</h3>
-                  <p className="text-sm text-gray-600">Do not use the word &quot;study&quot; or mention specific subjects.</p>
+                  <p className="text-sm text-gray-600">{Task[3]}</p>
                 </div>
               </div>
 
@@ -61,8 +97,7 @@ export default function TaskDetails() {
                 <span className="text-xl text-sky-600">🎨</span>
                 <div>
                   <h3 className="font-medium">Tone and Style</h3>
-                  <p className="text-sm text-gray-600">Your poem can be serious, humorous, or reflective.
-                    Experiment with rhyme and rhythm to convey the tired student&apos;s emotions.</p>
+                  <p className="text-sm text-gray-600">{Task[4]}</p>
                 </div>
               </div>
             </div>
