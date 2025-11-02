@@ -134,7 +134,7 @@ export default function AIHumanWorkPage() {
             <div className="mt-3 flex items-center justify-between gap-2">
               <Rules/>
 
-              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
+              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
                 Submit
               </Button>
 

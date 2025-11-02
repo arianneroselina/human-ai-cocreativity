@@ -146,9 +146,7 @@ export default function HumanAIPage() {
             <div className="mt-3 flex items-center justify-between gap-2">
               <Rules/>
 
-              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}
-                      className="bg-[var(--purple)]"
-              >
+              <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled} className="bg-[var(--purple)]">
                 Submit
               </Button>
 
