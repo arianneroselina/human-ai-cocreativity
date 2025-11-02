@@ -36,6 +36,7 @@ export default function AIPage() {
 
   const generateAiDraft = async () => {
     if (aiUsed) return;
+    setAiUsed(true);
 
     const input = [
       Task[0],
@@ -63,7 +64,6 @@ export default function AIPage() {
 
     const data = await res.json();
     setText(data.text || "");
-    setAiUsed(true);
   };
 
   const submit = () => {

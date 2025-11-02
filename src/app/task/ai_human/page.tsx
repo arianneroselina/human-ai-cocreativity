@@ -27,16 +27,17 @@ export default function AIHumanWorkPage() {
 
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
-  const [aiGenerated, setAiGenerated] = useState(false);
+  const [aiUsed, setAiUsed] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   // readOnly until AI generates; afterward editable (unless locked)
-  const readOnly = useMemo(() => locked || !aiGenerated, [locked, aiGenerated]);
+  const readOnly = useMemo(() => locked || !aiUsed, [locked, aiUsed]);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
   const generateAiDraft = async () => {
-    if (aiGenerated) return;
+    if (aiUsed) return;
+    setAiUsed(true); // AI disabled after this
 
     const input = [
       Task[0],
@@ -59,12 +60,12 @@ export default function AIHumanWorkPage() {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       console.error("AI error", err);
+      setAiUsed(false);
       return;
     }
 
     const data = await res.json();
     setText(data.text || "");
-    setAiGenerated(true); // AI disabled after this
   };
 
   const clearDraft = () => setText("");
@@ -75,7 +76,7 @@ export default function AIHumanWorkPage() {
     send({ type: 'SUBMIT_TRIAL' });
   };
 
-  const submitDisabled = locked || text.trim().length === 0 || !aiGenerated;
+  const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -94,8 +95,8 @@ export default function AIHumanWorkPage() {
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={generateAiDraft} disabled={locked || aiGenerated} className="bg-[var(--purple)]">
-                {aiGenerated ? "AI Draft Generated (AI Disabled)" : "Generate AI Draft"}
+              <Button onClick={generateAiDraft} disabled={locked || aiUsed} className="bg-[var(--purple)]">
+                {aiUsed ? "AI Draft Generated (AI Disabled)" : "Generate AI Draft"}
               </Button>
               <Button
                 variant="secondary"
@@ -105,7 +106,7 @@ export default function AIHumanWorkPage() {
                 Clear
               </Button>
               <span className="ml-auto text-sm text-gray-500">
-                {aiGenerated ? "You can edit now. AI is disabled." : "Generate the AI draft to begin."}
+                {aiUsed ? "You can edit now. AI is disabled." : "Generate the AI draft to begin."}
               </span>
             </div>
           </div>
@@ -116,7 +117,7 @@ export default function AIHumanWorkPage() {
           <div className="rounded-lg border bg-white p-4 shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <Label htmlFor="draft" className="text-sm font-medium">
-                {aiGenerated ? "Draft (you can edit)" : "AI draft will appear here"}
+                {aiUsed ? "Draft (you can edit)" : "AI draft will appear here"}
               </Label>
               <span className="text-xs text-gray-500">
                 {words} words • {text.length} chars
@@ -127,7 +128,7 @@ export default function AIHumanWorkPage() {
               rows={14}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder={aiGenerated ? "You can now edit the AI draft..." : "Click 'Generate AI Draft' to start..."}
+              placeholder={aiUsed ? "You can now edit the AI draft..." : "Click 'Generate AI Draft' to start..."}
               readOnly={readOnly}
               className={readOnly ? "bg-gray-100" : ""}
             />

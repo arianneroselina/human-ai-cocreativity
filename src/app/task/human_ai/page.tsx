@@ -40,6 +40,7 @@ export default function HumanAIPage() {
       alert("Please write something first before asking AI to edit.");
       return;
     }
+    setAiEdited(true); // lock editor
 
     const input = [
       `Improve the poem under <TEXT> while preserving its core meaning and voice. This was the task:`,
@@ -69,12 +70,12 @@ export default function HumanAIPage() {
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       console.error("AI error", err);
+      setAiEdited(false);
       return;
     }
 
     const data = await res.json();
     setText(data.text || "");
-    setAiEdited(true); // lock editor
   };
 
   const clearDraft = () => setText("");
