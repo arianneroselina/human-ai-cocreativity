@@ -17,6 +17,9 @@ import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
 import RoundHeader from "@/components/ui/roundHeader";
+import { useSubmitHotkey } from "@/components/ui/shortcut";
+import { useAutosave } from "@/lib/useAutosave";
+import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 
 export default function AIPage() {
   useRouteGuard(['task']);
@@ -32,9 +35,14 @@ export default function AIPage() {
   const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
+  const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
+  const { saving, lastSavedAt } = useAutosave(saveKey, { text, aiUsed }, { setText, setAiUsed });
+
   const readOnly = useMemo(() => true, []);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
+
+  useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const generateAiDraft = async () => {
     if (aiUsed || loading) return;
@@ -126,9 +134,12 @@ export default function AIPage() {
           <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <Label htmlFor="draft" className="text-sm font-medium">AI draft (read-only)</Label>
-              <span className="text-xs text-muted-foreground">
-                {words} words • {text.length} chars
-              </span>
+              <div className="flex items-center gap-3">
+                <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
+                <span className="text-xs text-muted-foreground">
+                  {words} words • {text.length} chars
+                </span>
+              </div>
             </div>
             <Textarea
               id="draft"

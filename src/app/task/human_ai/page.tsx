@@ -17,6 +17,9 @@ import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
 import RoundHeader from "@/components/ui/roundHeader";
+import { useSubmitHotkey } from "@/components/ui/shortcut";
+import { useAutosave } from "@/lib/useAutosave";
+import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 
 export default function HumanAIPage() {
   useRouteGuard(["task"]);
@@ -28,16 +31,21 @@ export default function HumanAIPage() {
 
   const [text, setText] = useState("");
   const [locked, setLocked] = useState(false);
-  const [aiEdited, setAiEdited] = useState(false);
+  const [aiUsed, setAiUsed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
-  const readOnly = useMemo(() => locked || aiEdited, [locked, aiEdited]);
+  const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
+  const { saving, lastSavedAt } = useAutosave(saveKey, { text, aiUsed }, { setText, setAiUsed });
+
+  const readOnly = useMemo(() => locked || aiUsed, [locked, aiUsed]);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
+  useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
+
   const askAIToEdit = async () => {
-    if (aiEdited || loading) return;
+    if (aiUsed || loading) return;
     if (!text.trim()) {
       alert("Please write something first before asking AI to edit.");
       return;
@@ -76,7 +84,7 @@ export default function HumanAIPage() {
 
       const data = await res.json();
       setText(data.text || "");
-      setAiEdited(true);
+      setAiUsed(true);
     } finally {
       setLoading(false);
     }
@@ -90,7 +98,7 @@ export default function HumanAIPage() {
     send({ type: "SUBMIT_TRIAL" });
   };
 
-  const submitDisabled = locked || text.trim().length === 0 || !aiEdited;
+  const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
   return (
     <main className="min-h-dvh bg-background">
@@ -110,13 +118,13 @@ export default function HumanAIPage() {
             </p>
 
             <div className="flex items-center gap-2 pt-4">
-              <Button onClick={askAIToEdit} disabled={locked || aiEdited || text.trim().length === 0 || loading}>
+              <Button onClick={askAIToEdit} disabled={locked || aiUsed || text.trim().length === 0 || loading}>
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Editing...
                   </>
-                ) : aiEdited ? (
+                ) : aiUsed ? (
                   "AI Edit Applied (Locked)"
                 ) : (
                   "Ask AI to Edit"
@@ -126,7 +134,7 @@ export default function HumanAIPage() {
               <Button
                 variant="secondary"
                 onClick={clearDraft}
-                disabled={locked || text.length === 0 || aiEdited || loading}
+                disabled={locked || text.length === 0 || aiUsed || loading}
               >
                 Clear
               </Button>
@@ -134,7 +142,7 @@ export default function HumanAIPage() {
               <span className="ml-auto text-sm text-muted-foreground">
                 {loading
                   ? "Editing with AI..."
-                  : aiEdited
+                  : aiUsed
                     ? "AI edited your text. Editing is locked."
                     : "Write your draft, then ask AI to edit."}
               </span>
@@ -147,11 +155,14 @@ export default function HumanAIPage() {
           <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
             <div className="mb-2 flex items-center justify-between">
               <Label htmlFor="draft" className="text-sm font-medium">
-                {aiEdited ? "AI-edited draft (locked)" : "Your draft"}
+                {aiUsed ? "AI-edited draft (locked)" : "Your draft"}
               </Label>
-              <span className="text-xs text-muted-foreground">
-                {words} words • {text.length} chars
-              </span>
+              <div className="flex items-center gap-3">
+                <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
+                <span className="text-xs text-muted-foreground">
+                  {words} words • {text.length} chars
+                </span>
+              </div>
             </div>
             <Textarea
               id="draft"

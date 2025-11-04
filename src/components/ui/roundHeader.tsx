@@ -3,6 +3,7 @@
 import { TimerBadge } from "@/components/shadcn_ui/timer";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { usePauseResumeHotkeys } from "@/components/ui/shortcut";
 
 interface RoundHeaderProps {
   workflow: string;
@@ -15,6 +16,8 @@ export default function RoundHeader({ workflow, round }: RoundHeaderProps) {
 
   const togglePause = useCallback(() => setPaused((p) => !p), []);
 
+  usePauseResumeHotkeys(paused, setPaused);
+
   useEffect(() => {
     if (paused) {
       const prev = document.body.style.overflow;
@@ -24,18 +27,6 @@ export default function RoundHeader({ workflow, round }: RoundHeaderProps) {
         document.body.style.overflow = prev;
       };
     }
-  }, [paused]);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (!paused) return;
-      if (e.key === " " || e.key === "Escape") {
-        e.preventDefault();
-        setPaused(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
   }, [paused]);
 
   return (

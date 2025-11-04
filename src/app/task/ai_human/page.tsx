@@ -17,6 +17,9 @@ import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
 import RoundHeader from "@/components/ui/roundHeader";
+import { useSubmitHotkey } from "@/components/ui/shortcut";
+import { useAutosave } from "@/lib/useAutosave";
+import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
@@ -32,10 +35,15 @@ export default function AIHumanWorkPage() {
   const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
+  const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
+  const { saving, lastSavedAt } = useAutosave(saveKey, { text, aiUsed }, { setText, setAiUsed });
+
   // readOnly until AI generates; afterward editable (unless locked)
   const readOnly = useMemo(() => locked || !aiUsed, [locked, aiUsed]);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
+
+  useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const generateAiDraft = async () => {
     if (aiUsed || loading) return;
@@ -138,9 +146,12 @@ export default function AIHumanWorkPage() {
               <Label htmlFor="draft" className="text-sm font-medium">
                 {aiUsed ? "Draft (you can edit)" : "AI draft will appear here"}
               </Label>
-              <span className="text-xs text-muted-foreground">
-                {words} words • {text.length} chars
-              </span>
+              <div className="flex items-center gap-3">
+                <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
+                <span className="text-xs text-muted-foreground">
+                  {words} words • {text.length} chars
+                </span>
+              </div>
             </div>
             <Textarea
               id="draft"
