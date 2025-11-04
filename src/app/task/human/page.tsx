@@ -45,7 +45,7 @@ export default function HumanPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="Human only" trial={run.trialIndex} />
+      <Header workflow="Human only" round={run.roundIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

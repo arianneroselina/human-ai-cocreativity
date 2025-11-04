@@ -5,30 +5,30 @@ export async function POST(req: Request) {
   const body = await req.json();
   const {
     sessionId,
-    trialIndex,
+    roundIndex,
     workflow,      // 'human' | 'ai' | 'human_ai' | 'ai_human'
     text,
     metrics = {},  // { wordCount, meetsRequiredWords, meetsAvoidWords }
   } = body;
 
-  if (!sessionId || !trialIndex || !workflow) {
+  if (!sessionId || !roundIndex || !workflow) {
     return NextResponse.json({ error: 'missing fields' }, { status: 400 });
   }
 
-  const findTrial = await prisma.trial.findUnique({
-    where: { sessionId_index: { sessionId, index: trialIndex } },
+  const findRound = await prisma.round.findUnique({
+    where: { sessionId_index: { sessionId, index: roundIndex } },
   });
 
-  if (!findTrial) {
-    return NextResponse.json({ error: 'Trial not found' }, { status: 404 });
+  if (!findRound) {
+    return NextResponse.json({ error: 'Round not found' }, { status: 404 });
   }
 
-  const startedAt = findTrial.startedAt;
+  const startedAt = findRound.startedAt;
   const submittedAt = new Date();
   const timeMs = submittedAt.getTime() - startedAt.getTime();
 
-  const trial = await prisma.trial.update({
-    where: { id: findTrial.id },
+  const round = await prisma.round.update({
+    where: { id: findRound.id },
     data: {
       submittedAt,
       timeMs,
@@ -39,5 +39,5 @@ export async function POST(req: Request) {
     },
   });
 
-  return NextResponse.json({ ok: true, trialId: trial.id });
+  return NextResponse.json({ ok: true, roundId: round.id });
 }

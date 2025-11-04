@@ -25,37 +25,37 @@ export default function Choose() {
     send({ type: 'SELECT_WORKFLOW', workflow: wf });
   };
 
-  const startTrial = async () => {
+  const startRound = async () => {
     setOpen(false);
     send({ type: 'LOCK_WORKFLOW' });
     router.push(`/task/${choice}`);
 
     const { run } = useExperiment.getState();
-    await fetch('/api/trial/start', {
+    await fetch('/api/round/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         sessionId: run.sessionId,
-        trialIndex: run.trialIndex,
+        roundIndex: run.roundIndex,
         workflow: run.workflow,
       }),
     });
 
-    console.log("Trial started:", {
+    console.log("Round started:", {
       sessionId: run.sessionId,
-      trialIndex: run.trialIndex,
+      roundIndex: run.roundIndex,
       workflow: run.workflow,
     });
   };
 
-  // Re-announce the current choice when a new trial starts
+  // Re-announce the current choice when a new round starts
   useEffect(() => {
     send({ type: 'SELECT_WORKFLOW', workflow: choice });
-  }, [run.trialIndex, send]); // intentionally not depending on `choice` to avoid double sends
+  }, [run.roundIndex, send]); // intentionally not depending on `choice` to avoid double sends
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow={""} trial={0} />
+      <Header workflow={""} round={0} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6 space-y-4">
@@ -130,7 +130,7 @@ export default function Choose() {
 
           <DialogFooter className="mt-3">
             <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={startTrial}>Start now</Button>
+            <Button onClick={startRound}>Start now</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

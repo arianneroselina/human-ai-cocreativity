@@ -94,7 +94,7 @@ export default function HumanAIPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="Human → AI" trial={run.trialIndex} />
+      <Header workflow="Human → AI" round={run.roundIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

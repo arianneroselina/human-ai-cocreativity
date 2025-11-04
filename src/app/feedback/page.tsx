@@ -46,7 +46,7 @@ export default function FeedbackPage() {
     const payload = {
       sessionId: run.sessionId,
       participantId: run.participantId,
-      totalTrials: run.totalTrials,
+      totalRounds: run.totalRounds,
       submittedAt: new Date().toISOString(),
       feedback: {
         satisfaction,
@@ -103,7 +103,7 @@ export default function FeedbackPage() {
   if (submitted) {
     return (
       <main className="min-h-dvh bg-background">
-        <Header workflow="" trial={0} />
+        <Header workflow="" round={0} />
 
         <div className="mx-auto max-w-3xl p-6">
           <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
@@ -190,7 +190,7 @@ export default function FeedbackPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="" trial={0} />
+      <Header workflow="" round={0} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
@@ -198,7 +198,7 @@ export default function FeedbackPage() {
         <header className="mb-6 text-center">
           <h1 className="text-3xl font-semibold text-foreground">Final feedback</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Thanks for completing all {run.totalTrials} trials. A few short questions:
+            Thanks for completing all {run.totalRounds} rounds. A few short questions:
           </p>
         </header>
 

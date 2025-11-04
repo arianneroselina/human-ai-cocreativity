@@ -65,10 +65,10 @@ function ThemeToggle() {
 
 interface HeaderProps {
   workflow: string;
-  trial: number;
+  round: number;
 }
 
-export default function Header({ workflow, trial }: HeaderProps) {
+export default function Header({ workflow, round }: HeaderProps) {
   const [paused, setPaused] = useState(false);
   const resumeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -167,14 +167,14 @@ export default function Header({ workflow, trial }: HeaderProps) {
         </div>
       </header>
 
-      {/* Trial bar now uses theme tokens */}
-      {trial > 0 && (
+      {/* Round bar now uses theme tokens */}
+      {round > 0 && (
         <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="mx-auto max-w-4xl p-4 flex items-center gap-3">
             <div className="mr-auto">
               <h1 className="text-xl font-semibold tracking-tight text-foreground">Human-AI Co-Creativity</h1>
               <p className="text-xs text-muted-foreground">
-                Trial {trial}: <span className="font-medium text-foreground">{workflow}</span>
+                Round {round}: <span className="font-medium text-foreground">{workflow}</span>
               </p>
             </div>
 

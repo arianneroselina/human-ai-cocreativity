@@ -5,21 +5,21 @@ export async function POST(req: Request) {
   const body = await req.json();
   const {
     sessionId,
-    trialIndex,
+    roundIndex,
     workflow,      // 'human' | 'ai' | 'human_ai' | 'ai_human'
   } = body;
 
-  if (!sessionId || !trialIndex || !workflow) {
+  if (!sessionId || !roundIndex || !workflow) {
     return NextResponse.json({ error: 'missing fields' }, { status: 400 });
   }
 
-  const trial = await prisma.trial.create({
+  const round = await prisma.round.create({
     data: {
       sessionId,
-      index: trialIndex,
+      index: roundIndex,
       workflow,
     },
   });
 
-  return NextResponse.json({ ok: true, trialId: trial.id });
+  return NextResponse.json({ ok: true, roundId: round.id });
 }

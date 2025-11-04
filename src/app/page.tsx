@@ -66,7 +66,7 @@ export default function Page() {
 
   const start = async () => {
     setStarting(true);
-    send({ type: 'START_SESSION', totalTrials: 3 }); // fixed to 3 (pilot)
+    send({ type: 'START_SESSION', totalRounds: 3 }); // fixed to 3 (pilot)
     router.replace('/choose');
 
     const { run } = useExperiment.getState();
@@ -76,20 +76,20 @@ export default function Page() {
       body: JSON.stringify({
         participantId: run.participantId,
         sessionId: run.sessionId,
-        totalTrials: run.totalTrials,
+        totalRounds: run.totalRounds,
       }),
     }).catch(console.error);
 
     console.log("Starting session:", {
       participantId: run.participantId,
       sessionId: run.sessionId,
-      totalTrials: run.totalTrials,
+      totalRounds: run.totalRounds,
     });
   };
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow={""} trial={0} />
+      <Header workflow={""} round={0} />
       <Progress />
 
       <div className="mx-auto max-w-5xl p-6 space-y-6">
@@ -101,7 +101,7 @@ export default function Page() {
                 Start a new session
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                This pilot session contains <span className="font-medium text-foreground">3 short trials</span>. You can pause during a task, but each trial is time-boxed.
+                This pilot session contains <span className="font-medium text-foreground">3 short rounds</span>. You can pause during a task, but each round is time-boxed.
               </p>
             </div>
             <DevResetButton />
@@ -194,7 +194,7 @@ export default function Page() {
                     What to expect in this session
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                    <li>3 time-boxed trials. In each trial you’ll <span className="font-medium text-foreground">choose a workflow</span>, then complete the task.</li>
+                    <li>3 time-boxed rounds. In each round you’ll <span className="font-medium text-foreground">choose a workflow</span>, then complete the task.</li>
                     <li>At the very end, you’ll answer a brief feedback survey.</li>
                   </ul>
                 </div>

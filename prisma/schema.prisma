@@ -24,15 +24,15 @@ model Session {
   id            String      @id @default(cuid())
   participant   Participant @relation(fields: [participantId], references: [id])
   participantId String
-  totalTrials   Int
+  totalRounds   Int
   startedAt     DateTime    @default(now())
   finishedAt    DateTime?
   timeMs        Int?
-  trials        Trial[]
+  rounds        Round[]
   feedback      Feedback?
 }
 
-model Trial {
+model Round {
   id                 String    @id @default(cuid())
   session            Session   @relation(fields: [sessionId], references: [id])
   sessionId          String

@@ -9,13 +9,13 @@ import { Button } from '@/components/shadcn_ui/button';
 import { CheckCircle2, Timer as TimerIcon, ArrowRight, Trophy, Loader2, ClipboardList } from 'lucide-react';
 import Header from "@/components/ui/header";
 
-export default function AfterTrial() {
+export default function AfterRound() {
   useRouteGuard(['submit']);
 
   const { run, send } = useExperiment();
   const router = useRouter();
 
-  const finishing = run.trialIndex >= run.totalTrials;
+  const finishing = run.roundIndex >= run.totalRounds;
   const targetHref = finishing ? '/feedback' : '/choose';
 
   const [seconds, setSeconds] = useState(30);
@@ -62,21 +62,21 @@ export default function AfterTrial() {
   }, [next, navigating]);
 
   const title = useMemo(
-    () => (finishing ? 'All trials submitted' : `Trial ${run.trialIndex} submitted`),
-    [finishing, run.trialIndex]
+    () => (finishing ? 'All rounds submitted' : `Round ${run.roundIndex} submitted`),
+    [finishing, run.roundIndex]
   );
 
   const subtitle = useMemo(
     () =>
       finishing
         ? 'You’re done. Thanks for participating!'
-        : `Next: Trial ${run.trialIndex + 1} of ${run.totalTrials}`,
-    [finishing, run.trialIndex, run.totalTrials]
+        : `Next: Round ${run.roundIndex + 1} of ${run.totalRounds}`,
+    [finishing, run.roundIndex, run.totalRounds]
   );
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="" trial={0} />
+      <Header workflow="" round={0} />
       <Progress />
 
       <div className="mx-auto max-w-3xl p-6">
@@ -93,7 +93,7 @@ export default function AfterTrial() {
               <div className="mt-4 rounded-lg border border-border bg-muted p-4">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                   <ClipboardList className="h-4 w-4" />
-                  Submission Summary (this trial)
+                  Submission Summary (this round)
                 </div>
 
                 <div className="mt-3 grid grid-cols-1 gap-2 text-sm">
@@ -117,7 +117,7 @@ export default function AfterTrial() {
                 <div className="inline-flex items-center gap-2 rounded-md border border-border bg-accent px-3 py-1.5 text-xs text-accent-foreground">
                   <TimerIcon className="h-4 w-4" />
                   <span>
-                    Continuing {finishing ? 'to feedback' : 'to next trial'} in{" "}
+                    Continuing {finishing ? 'to feedback' : 'to next round'} in{" "}
                     <span className="font-medium text-foreground">{seconds}s</span>...
                   </span>
                 </div>
@@ -138,7 +138,7 @@ export default function AfterTrial() {
 
               {!finishing && (
                 <p className="mt-3 text-xs text-muted-foreground">
-                  You’ll choose your workflow for the next trial on the next screen.
+                  You’ll choose your workflow for the next round on the next screen.
                 </p>
               )}
             </div>

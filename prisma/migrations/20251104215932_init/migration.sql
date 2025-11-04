@@ -13,7 +13,7 @@ CREATE TABLE "Participant" (
 CREATE TABLE "Session" (
     "id" TEXT NOT NULL,
     "participantId" TEXT NOT NULL,
-    "totalTrials" INTEGER NOT NULL,
+    "totalRounds" INTEGER NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "finishedAt" TIMESTAMP(3),
     "timeMs" INTEGER,
@@ -22,7 +22,7 @@ CREATE TABLE "Session" (
 );
 
 -- CreateTable
-CREATE TABLE "Trial" (
+CREATE TABLE "Round" (
     "id" TEXT NOT NULL,
     "sessionId" TEXT NOT NULL,
     "index" INTEGER NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE "Trial" (
     "meetsRequiredWords" BOOLEAN,
     "meetsAvoidWords" BOOLEAN,
 
-    CONSTRAINT "Trial_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Round_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -53,7 +53,7 @@ CREATE TABLE "Feedback" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Trial_sessionId_index_key" ON "Trial"("sessionId", "index");
+CREATE UNIQUE INDEX "Round_sessionId_index_key" ON "Round"("sessionId", "index");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Feedback_sessionId_key" ON "Feedback"("sessionId");
@@ -62,7 +62,7 @@ CREATE UNIQUE INDEX "Feedback_sessionId_key" ON "Feedback"("sessionId");
 ALTER TABLE "Session" ADD CONSTRAINT "Session_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "Participant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Trial" ADD CONSTRAINT "Trial_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Round" ADD CONSTRAINT "Round_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Feedback" ADD CONSTRAINT "Feedback_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

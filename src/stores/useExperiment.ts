@@ -6,7 +6,7 @@ import type { ExperimentRun } from '@/lib/experiment';
 import { Workflow } from "@/lib/experiment";
 
 type Event =
-  | { type: 'START_SESSION'; totalTrials?: number }
+  | { type: 'START_SESSION'; totalRounds?: number }
   | { type: 'SELECT_WORKFLOW'; workflow: Workflow }
   | { type: 'LOCK_WORKFLOW' }
   | { type: 'SUBMIT_TRIAL' }
@@ -23,8 +23,8 @@ interface Store {
 const initial: ExperimentRun = {
   participantId: null,
   sessionId: null,
-  totalTrials: 3,
-  trialIndex: 0,
+  totalRounds: 3,
+  roundIndex: 0,
   phase: 'idle',
   locked: false
 };
@@ -46,7 +46,7 @@ export const useExperiment = create<Store>()(
           case 'LOCK_WORKFLOW':    return run.phase === 'choose_workflow' && !!run.workflow;
           case 'SUBMIT_TRIAL':     return run.phase === 'task';
           case 'NEXT_TRIAL':       return run.phase === 'submit';
-          case 'FINISH_SESSION':   return run.phase === 'submit' && run.trialIndex >= run.totalTrials;
+          case 'FINISH_SESSION':   return run.phase === 'submit' && run.roundIndex >= run.totalRounds;
           case 'RESET':            return true;
           default:                 return false;
         }
@@ -61,8 +61,8 @@ export const useExperiment = create<Store>()(
               if (state.can('START_SESSION')) {
                 s.participantId = s.participantId ?? uuid();
                 s.sessionId = uuid();
-                s.totalTrials = Math.min(5, Math.max(3, event.totalTrials ?? s.totalTrials));
-                s.trialIndex = 1;
+                s.totalRounds = Math.min(5, Math.max(3, event.totalRounds ?? s.totalRounds));
+                s.roundIndex = 1;
                 s.phase = 'choose_workflow';
                 s.locked = false;
                 s.workflow = undefined;
@@ -95,8 +95,8 @@ export const useExperiment = create<Store>()(
 
             case 'NEXT_TRIAL': {
               if (state.can('NEXT_TRIAL')) {
-                if (s.trialIndex < s.totalTrials) {
-                  s.trialIndex += 1;
+                if (s.roundIndex < s.totalRounds) {
+                  s.roundIndex += 1;
                   s.phase = 'choose_workflow';
                   s.locked = false;
                   s.workflow = undefined;

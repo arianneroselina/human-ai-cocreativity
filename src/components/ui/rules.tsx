@@ -13,11 +13,11 @@ export default function Rules() {
           </li>
           <li className="flex items-center gap-1.5">
             <Lock className="h-3.5 w-3.5" />
-            You can’t change workflow after starting a trial.
+            You can’t change workflow after starting a round.
           </li>
           <li className="flex items-center gap-1.5">
             <Timer className="h-3.5 w-3.5" />
-            Each trial is time-boxed; please submit before time runs out.
+            Each round is time-boxed; please submit before time runs out.
           </li>
         </ul>
       </div>

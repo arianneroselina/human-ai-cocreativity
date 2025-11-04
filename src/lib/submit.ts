@@ -14,21 +14,21 @@ export async function submitData(
   localStorage.setItem("meetsAvoidWords", JSON.stringify(meetsAvoidWords));
 
   const { run } = useExperiment.getState();
-  await fetch('/api/trial/submit', {
+  await fetch('/api/round/submit', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       sessionId: run.sessionId,
-      trialIndex: run.trialIndex,
+      roundIndex: run.roundIndex,
       workflow: run.workflow,
       text,
       metrics: { wordCount: words, meetsRequiredWords, meetsAvoidWords },
     }),
   });
 
-  console.log("Trial submitted:", {
+  console.log("Round submitted:", {
     sessionId: run.sessionId,
-    trialIndex: run.trialIndex,
+    roundIndex: run.roundIndex,
     workflow: run.workflow,
     text,
     metrics: { wordCount: words, meetsRequiredWords, meetsAvoidWords },
