@@ -9,7 +9,7 @@ export default function Footer() {
 
   return (
     <footer className="mt-10 border-t border-border bg-card/60 text-card-foreground backdrop-blur">
-      <div className="mx-auto max-w-5xl px-4 py-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mx-auto w-full px-4 py-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <TooltipProvider delayDuration={150}>
           <Tooltip>
             <TooltipTrigger asChild>
