@@ -9,7 +9,6 @@ import { useExperiment } from '@/stores/useExperiment';
 import { Workflow, Workflows } from '@/lib/experiment';
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
-import Header from "@/components/ui/header";
 
 export default function Choose() {
   useRouteGuard(['choose_workflow']);
@@ -55,7 +54,6 @@ export default function Choose() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow={""} round={0} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6 space-y-4">

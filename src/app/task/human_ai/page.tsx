@@ -6,7 +6,6 @@ import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails, { GeneralAIRules, HumanThenAIRules, Task } from "@/components/ui/taskDetails";
-import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkWords } from "@/lib/check";
 import { submitData } from "@/lib/submit";
@@ -17,6 +16,7 @@ import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
+import RoundHeader from "@/components/ui/roundHeader";
 
 export default function HumanAIPage() {
   useRouteGuard(["task"]);
@@ -94,7 +94,7 @@ export default function HumanAIPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="Human → AI" round={run.roundIndex} />
+      <RoundHeader workflow="Human → AI" round={run.roundIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

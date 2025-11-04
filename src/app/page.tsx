@@ -8,9 +8,8 @@ import Progress from '@/components/ui/progress';
 import Rules from "@/components/ui/rules";
 import { Workflows } from "@/lib/experiment";
 import {
-  RotateCcw, Play, Loader2, ArrowLeftRight, Users, Timer as TimerIcon, ClipboardList, ShieldCheck, EyeOff,
+  RotateCcw, Play, Loader2, ArrowLeftRight, Users, Timer as TimerIcon, ShieldCheck, Clock, ClipboardList, EyeOff
 } from 'lucide-react';
-import Header from "@/components/ui/header";
 
 function DevResetButton() {
   const { send } = useExperiment();
@@ -89,7 +88,6 @@ export default function Page() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow={""} round={0} />
       <Progress />
 
       <div className="mx-auto max-w-5xl p-6 space-y-6">
@@ -101,7 +99,7 @@ export default function Page() {
                 Start a new session
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                This pilot session contains <span className="font-medium text-foreground">3 short rounds</span>. You can pause during a task, but each round is time-boxed.
+                This session contains <span className="font-medium text-foreground">3 rounds</span>. You can pause during a task, but each round is time-boxed.
               </p>
             </div>
             <DevResetButton />
@@ -138,6 +136,13 @@ export default function Page() {
                 Session in progress — please <span className="font-medium text-foreground">Resume</span>.
               </span>
             )}
+
+            {!hasActiveSession && (
+              <div className="mt-1 inline-flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="h-4 w-4" />
+                <span className="text-xs text-foreground">This whole session takes ~20–30 minutes</span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -148,9 +153,10 @@ export default function Page() {
             <div className="flex-1">
               <h3 className="text-xl font-semibold tracking-tight">What this study is about</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                We’re exploring how people collaborate with AI on time-boxed tasks, and how this affects <span className="font-medium text-foreground">efficiency, output quality, workflow choices,</span> and <span className="font-medium text-foreground">trust in AI</span>.
-                You’ll complete multiple short tasks while choosing one of four collaboration workflows each round.
-                Your outputs are later stored anonymously and we&apos;ll analyze how choices and performance evolve over time.
+                We’re exploring how people collaborate with AI on time-boxed writing tasks, and how this affects
+                <span className="font-medium text-foreground"> efficiency</span>, <span className="font-medium text-foreground">output quality</span>,
+                <span className="font-medium text-foreground"> workflow choices</span>, and <span className="font-medium text-foreground">trust in AI</span>.
+                You’ll complete several rounds while choosing one of four collaboration workflows each time.
               </p>
             </div>
 
@@ -194,8 +200,9 @@ export default function Page() {
                     What to expect in this session
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                    <li>3 time-boxed rounds. In each round you’ll <span className="font-medium text-foreground">choose a workflow</span>, then complete the task.</li>
-                    <li>At the very end, you’ll answer a brief feedback survey.</li>
+                    <li>3 time-boxed rounds (total ~20–30 minutes).</li>
+                    <li>Each round: choose a workflow, complete the task.</li>
+                    <li>Short feedback at the end; get a brief summary.</li>
                   </ul>
                 </div>
 
@@ -230,7 +237,8 @@ export default function Page() {
                     Privacy & anonymization
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                    <li>No personal data is collected; we follow GDPR-compliant handling of study data.</li>
+                    <li>No personal data collected; anonymous session code provided.</li>
+                    <li>GDPR-aligned handling of study data.</li>
                   </ul>
                 </div>
               </div>

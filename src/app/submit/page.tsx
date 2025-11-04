@@ -7,7 +7,6 @@ import { useRouteGuard } from '@/lib/useRouteGuard';
 import Progress from '@/components/ui/progress';
 import { Button } from '@/components/shadcn_ui/button';
 import { CheckCircle2, Timer as TimerIcon, ArrowRight, Trophy, Loader2, ClipboardList } from 'lucide-react';
-import Header from "@/components/ui/header";
 
 export default function AfterRound() {
   useRouteGuard(['submit']);
@@ -76,7 +75,6 @@ export default function AfterRound() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="" round={0} />
       <Progress />
 
       <div className="mx-auto max-w-3xl p-6">

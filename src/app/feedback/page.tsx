@@ -8,7 +8,6 @@ import { useExperiment } from "@/stores/useExperiment";
 import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, RefreshCw, ChevronDown } from "lucide-react";
 import { Workflow, Workflows } from "@/lib/experiment";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
-import Header from "@/components/ui/header";
 import Progress from "@/components/ui/progress";
 
 export default function FeedbackPage() {
@@ -103,8 +102,6 @@ export default function FeedbackPage() {
   if (submitted) {
     return (
       <main className="min-h-dvh bg-background">
-        <Header workflow="" round={0} />
-
         <div className="mx-auto max-w-3xl p-6">
           <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
             <div className="flex items-start gap-3">
@@ -190,7 +187,6 @@ export default function FeedbackPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="" round={0} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

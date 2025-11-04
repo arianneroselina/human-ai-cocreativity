@@ -6,7 +6,6 @@ import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails from "@/components/ui/taskDetails";
-import Header from "@/components/ui/header";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkWords } from "@/lib/check";
 import { submitData } from "@/lib/submit";
@@ -16,6 +15,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
+import RoundHeader from "@/components/ui/roundHeader";
 
 export default function HumanPage() {
   useRouteGuard(["task"]);
@@ -45,7 +45,7 @@ export default function HumanPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <Header workflow="Human only" round={run.roundIndex} />
+      <RoundHeader workflow="Human only" round={run.roundIndex} />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
