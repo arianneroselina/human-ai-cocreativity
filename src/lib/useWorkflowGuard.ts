@@ -29,7 +29,7 @@ export function useWorkflowGuard() {
       }
     }
     // If not in task anymore, bounce to the right phase screen
-    if (run.phase === 'submit') router.replace('/submit');
-    if (run.phase === 'feedback') router.replace('/feedback');
+    if (run.phase === 'round_feedback') router.replace('/feedback/round');
+    if (run.phase === 'feedback') router.replace('/feedback/session');
   }, [run.phase, run.locked, run.workflow, router, choice]);
 }

@@ -9,8 +9,8 @@ type Event =
   | { type: 'START_SESSION'; totalRounds?: number }
   | { type: 'SELECT_WORKFLOW'; workflow: Workflow }
   | { type: 'LOCK_WORKFLOW' }
-  | { type: 'SUBMIT_TRIAL' }
-  | { type: 'NEXT_TRIAL' }
+  | { type: 'SUBMIT_ROUND' }
+  | { type: 'NEXT_ROUND' }
   | { type: 'FINISH_SESSION' }
   | { type: 'RESET' };
 
@@ -44,9 +44,9 @@ export const useExperiment = create<Store>()(
           case 'START_SESSION':    return run.phase === 'idle';
           case 'SELECT_WORKFLOW':  return run.phase === 'choose_workflow' && !run.locked;
           case 'LOCK_WORKFLOW':    return run.phase === 'choose_workflow' && !!run.workflow;
-          case 'SUBMIT_TRIAL':     return run.phase === 'task';
-          case 'NEXT_TRIAL':       return run.phase === 'submit';
-          case 'FINISH_SESSION':   return run.phase === 'submit' && run.roundIndex >= run.totalRounds;
+          case 'SUBMIT_ROUND':     return run.phase === 'task';
+          case 'NEXT_ROUND':       return run.phase === 'round_feedback';
+          case 'FINISH_SESSION':   return run.phase === 'round_feedback' && run.roundIndex >= run.totalRounds;
           case 'RESET':            return true;
           default:                 return false;
         }
@@ -86,15 +86,15 @@ export const useExperiment = create<Store>()(
               return { run: s };
             }
 
-            case 'SUBMIT_TRIAL': {
-              if (state.can('SUBMIT_TRIAL')) {
-                s.phase = 'submit';
+            case 'SUBMIT_ROUND': {
+              if (state.can('SUBMIT_ROUND')) {
+                s.phase = 'round_feedback';
               }
               return { run: s };
             }
 
-            case 'NEXT_TRIAL': {
-              if (state.can('NEXT_TRIAL')) {
+            case 'NEXT_ROUND': {
+              if (state.can('NEXT_ROUND')) {
                 if (s.roundIndex < s.totalRounds) {
                   s.roundIndex += 1;
                   s.phase = 'choose_workflow';

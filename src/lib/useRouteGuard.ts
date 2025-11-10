@@ -11,7 +11,6 @@ export function useRouteGuard(allow: PhaseAllow) {
   const router = useRouter();
 
   useEffect(() => {
-    console.log(run.phase)
     if (!allow.includes(run.phase)) {
       if (run.phase === 'idle')         router.replace('/');
       else if (run.phase === 'choose_workflow') router.replace('/choose');
@@ -23,9 +22,9 @@ export function useRouteGuard(allow: PhaseAllow) {
         router.replace(`/task/${run.workflow}`);
         return;
       }
-      else if (run.phase === 'submit')  router.replace('/submit');
+      else if (run.phase === 'round_feedback')  router.replace('/feedback/round');
       else if (run.phase === 'feedback') {
-        router.replace('/feedback');
+        router.replace('/feedback/session');
       }
     }
   }, [allow, run.phase, run.workflow, run.locked, router]);

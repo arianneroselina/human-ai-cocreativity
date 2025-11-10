@@ -84,7 +84,7 @@ export default function AIPage() {
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: 'SUBMIT_TRIAL' });
+    send({ type: 'SUBMIT_ROUND' });
   };
 
   const submitDisabled = locked || !aiUsed || text.trim().length === 0;

@@ -85,7 +85,7 @@ export default function AIHumanWorkPage() {
   const submit = () => {
     setLocked(true);
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: 'SUBMIT_TRIAL' });
+    send({ type: 'SUBMIT_ROUND' });
   };
 
   const submitDisabled = locked || text.trim().length === 0 || !aiUsed;

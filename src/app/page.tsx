@@ -57,8 +57,8 @@ export default function Page() {
     switch (run.phase) {
       case 'choose_workflow': return '/choose';
       case 'task':            return `/task/${run.workflow}`;
-      case 'submit':          return '/submit';
-      case 'feedback':        return '/feedback';
+      case 'round_feedback':  return '/feedback/round';
+      case 'feedback':        return '/feedback/session';
       default:                return null;
     }
   }, [run.phase, run.workflow, starting]);
@@ -77,7 +77,7 @@ export default function Page() {
         sessionId: run.sessionId,
         totalRounds: run.totalRounds,
       }),
-    }).catch(console.error);
+    });
 
     console.log("Starting session:", {
       participantId: run.participantId,

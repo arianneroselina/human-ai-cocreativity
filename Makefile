@@ -29,7 +29,7 @@ clean:
 	rm -rf prisma/migrations node_modules/.prisma generated/prisma
 
 .PHONY: rebuild
-rebuild: clean gen migrate
+rebuild: clean reset gen migrate
 
 .PHONY: help
 help:

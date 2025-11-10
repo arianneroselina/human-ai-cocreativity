@@ -33,20 +33,36 @@ model Session {
 }
 
 model Round {
-  id                 String    @id @default(cuid())
-  session            Session   @relation(fields: [sessionId], references: [id])
+  id                 String         @id @default(cuid())
+  session            Session        @relation(fields: [sessionId], references: [id])
   sessionId          String
   index              Int
   workflow           Workflow
-  startedAt          DateTime  @default(now())
+  startedAt          DateTime       @default(now())
   submittedAt        DateTime?
   text               String?
   timeMs             Int?
   wordCount          Int?
   meetsRequiredWords Boolean?
   meetsAvoidWords    Boolean?
+  feedback           RoundFeedback?
 
   @@unique([sessionId, index])
+}
+
+model RoundFeedback {
+  id           String    @id @default(cuid())
+  round        Round     @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
+  sessionId    String
+  roundIndex   Int
+  workflow     Workflow
+  liking       Int?
+  trust        Int?
+  satisfaction Int?
+  comment      String?
+  createdAt    DateTime  @default(now())
+
+  @@unique([sessionId, roundIndex])
 }
 
 model Feedback {

@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       clarity: clarity ?? null,
       recommendation: recommendation ?? null,
       workflowRating: workflowBest ?? null,
-      comments: typeof comment === 'string' ? comment.slice(0, 2000) : null,
+      comments: comment ? String(comment).slice(0, 2000) : null,
     },
   });
 

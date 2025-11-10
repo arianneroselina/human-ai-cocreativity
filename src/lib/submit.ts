@@ -34,6 +34,6 @@ export async function submitData(
     metrics: { wordCount: words, meetsRequiredWords, meetsAvoidWords },
   });
 
-  useExperiment.getState().send({ type: 'SUBMIT_TRIAL' });
-  router.push("/submit");
+  useExperiment.getState().send({ type: 'SUBMIT_ROUND' });
+  router.push("/feedback/round");
 }

@@ -70,7 +70,7 @@ export default function FeedbackPage() {
     setSubmitted(true);
 
     const { run } = useExperiment.getState();
-    await fetch('/api/feedback', {
+    await fetch('/api/feedback/session', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -83,7 +83,7 @@ export default function FeedbackPage() {
       }),
     });
 
-    console.log("Survey submitted:", {
+    console.log("Feedback submitted:", {
       sessionId: run.sessionId,
       satisfaction,
       clarity,
@@ -223,7 +223,7 @@ export default function FeedbackPage() {
             />
 
             <LikertRow
-              label="3) Likely to recommend similar tasks"
+              label="3) Likely to recommend the platform"
               value={recommendation}
               onChange={setRecommendation}
               left="Very unlikely"
@@ -250,7 +250,8 @@ export default function FeedbackPage() {
                           : "border-border hover:bg-accent"
                       ].join(" ")}
                     >
-                      <div className="font-medium">{w.label}</div>
+                        <span className="text-base leading-none p-1">{w.icon}</span>
+                        <span className="font-medium">{w.title}</span>
                     </button>
                   );
                 })}
