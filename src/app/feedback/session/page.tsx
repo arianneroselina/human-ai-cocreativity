@@ -9,6 +9,7 @@ import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, RefreshCw, ChevronDo
 import { Workflow, Workflows } from "@/lib/experiment";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import Progress from "@/components/ui/progress";
+import { Textarea } from "@/components/shadcn_ui/textarea";
 
 export default function FeedbackPage() {
   useRouteGuard(["feedback"]);
@@ -21,6 +22,8 @@ export default function FeedbackPage() {
   const [recommendation, setRecommendation] = useState<Likert | null>(null);
   const [workflowBest, setWorkflowBest] = useState<Workflow | null>(null);
   const [comment, setComment] = useState("");
+  const commentChars = useMemo(() => comment.length, [comment]);
+  const MAX_COMMENT_CHARS = 1000;
 
   const [submitted, setSubmitted] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -263,15 +266,27 @@ export default function FeedbackPage() {
               <label htmlFor="comment" className="block text-sm text-foreground">
                 Additional comments (optional)
               </label>
-              <input
+
+              <Textarea
                 id="comment"
-                type="text"
+                rows={5}
+                maxLength={MAX_COMMENT_CHARS}
+                value={comment}
+                onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))}
+                placeholder="Anything that stood out, suggestions, etc."
                 className="w-full rounded-lg border border-border bg-background p-3 text-sm text-foreground
                 placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="Anything that stood out, suggestions, etc."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
               />
+
+              <div className="flex justify-end">
+                <span
+                  className={`text-xs ${commentChars >= MAX_COMMENT_CHARS ? "text-red-500" : "text-muted-foreground"}`}
+                  aria-live="polite"
+                  role="status"
+                >
+                  {commentChars}/{MAX_COMMENT_CHARS}
+                </span>
+              </div>
             </div>
           </div>
 

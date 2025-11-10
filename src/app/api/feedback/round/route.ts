@@ -34,14 +34,14 @@ export async function POST(req: Request) {
       liking: liking ?? null,
       trust: trustVal, // null for human-only
       satisfaction: satisfaction ?? null,
-      comment: comment ? String(comment).slice(0, 2000) : null,
+      comment: comment ? String(comment).slice(0, 200) : null,
     },
     update: {
       workflow,
       liking: liking ?? null,
       trust: trustVal,
       satisfaction: satisfaction ?? null,
-      comment: comment ? String(comment).slice(0, 2000) : null,
+      comment: comment ? String(comment).slice(0, 200) : null,
     },
   });
 

@@ -9,6 +9,7 @@ import Progress from "@/components/ui/progress";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Workflows, type Workflow } from "@/lib/experiment";
+import { Textarea } from "@/components/shadcn_ui/textarea";
 
 export default function RoundFeedbackPage() {
   useRouteGuard(["round_feedback"]);
@@ -26,6 +27,8 @@ export default function RoundFeedbackPage() {
   const [trust, setTrust] = useState<Likert | null>(null); // AI only
   const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
   const [comment, setComment] = useState("");
+  const commentChars = useMemo(() => comment.length, [comment]);
+  const MAX_COMMENT_CHARS = 200;
 
   const canSubmit =
     liking !== null &&
@@ -132,14 +135,27 @@ export default function RoundFeedbackPage() {
                   <label htmlFor="comment" className="block text-sm text-foreground">
                     Optional short comment
                   </label>
-                  <input
+
+                  <Textarea
                     id="comment"
-                    type="text"
-                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    placeholder="Anything notable this round?"
+                    rows={2}
+                    maxLength={MAX_COMMENT_CHARS}
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))}
+                    placeholder="Anything notable this round?"
+                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
+               placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   />
+
+                  <div className="flex justify-end">
+                    <span
+                      className={`text-xs ${commentChars >= MAX_COMMENT_CHARS ? "text-red-500" : "text-muted-foreground"}`}
+                      aria-live="polite"
+                      role="status"
+                    >
+                      {commentChars}/{MAX_COMMENT_CHARS}
+                    </span>
+                  </div>
                 </div>
               </div>
 
