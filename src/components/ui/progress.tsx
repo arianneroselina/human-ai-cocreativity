@@ -7,7 +7,7 @@ export default function Progress() {
 
   const completedRounds = (() => {
     switch (run.phase) {
-      case 'submit':
+      case 'round_feedback':
         return run.roundIndex;
       case 'feedback':
         return run.totalRounds;
