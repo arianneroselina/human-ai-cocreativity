@@ -52,7 +52,7 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="inline-flex items-center justify-center rounded-md border border-border bg-transparent p-1.5 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+      className="inline-flex items-center justify-center rounded-md border border-white/25 bg-white/10 p-1.5 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
       title={dark ? "Switch to light mode" : "Switch to dark mode"}
       aria-label="Toggle theme"
       type="button"
