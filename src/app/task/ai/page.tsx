@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -89,6 +89,11 @@ export default function AIPage() {
 
   const submitDisabled = locked || !aiUsed || text.trim().length === 0;
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    alert("Pasting is disabled.");
+  };
+
   return (
     <main className="min-h-dvh bg-background">
       <RoundHeader workflow="AI only" round={run.roundIndex} />
@@ -146,6 +151,7 @@ export default function AIPage() {
               rows={14}
               value={text}
               readOnly={readOnly}
+              onPaste={handlePaste}
               placeholder="Click 'Generate AI Draft' to see the output..."
               className="bg-muted text-foreground placeholder:text-muted-foreground"
             />

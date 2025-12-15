@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -100,6 +100,11 @@ export default function HumanAIPage() {
 
   const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    alert("Pasting is disabled.");
+  };
+
   return (
     <main className="min-h-dvh bg-background">
       <RoundHeader workflow="Human → AI" round={run.roundIndex} />
@@ -164,6 +169,7 @@ export default function HumanAIPage() {
                 </span>
               </div>
             </div>
+
             <Textarea
               id="draft"
               rows={14}
@@ -171,8 +177,10 @@ export default function HumanAIPage() {
               onChange={(e) => setText(e.target.value)}
               placeholder="Write here... then click 'Ask AI to Edit'."
               readOnly={readOnly}
+              onPaste={handlePaste}
               className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />
+
             <div className="mt-3 flex items-center justify-between gap-2">
               <Rules />
 

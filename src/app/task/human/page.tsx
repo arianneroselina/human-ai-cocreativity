@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -51,6 +51,11 @@ export default function HumanPage() {
 
   const submitDisabled = locked || text.trim().length === 0;
 
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    alert("Pasting is disabled.");
+  };
+
   return (
     <main className="min-h-dvh bg-background">
       <RoundHeader workflow="Human only" round={run.roundIndex} />
@@ -92,6 +97,7 @@ export default function HumanPage() {
               onChange={(e) => setText(e.target.value)}
               placeholder="Write here..."
               readOnly={readOnly}
+              onPaste={handlePaste}
               className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
             />
 
