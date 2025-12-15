@@ -26,6 +26,11 @@ export default function RoundFeedbackPage() {
   const [liking, setLiking] = useState<Likert | null>(null);
   const [trust, setTrust] = useState<Likert | null>(null); // AI only
   const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
+  const [mentalDemand, setMentalDemand] = useState<Likert | null>(null);
+  const [physicalDemand, setPhysicalDemand] = useState<Likert | null>(null);
+  const [temporalDemand, setTemporalDemand] = useState<Likert | null>(null);
+  const [effort, setEffort] = useState<Likert | null>(null);
+  const [frustration, setFrustration] = useState<Likert | null>(null);
   const [comment, setComment] = useState("");
   const commentChars = useMemo(() => comment.length, [comment]);
   const MAX_COMMENT_CHARS = 200;
@@ -33,7 +38,12 @@ export default function RoundFeedbackPage() {
   const canSubmit =
     liking !== null &&
     satisfaction !== null &&
-    (workflowUsesAI ? trust !== null : true);
+    (workflowUsesAI ? trust !== null : true) &&
+    mentalDemand !== null &&
+    physicalDemand !== null &&
+    temporalDemand !== null &&
+    effort !== null &&
+    frustration !== null;
 
   const title = useMemo(
     () => `Round ${run.roundIndex} — quick feedback`,
@@ -55,6 +65,11 @@ export default function RoundFeedbackPage() {
         liking,
         trust,
         satisfaction,
+        mentalDemand,
+        physicalDemand,
+        temporalDemand,
+        effort,
+        frustration,
         comment,
       }),
     });
@@ -66,6 +81,11 @@ export default function RoundFeedbackPage() {
       liking,
       trust,
       satisfaction,
+      mentalDemand,
+      physicalDemand,
+      temporalDemand,
+      effort,
+      frustration,
       comment,
     });
 
@@ -89,13 +109,12 @@ export default function RoundFeedbackPage() {
             </div>
             <div className="flex-1">
               <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {(run.roundIndex >= run.totalRounds) ?
-                    "Just a few quick questions before finishing the session." :
-                    "Just a few quick questions before the next round."
-                  }
-                </p>
-
+              <p className="mt-1 text-sm text-muted-foreground">
+                {(run.roundIndex >= run.totalRounds) ?
+                  "Just a few quick questions before finishing the session." :
+                  "Just a few quick questions before the next round."
+                }
+              </p>
 
               {wf && (
                 <div className="mt-3 inline-flex items-center gap-2 rounded-md border border-border bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
@@ -106,29 +125,66 @@ export default function RoundFeedbackPage() {
 
               <div className="mt-5 space-y-5">
                 <LikertRow
-                  label="1) How did you like the workflow you chose this round?"
+                  label={`1) I liked the workflow "${wf?.title}" I chose this round.`}
                   value={liking}
                   onChange={setLiking}
-                  left="Hated it"
-                  right="Loved it"
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
                 />
 
                 {workflowUsesAI && (
                   <LikertRow
-                    label="2) How much did you trust the AI this round?"
+                    label="2) I trusted the AI during this round."
                     value={trust}
                     onChange={setTrust}
-                    left="Not at all"
-                    right="Completely"
+                    left="Strongly Disagree"
+                    right="Strongly Agree"
                   />
                 )}
 
                 <LikertRow
-                  label={`${workflowUsesAI ? "3" : "2"}) How satisfied are you with your result?`}
+                  label={`${workflowUsesAI ? "3" : "2"}) I am satisfied with the results of this round.`}
                   value={satisfaction}
                   onChange={setSatisfaction}
-                  left="Very dissatisfied"
-                  right="Very satisfied"
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+
+                {/* Start of TLX metrics */}
+                <LikertRow
+                  label={`${workflowUsesAI ? "4" : "3"}) This task was mentally demanding.`}
+                  value={mentalDemand}
+                  onChange={setMentalDemand}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+                <LikertRow
+                  label={`${workflowUsesAI ? "5" : "4"}) This task was physically demanding.`}
+                  value={physicalDemand}
+                  onChange={setPhysicalDemand}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+                <LikertRow
+                  label={`${workflowUsesAI ? "6" : "5"}) I felt rushed during this round.`}
+                  value={temporalDemand}
+                  onChange={setTemporalDemand}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+                <LikertRow
+                  label={`${workflowUsesAI ? "7" : "6"}) This task required a lot of effort.`}
+                  value={effort}
+                  onChange={setEffort}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+                <LikertRow
+                  label={`${workflowUsesAI ? "8" : "7"}) I felt frustrated during this round.`}
+                  value={frustration}
+                  onChange={setFrustration}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
                 />
 
                 <div className="space-y-2">
@@ -143,8 +199,7 @@ export default function RoundFeedbackPage() {
                     value={comment}
                     onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))}
                     placeholder="Anything notable this round?"
-                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
-               placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                   />
 
                   <div className="flex justify-end">
@@ -165,9 +220,7 @@ export default function RoundFeedbackPage() {
                   disabled={!canSubmit || loading}
                   className="inline-flex items-center gap-2"
                 >
-                  {loading &&
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  }
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                   Continue
                 </Button>
               </div>

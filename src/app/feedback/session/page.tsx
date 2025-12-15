@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/shadcn_ui/button";
-import { useRouteGuard } from "@/lib/useRouteGuard";
 import { useExperiment } from "@/stores/useExperiment";
+import { useRouteGuard } from "@/lib/useRouteGuard";
+import { Button } from "@/components/shadcn_ui/button";
+import Progress from "@/components/ui/progress";
+import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, RefreshCw, ChevronDown } from "lucide-react";
 import { Workflow, Workflows } from "@/lib/experiment";
-import LikertRow, { Likert } from "@/components/ui/likertRow";
-import Progress from "@/components/ui/progress";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 
 export default function FeedbackPage() {
@@ -17,10 +17,13 @@ export default function FeedbackPage() {
   const router = useRouter();
   const { run, send } = useExperiment();
 
-  const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
-  const [clarity, setClarity] = useState<Likert | null>(null);
-  const [recommendation, setRecommendation] = useState<Likert | null>(null);
+  const [satisfaction, setSatisfaction] = useState<number | null>(null);
+  const [clarity, setClarity] = useState<number | null>(null);
+  const [effort, setEffort] = useState<number | null>(null);
+  const [frustration, setFrustration] = useState<number | null>(null);
+  const [recommendation, setRecommendation] = useState<number | null>(null);
   const [workflowBest, setWorkflowBest] = useState<Workflow | null>(null);
+
   const [comment, setComment] = useState("");
   const commentChars = useMemo(() => comment.length, [comment]);
   const MAX_COMMENT_CHARS = 1000;
@@ -31,6 +34,8 @@ export default function FeedbackPage() {
   const canSubmit =
     satisfaction !== null &&
     clarity !== null &&
+    effort !== null &&
+    frustration !== null &&
     recommendation !== null &&
     workflowBest !== null;
 
@@ -53,6 +58,8 @@ export default function FeedbackPage() {
       feedback: {
         satisfaction,
         clarity,
+        effort,
+        frustration,
         recommendation,
         workflowBest,
         comments: comment || null,
@@ -80,6 +87,8 @@ export default function FeedbackPage() {
         sessionId: run.sessionId,
         satisfaction,
         clarity,
+        effort,
+        frustration,
         recommendation,
         workflowBest,
         comment,
@@ -90,6 +99,8 @@ export default function FeedbackPage() {
       sessionId: run.sessionId,
       satisfaction,
       clarity,
+      effort,
+      frustration,
       recommendation,
       workflowBest,
       comment,
@@ -114,7 +125,7 @@ export default function FeedbackPage() {
                   Thank you for your feedback!
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Your responses were recorded. Below are a few options for your records.
+                  Your responses have been recorded. Here are some options for your records.
                 </p>
 
                 <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -125,16 +136,11 @@ export default function FeedbackPage() {
                     title="Copy anonymous session code"
                   >
                     {copied ? (
-                      <>
-                        <ClipboardCheck className="h-4 w-4" />
-                        Copied
-                      </>
+                      <ClipboardCheck className="h-4 w-4" />
                     ) : (
-                      <>
-                        <Clipboard className="h-4 w-4" />
-                        Copy session code
-                      </>
+                      <Clipboard className="h-4 w-4" />
                     )}
+                    {copied ? "Copied" : "Copy session code"}
                   </Button>
 
                   <Button
@@ -172,7 +178,7 @@ export default function FeedbackPage() {
                       If you have questions or want to withdraw your data, contact the study team with your session code:
                       <span className="ml-1 font-mono text-xs rounded border border-border bg-muted px-1 py-0.5">
                         {sessionCode}
-                      </span>.
+                      </span>..
                     </p>
                   </div>
                 </details>
@@ -205,37 +211,53 @@ export default function FeedbackPage() {
         <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
           <h2 className="font-semibold text-xl text-foreground">Your experience</h2>
           <p className="text-sm text-muted-foreground mt-2">
-            Please rate and tell us which workflow worked best for you.
+            Please rate the following statements based on your experience during the session.
           </p>
 
           <div className="mt-6 space-y-6">
             <LikertRow
-              label="1) Overall satisfaction"
+              label="1) I am satisfied with my results during the session."
               value={satisfaction}
               onChange={setSatisfaction}
-              left="Very dissatisfied"
-              right="Very satisfied"
+              left="Strongly Disagree"
+              right="Strongly Agree"
             />
 
             <LikertRow
-              label="2) Task clarity"
+              label="2) The tasks were clear and easy to understand."
               value={clarity}
               onChange={setClarity}
-              left="Very unclear"
-              right="Very clear"
+              left="Strongly Disagree"
+              right="Strongly Agree"
             />
 
             <LikertRow
-              label="3) Likely to recommend the platform"
+              label="3) The study required a lot of effort."
+              value={effort}
+              onChange={setEffort}
+              left="Strongly Disagree"
+              right="Strongly Agree"
+            />
+
+            <LikertRow
+              label="4) I felt frustrated during the study."
+              value={frustration}
+              onChange={setFrustration}
+              left="Strongly Disagree"
+              right="Strongly Agree"
+            />
+
+            <LikertRow
+              label="5) I would recommend this study to my friends/colleagues."
               value={recommendation}
               onChange={setRecommendation}
-              left="Very unlikely"
-              right="Very likely"
+              left="Strongly Disagree"
+              right="Strongly Agree"
             />
 
             {/* Workflow picker */}
             <div className="space-y-2">
-              <div className="text-sm text-foreground">4) Which workflow felt most useful?</div>
+              <div className="text-sm text-foreground">6) Which workflow felt most useful?</div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {Workflows.map((w) => {
                   const active = workflowBest === w.key;
@@ -253,8 +275,8 @@ export default function FeedbackPage() {
                           : "border-border hover:bg-accent"
                       ].join(" ")}
                     >
-                        <span className="text-base leading-none p-1">{w.icon}</span>
-                        <span className="font-medium">{w.title}</span>
+                      <span className="text-base leading-none p-1">{w.icon}</span>
+                      <span className="font-medium">{w.title}</span>
                     </button>
                   );
                 })}

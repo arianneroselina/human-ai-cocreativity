@@ -40,6 +40,7 @@ export default function AIHumanWorkPage() {
 
   // readOnly until AI generates; afterward editable (unless locked)
   const readOnly = useMemo(() => locked || !aiUsed, [locked, aiUsed]);
+  const [showMessage, setShowMessage] = useState(false);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
@@ -90,9 +91,12 @@ export default function AIHumanWorkPage() {
 
   const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    alert("Pasting is disabled.");
+    setShowMessage(true);
+    setTimeout(() => {
+      setShowMessage(false);
+    }, 2000);
   };
 
   return (
@@ -159,16 +163,25 @@ export default function AIHumanWorkPage() {
               </div>
             </div>
 
-            <Textarea
-              id="draft"
-              rows={14}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              placeholder={aiUsed ? "You can now edit the AI draft..." : "Click 'Generate AI Draft' to start..."}
-              readOnly={readOnly}
-              onPaste={handlePaste}
-              className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
-            />
+            <div className="relative">
+              <Textarea
+                id="draft"
+                rows={14}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                placeholder={aiUsed ? "You can now edit the AI draft..." : "Click 'Generate AI Draft' to start..."}
+                readOnly={readOnly}
+                onCopy={handleCopyPaste}
+                onPaste={handleCopyPaste}
+                onCut={handleCopyPaste}
+                className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
+              />
+              {showMessage && (
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mt-1 mb-1 bg-black text-white text-xs p-2 rounded-md shadow-md opacity-50 text-center w-auto max-w-xs">
+                  Copy, paste, and cut are disabled for this field.
+                </div>
+              )}
+            </div>
 
             <div className="mt-3 flex items-center justify-between gap-2">
               <Rules />

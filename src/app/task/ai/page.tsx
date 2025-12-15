@@ -39,6 +39,7 @@ export default function AIPage() {
   const { saving, lastSavedAt } = useAutosave(saveKey, { text, aiUsed }, { setText, setAiUsed });
 
   const readOnly = useMemo(() => true, []);
+  const [showMessage, setShowMessage] = useState(false);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
@@ -89,9 +90,12 @@ export default function AIPage() {
 
   const submitDisabled = locked || !aiUsed || text.trim().length === 0;
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
-    alert("Pasting is disabled.");
+    setShowMessage(true);
+    setTimeout(() => {
+      setShowMessage(false);
+    }, 2000);
   };
 
   return (
@@ -146,15 +150,26 @@ export default function AIPage() {
                 </span>
               </div>
             </div>
-            <Textarea
-              id="draft"
-              rows={14}
-              value={text}
-              readOnly={readOnly}
-              onPaste={handlePaste}
-              placeholder="Click 'Generate AI Draft' to see the output..."
-              className="bg-muted text-foreground placeholder:text-muted-foreground"
-            />
+
+            <div className="relative">
+              <Textarea
+                id="draft"
+                rows={14}
+                value={text}
+                readOnly={readOnly}
+                onCopy={handleCopyPaste}
+                onPaste={handleCopyPaste}
+                onCut={handleCopyPaste}
+                placeholder="Click 'Generate AI Draft' to see the output..."
+                className="bg-muted text-foreground placeholder:text-muted-foreground"
+              />
+                {showMessage && (
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mt-1 mb-1 bg-black text-white text-xs p-2 rounded-md shadow-md opacity-50 text-center w-auto max-w-xs">
+                    Copy, paste, and cut are disabled for this field.
+                  </div>
+                )}
+            </div>
+
             <div className="mt-3 flex items-center justify-between gap-2">
               <Rules />
 

@@ -51,16 +51,21 @@ model Round {
 }
 
 model RoundFeedback {
-  id           String    @id @default(cuid())
-  round        Round     @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
-  sessionId    String
-  roundIndex   Int
-  workflow     Workflow
-  liking       Int?
-  trust        Int?
-  satisfaction Int?
-  comment      String?
-  createdAt    DateTime  @default(now())
+  id             String    @id @default(cuid())
+  round          Round     @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
+  sessionId      String
+  roundIndex     Int
+  workflow       Workflow
+  liking         Int?
+  trust          Int?
+  satisfaction   Int?
+  mentalDemand   Int?
+  physicalDemand Int?
+  temporalDemand Int?
+  effort         Int?
+  frustration    Int?
+  comment        String?
+  createdAt      DateTime  @default(now())
 
   @@unique([sessionId, roundIndex])
 }
@@ -71,6 +76,8 @@ model Feedback {
   sessionId      String   @unique
   satisfaction   Int?
   clarity        Int?
+  effort         Int?
+  frustration    Int?
   recommendation Int?
   workflowRating Workflow?
   comments       String?
