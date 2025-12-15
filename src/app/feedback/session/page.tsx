@@ -17,11 +17,11 @@ export default function FeedbackPage() {
   const router = useRouter();
   const { run, send } = useExperiment();
 
-  const [satisfaction, setSatisfaction] = useState<number | null>(null);
-  const [clarity, setClarity] = useState<number | null>(null);
-  const [effort, setEffort] = useState<number | null>(null);
-  const [frustration, setFrustration] = useState<number | null>(null);
-  const [recommendation, setRecommendation] = useState<number | null>(null);
+  const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
+  const [clarity, setClarity] = useState<Likert | null>(null);
+  const [effort, setEffort] = useState<Likert | null>(null);
+  const [frustration, setFrustration] = useState<Likert | null>(null);
+  const [recommendation, setRecommendation] = useState<Likert | null>(null);
   const [workflowBest, setWorkflowBest] = useState<Workflow | null>(null);
 
   const [comment, setComment] = useState("");
