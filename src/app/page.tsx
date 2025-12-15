@@ -10,6 +10,7 @@ import { Workflows } from "@/lib/experiment";
 import {
   RotateCcw, Play, Loader2, ArrowLeftRight, Users, Timer as TimerIcon, ShieldCheck, Clock, ClipboardList, EyeOff
 } from 'lucide-react';
+import ConsentModal from "@/components/ui/consentModal";
 
 function DevResetButton() {
   const { send } = useExperiment();
@@ -38,7 +39,8 @@ function DevResetButton() {
 export default function Page() {
   const router = useRouter();
   const { run, send } = useExperiment();
-  const [starting, setStarting] = useState(false);
+  const [showConsent, setShowConsent] = useState<boolean>(false);
+  const [starting, setStarting] = useState<boolean>(false);
   const [detailsOpen, setDetailsOpen] = useState(true);
 
   // Prefetch choose page to reduce visual delay
@@ -86,8 +88,18 @@ export default function Page() {
     });
   };
 
+  const handleConsent = (consent: boolean) => {
+    setShowConsent(false);
+    if (consent) {
+      start();
+    } else {
+      alert("You must agree to the consent to participate.");
+    }
+  };
+
   return (
     <main className="min-h-dvh bg-background">
+      {showConsent && <ConsentModal onConsent={handleConsent} />}
       <Progress />
 
       <div className="mx-auto max-w-5xl p-6 space-y-6">
@@ -122,7 +134,7 @@ export default function Page() {
             )}
 
             <Button
-              onClick={start}
+              onClick={() => setShowConsent(true)}
               disabled={hasActiveSession || starting}
               className="inline-flex items-center gap-2 bg-primary"
               title={hasActiveSession ? "Session in progress — Resume instead" : "Start session"}
