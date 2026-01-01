@@ -63,7 +63,7 @@ export default function Choose() {
             Choose your workflow
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            You’ll confirm your choice before starting. Estimated duration: ~10 minutes.
+            You’ll confirm your choice before starting. Estimated duration: ~5 minutes.
           </p>
 
           {/* Selectable cards */}

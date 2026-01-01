@@ -3,12 +3,19 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useExperiment } from "@/stores/useExperiment";
+import { getGermanStates } from "@/lib/deRegions";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
 import ISO6391 from "iso-639-1";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import { ClipboardList, Loader2 } from "lucide-react";
+
+type Gender = "female" | "male" | "prefer_not_to_say";
+
+type Education = "secondary" | "bachelor" | "master" | "phd" | "other" | "prefer_not_to_say";
+
+type EnglishLevel = "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "native" | "prefer_not_to_say";
 
 export default function PreQuestionnaire() {
   useRouteGuard(["pre-questionnaire"]);
@@ -19,7 +26,13 @@ export default function PreQuestionnaire() {
   const [loading, setLoading] = useState(false);
 
   const [ageGroup, setAgeGroup] = useState<string>("");
+  const [gender, setGender] = useState<Gender | "">("");
+
+  const [regionDE, setRegionDE] = useState<string>("");
+  const [education, setEducation] = useState<Education | "">("");
+
   const [nativeLang, setNativeLang] = useState<string>("");
+  const [englishLevel, setEnglishLevel] = useState<EnglishLevel | "">("");
 
   const [writingConfidence, setWritingConfidence] = useState<Likert | null>(null);
   const [aiFamiliarity, setAiFamiliarity] = useState<Likert | null>(null);
@@ -29,9 +42,15 @@ export default function PreQuestionnaire() {
   const MAX_COMMENT_CHARS = 200;
   const commentChars = useMemo(() => comment.length, [comment]);
 
+  const germanStates = useMemo(() => getGermanStates(), []);
+
   const canSubmit =
     ageGroup.trim().length > 0 &&
+    gender !== "" &&
+    regionDE !== "" &&
+    education !== "" &&
     nativeLang.trim().length > 0 &&
+    englishLevel !== "" &&
     writingConfidence !== null &&
     aiFamiliarity !== null &&
     aiAttitude !== null;
@@ -49,7 +68,11 @@ export default function PreQuestionnaire() {
         participantId: run.participantId,
         sessionId: run.sessionId,
         ageGroup,
+        gender,
+        regionDE,
+        education,
         nativeLang,
+        englishLevel,
         writingConfidence,
         aiFamiliarity,
         aiAttitude,
@@ -57,19 +80,8 @@ export default function PreQuestionnaire() {
       }),
     });
 
-    console.log("Pre-questionnaire submitted:", {
-      participantId: run.participantId,
-      sessionId: run.sessionId,
-      ageGroup,
-      nativeLang,
-      writingConfidence,
-      aiFamiliarity,
-      aiAttitude,
-      comment,
-    });
-
     send({ type: "FINISH_PREQUESTIONNAIRE" } as any);
-    router.replace("/choose");
+    router.replace("/tutorial");
   };
 
   const languageOptions = useMemo(() => {
@@ -80,13 +92,11 @@ export default function PreQuestionnaire() {
 
     const opts = ISO6391.getAllCodes()
       .map((code) => {
-        const name =
-          (dn?.of?.(code) as string | undefined) || ISO6391.getName(code) || code;
+        const name = (dn?.of?.(code) as string | undefined) || ISO6391.getName(code) || code;
         return { code, name };
       })
       .filter((x) => x.name && x.name !== x.code);
 
-    // sort by name
     opts.sort((a, b) => a.name.localeCompare(b.name));
     return opts;
   }, []);
@@ -102,12 +112,10 @@ export default function PreQuestionnaire() {
 
             <div className="flex-1">
               <h2 className="text-2xl font-semibold tracking-tight">Pre-questionnaire</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                A few quick questions before we begin the study.
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">A few quick questions before we begin.</p>
 
               <div className="mt-5 space-y-5">
-                {/* Age group */}
+                {/* 1) Age group */}
                 <div className="space-y-2">
                   <label className="block text-sm text-foreground">1) Age group</label>
                   <select
@@ -127,53 +135,131 @@ export default function PreQuestionnaire() {
                   </select>
                 </div>
 
-                {/* Native language */}
+                {/* 2) Gender */}
                 <div className="space-y-2">
-                  <label className="block text-sm text-foreground">
-                    2) Native language
-                  </label>
-
+                  <label className="block text-sm text-foreground">2) Gender</label>
                   <select
-                    value={nativeLang}
-                    onChange={(e) => setNativeLang(e.target.value)}
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value as any)}
                     className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
-               focus:outline-none focus:ring-2 focus:ring-ring"
+                               focus:outline-none focus:ring-2 focus:ring-ring"
                   >
                     <option value="" disabled>
                       Select…
                     </option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
 
+                {/* 3) Region in Germany */}
+                <div className="space-y-2">
+                  <label className="block text-sm text-foreground">3) Region (Germany)</label>
+                  <select
+                    value={regionDE}
+                    onChange={(e) => setRegionDE(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
+                               focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="" disabled>
+                      Select…
+                    </option>
+                    <option value="not_in_germany">Not in Germany</option>
+                    {germanStates.map((r) => (
+                      <option key={r.code} value={r.code}>
+                        {r.name}
+                      </option>
+                    ))}
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                {/* 4) Highest education level */}
+                <div className="space-y-2">
+                  <label className="block text-sm text-foreground">4) Highest education level</label>
+                  <select
+                    value={education}
+                    onChange={(e) => setEducation(e.target.value as any)}
+                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
+                               focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="" disabled>
+                      Select…
+                    </option>
+                    <option value="secondary">Secondary school</option>
+                    <option value="bachelor">Bachelor</option>
+                    <option value="master">Master</option>
+                    <option value="phd">PhD</option>
+                    <option value="other">Other</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                {/* 5) Native language */}
+                <div className="space-y-2">
+                  <label className="block text-sm text-foreground">5) Native language</label>
+                  <select
+                    value={nativeLang}
+                    onChange={(e) => setNativeLang(e.target.value)}
+                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
+                               focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="" disabled>
+                      Select…
+                    </option>
                     {languageOptions.map((l) => (
                       <option key={l.code} value={l.code}>
                         {l.name}
                       </option>
                     ))}
                   </select>
-
-                  <p className="text-xs text-muted-foreground">
-                    If your language isn’t listed, choose the closest option.
-                  </p>
                 </div>
 
-                {/* Likert questions */}
+                {/* 6) English proficiency (select) */}
+                <div className="space-y-2">
+                  <label className="block text-sm text-foreground">6) English proficiency</label>
+                  <select
+                    value={englishLevel}
+                    onChange={(e) => setEnglishLevel(e.target.value as any)}
+                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground
+                               focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <option value="" disabled>
+                      Select…
+                    </option>
+                    <option value="a1">A1 (Beginner)</option>
+                    <option value="a2">A2 (Elementary)</option>
+                    <option value="b1">B1 (Intermediate)</option>
+                    <option value="b2">B2 (Upper-intermediate)</option>
+                    <option value="c1">C1 (Advanced)</option>
+                    <option value="c2">C2 (Proficient)</option>
+                    <option value="native">Native / near-native</option>
+                    <option value="prefer_not_to_say">Prefer not to say</option>
+                  </select>
+                </div>
+
+                {/* 7) Writing confidence */}
                 <LikertRow
-                  label="3) I feel confident writing short texts under time pressure."
+                  label="7) I feel confident writing short texts under time pressure."
                   value={writingConfidence}
                   onChange={setWritingConfidence}
                   left="Strongly Disagree"
                   right="Strongly Agree"
                 />
 
+                {/* 8) AI familiarity */}
                 <LikertRow
-                  label="4) I am familiar with AI writing tools (e.g., ChatGPT, Copilot)."
+                  label="8) I am familiar with AI writing tools (e.g., ChatGPT, Copilot)."
                   value={aiFamiliarity}
                   onChange={setAiFamiliarity}
                   left="Strongly Disagree"
                   right="Strongly Agree"
                 />
 
+                {/* 9) AI attitude */}
                 <LikertRow
-                  label="5) I generally have a positive attitude toward using AI for writing support."
+                  label="9) I generally have a positive attitude toward using AI for writing support."
                   value={aiAttitude}
                   onChange={setAiAttitude}
                   left="Strongly Disagree"

@@ -42,7 +42,7 @@ export default function RoundHeader({ workflow, round }: RoundHeaderProps) {
             </div>
 
             <TimerBadge
-              seconds={600}
+              seconds={300}
               onDone={() => setPaused(true)}
               running={!paused}
               className="bg-background text-foreground"

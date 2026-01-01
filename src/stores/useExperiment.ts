@@ -8,8 +8,8 @@ type Event =
   | { type: "START_SESSION"; totalRounds?: number }
   | { type: "FINISH_PREQUESTIONNAIRE" }
   | { type: "FINISH_TUTORIAL" }
-  | { type: "START_TRIAL" }
-  | { type: "FINISH_TRIAL" }
+  | { type: "START_PRACTICE" }
+  | { type: "FINISH_PRACTICE" }
   | { type: "SELECT_WORKFLOW"; workflow: Workflow }
   | { type: "LOCK_WORKFLOW" }
   | { type: "SUBMIT_ROUND" }
@@ -49,7 +49,7 @@ function shuffle<T>(arr: T[], seed: string): T[] {
   return a;
 }
 
-const TRIAL_WORKFLOWS: Workflow[] = ["human", "ai", "human_ai", "ai_human"];
+const PRACTICE_WORKFLOWS: Workflow[] = ["human", "ai", "human_ai", "ai_human"];
 
 const initial: ExperimentRun = {
   participantId: null,
@@ -81,8 +81,8 @@ export const useExperiment = create<Store>()(
           case "FINISH_TUTORIAL":
             return run.phase === "tutorial";
 
-          case "FINISH_TRIAL":
-            return run.phase === "trial";
+          case "FINISH_PRACTICE":
+            return run.phase === "practice";
 
           case "SELECT_WORKFLOW":
             return run.phase === "choose_workflow" && !run.locked;
@@ -94,7 +94,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "task";
 
           case "NEXT_ROUND":
-            return run.phase === "round_feedback" || (run.phase === "trial_pause" && r.mode === "trial");
+            return run.phase === "round_feedback" || (run.phase === "practice_pause" && r.mode === "practice");
 
           case "FINISH_SESSION":
             return run.phase === "round_feedback" && run.roundIndex >= run.totalRounds;
@@ -130,11 +130,11 @@ export const useExperiment = create<Store>()(
 
               s.tutorialDone = false;
 
-              s.mode = "trial";
-              s.trialTotal = 4;
-              s.trialIndex = 1;
-              s.trialOrder = shuffle(
-                TRIAL_WORKFLOWS,
+              s.mode = "practice";
+              s.practiceTotal = 4;
+              s.practiceIndex = 1;
+              s.practiceOrder = shuffle(
+                PRACTICE_WORKFLOWS,
                 `${String(s.participantId)}:${String(s.sessionId)}`
               );
 
@@ -151,19 +151,19 @@ export const useExperiment = create<Store>()(
             case "FINISH_TUTORIAL": {
               if (!can("FINISH_TUTORIAL")) return state;
               s.tutorialDone = true;
-              // start trial
-              s.phase = "trial";
+              // start practice
+              s.phase = "practice";
               return { run: s };
             }
 
-            case "START_TRIAL": {
-              if (s.phase !== "trial") return state;
+            case "START_PRACTICE": {
+              if (s.phase !== "practice") return state;
 
-              s.mode = "trial";
+              s.mode = "practice";
               s.locked = true;
 
-              const idx = Math.max(0, Number(s.trialIndex ?? 1) - 1);
-              s.workflow = (s.trialOrder?.[idx] ?? "human") as Workflow;
+              const idx = Math.max(0, Number(s.practiceIndex ?? 1) - 1);
+              s.workflow = (s.practiceOrder?.[idx] ?? "human") as Workflow;
 
               s.phase = "task";
               return { run: s };
@@ -172,8 +172,8 @@ export const useExperiment = create<Store>()(
             case "SUBMIT_ROUND": {
               if (!can("SUBMIT_ROUND")) return state;
 
-              if (s.mode === "trial") {
-                s.phase = "trial_pause";
+              if (s.mode === "practice") {
+                s.phase = "practice_pause";
               } else {
                 s.phase = "round_feedback";
               }
@@ -183,15 +183,15 @@ export const useExperiment = create<Store>()(
             case "NEXT_ROUND": {
               if (!can("NEXT_ROUND")) return state;
 
-              if (s.phase === "trial_pause" && s.mode === "trial") {
-                const total = Number(s.trialTotal ?? 4);
-                const current = Number(s.trialIndex ?? 1);
+              if (s.phase === "practice_pause" && s.mode === "practice") {
+                const total = Number(s.practiceTotal ?? 4);
+                const current = Number(s.practiceIndex ?? 1);
 
                 if (current < total) {
-                  s.trialIndex = current + 1;
-                  s.mode = "trial";
+                  s.practiceIndex = current + 1;
+                  s.mode = "practice";
                   s.locked = true;
-                  s.workflow = (s.trialOrder?.[s.trialIndex - 1] ?? "human") as Workflow;
+                  s.workflow = (s.practiceOrder?.[s.practiceIndex - 1] ?? "human") as Workflow;
                   s.phase = "task";
                 } else {
                   s.mode = "main";
@@ -218,8 +218,8 @@ export const useExperiment = create<Store>()(
               return state;
             }
 
-            case "FINISH_TRIAL": {
-              if (!can("FINISH_TRIAL")) return state;
+            case "FINISH_PRACTICE": {
+              if (!can("FINISH_PRACTICE")) return state;
 
               s.mode = "main";
               s.phase = "choose_workflow";

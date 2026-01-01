@@ -1,15 +1,24 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useExperiment } from '@/stores/useExperiment';
-import { Button } from '@/components/shadcn_ui/button';
-import Progress from '@/components/ui/progress';
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useExperiment } from "@/stores/useExperiment";
+import { Button } from "@/components/shadcn_ui/button";
+import Progress from "@/components/ui/progress";
 import Rules from "@/components/ui/rules";
 import { Workflows } from "@/lib/experiment";
 import {
-  RotateCcw, Play, Loader2, ArrowLeftRight, Users, Timer as TimerIcon, ShieldCheck, Clock, ClipboardList, EyeOff
-} from 'lucide-react';
+  RotateCcw,
+  Play,
+  Loader2,
+  ArrowLeftRight,
+  Users,
+  Timer as TimerIcon,
+  ShieldCheck,
+  Clock,
+  ClipboardList,
+  EyeOff,
+} from "lucide-react";
 import ConsentModal from "@/components/ui/consentModal";
 
 function DevResetButton() {
@@ -18,8 +27,8 @@ function DevResetButton() {
 
   const resetAll = () => {
     (useExperiment as any).persist?.clearStorage?.();
-    router.replace('/');
-    send({ type: 'RESET' });
+    router.replace("/");
+    send({ type: "RESET" });
     alert("Resetted.");
   };
 
@@ -43,38 +52,49 @@ export default function Page() {
   const [starting, setStarting] = useState<boolean>(false);
   const [detailsOpen, setDetailsOpen] = useState(true);
 
-  // Prefetch choose page to reduce visual delay
   useEffect(() => {
-    router.prefetch?.('/pre-questionnaire');
+    router.prefetch?.("/pre-questionnaire");
   }, [router]);
 
-  // Active session means user must Resume
   const hasActiveSession = useMemo(
-    () => run.phase !== 'idle' && run.phase !== 'feedback',
+    () => run.phase !== "idle" && run.phase !== "feedback",
     [run.phase]
   );
 
   const resumeTarget = useMemo(() => {
-    if (starting) return null; // avoid flicker just after clicking Start
+    if (starting) return null;
     switch (run.phase) {
-      case 'pre-questionnaire': return '/pre-questionnaire';
-      case 'choose_workflow':   return '/choose';
-      case 'task':              return `/task/${run.workflow}`;
-      case 'round_feedback':    return '/feedback/round';
-      case 'feedback':          return '/feedback/session';
-      default:                  return null;
+      case "pre-questionnaire":
+        return "/pre-questionnaire";
+      case "tutorial":
+        return "/tutorial";
+      case "practice":
+        return "/practice";
+      case "practice_pause":
+        return "/practice/pause";
+      case "choose_workflow":
+        return "/choose";
+      case "task":
+        return `/task/${run.workflow}`;
+      case "round_feedback":
+        return "/feedback/round";
+      case "feedback":
+        return "/feedback/session";
+      default:
+        return null;
     }
   }, [run.phase, run.workflow, starting]);
 
   const start = async () => {
     setStarting(true);
-    send({ type: 'START_SESSION', totalRounds: 3 });
-    router.replace('/pre-questionnaire');
+
+    send({ type: "START_SESSION", totalRounds: 3 } as any);
+    router.replace("/pre-questionnaire");
 
     const { run } = useExperiment.getState();
-    await fetch('/api/session/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    await fetch("/api/session/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         participantId: run.participantId,
         sessionId: run.sessionId,
@@ -91,11 +111,8 @@ export default function Page() {
 
   const handleConsent = (consent: boolean) => {
     setShowConsent(false);
-    if (consent) {
-      start();
-    } else {
-      alert("You must agree to the consent to participate.");
-    }
+    if (consent) start();
+    else alert("You must agree to the consent to participate.");
   };
 
   return (
@@ -112,7 +129,10 @@ export default function Page() {
                 Start a new session
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                This session contains <span className="font-medium text-foreground">3 rounds</span>. You can pause during a task, but each round is time-boxed.
+                This session includes{" "}
+                <span className="font-medium text-foreground">4 practice rounds</span>{" "}
+                (to experience all workflows) and{" "}
+                <span className="font-medium text-foreground">3 main rounds</span>.
               </p>
             </div>
             <DevResetButton />
@@ -167,9 +187,11 @@ export default function Page() {
               <h3 className="text-xl font-semibold tracking-tight">What this study is about</h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 We’re exploring how people collaborate with AI on time-boxed writing tasks, and how this affects
-                <span className="font-medium text-foreground"> efficiency</span>, <span className="font-medium text-foreground">output quality</span>,
-                <span className="font-medium text-foreground"> workflow choices</span>, and <span className="font-medium text-foreground">trust in AI</span>.
-                You’ll complete several rounds while choosing one of four collaboration workflows each time.
+                <span className="font-medium text-foreground"> efficiency</span>,{" "}
+                <span className="font-medium text-foreground">output quality</span>,{" "}
+                <span className="font-medium text-foreground">workflow choices</span>, and{" "}
+                <span className="font-medium text-foreground">trust in AI</span>.
+                You’ll first do a short practice section, then continue with the main rounds.
               </p>
             </div>
 
@@ -183,13 +205,13 @@ export default function Page() {
             </Button>
           </div>
 
-          {/* Workflows */}
           {detailsOpen && (
             <>
+              {/* Workflows */}
               <div className="mt-6">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                   <ArrowLeftRight className="h-4 w-4" />
-                  Collaboration workflows (choose one each round)
+                  Collaboration workflows
                 </div>
 
                 <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -205,28 +227,33 @@ export default function Page() {
                 </div>
               </div>
 
-              {/* What happens each round */}
+              {/* What to expect */}
               <div className="mt-6 grid gap-6 sm:grid-cols-2">
                 <div className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <TimerIcon className="h-4 w-4" />
-                    What to expect in this session
+                    What to expect
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                    <li>3 time-boxed rounds (total ~20–30 minutes).</li>
-                    <li>Each round: choose a workflow, complete the task.</li>
-                    <li>Short feedback at the end; get a brief summary.</li>
+                    <li>
+                      <span className="font-medium text-foreground">Practice:</span> 4 rounds (all workflows once, random order).
+                    </li>
+                    <li>
+                      <span className="font-medium text-foreground">Main:</span> 3 rounds (you choose a workflow each round).
+                    </li>
+                    <li>Each round: complete a timed writing task.</li>
+                    <li>Short feedback at the end.</li>
                   </ul>
                 </div>
 
                 <div className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <ClipboardList className="h-4 w-4" />
-                    What we record (anonymously)
+                    What we record (pseudonymized)
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                     <li>Task duration and timing.</li>
-                    <li>Your selected workflow each round.</li>
+                    <li>Workflow used in each round.</li>
                     <li>The final text output.</li>
                   </ul>
                 </div>
@@ -241,6 +268,7 @@ export default function Page() {
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                     <li>Participation is voluntary.</li>
+                    <li>You can stop at any time.</li>
                   </ul>
                 </div>
 
@@ -250,8 +278,9 @@ export default function Page() {
                     Privacy & anonymization
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                    <li>No personal data collected; anonymous session code provided.</li>
-                    <li>GDPR-aligned handling of study data.</li>
+                    <li>No names or contact details are collected.</li>
+                    <li>We collect background information (e.g., age group, gender, language) for research analysis.</li>
+                    <li>Data is handled in line with GDPR principles.</li>
                   </ul>
                 </div>
               </div>

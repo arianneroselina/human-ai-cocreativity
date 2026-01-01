@@ -1,6 +1,15 @@
 -- CreateEnum
 CREATE TYPE "Workflow" AS ENUM ('human', 'ai', 'human_ai', 'ai_human');
 
+-- CreateEnum
+CREATE TYPE "Gender" AS ENUM ('female', 'male', 'prefer_not_to_say');
+
+-- CreateEnum
+CREATE TYPE "Education" AS ENUM ('secondary', 'bachelor', 'master', 'phd', 'other', 'prefer_not_to_say');
+
+-- CreateEnum
+CREATE TYPE "EnglishLevel" AS ENUM ('a1', 'a2', 'b1', 'b2', 'c1', 'c2', 'native', 'prefer_not_to_say');
+
 -- CreateTable
 CREATE TABLE "Participant" (
     "id" TEXT NOT NULL,
@@ -26,7 +35,11 @@ CREATE TABLE "PreQuestionnaire" (
     "id" TEXT NOT NULL,
     "sessionId" TEXT NOT NULL,
     "ageGroup" TEXT NOT NULL,
+    "gender" "Gender" NOT NULL,
+    "regionDE" TEXT NOT NULL,
+    "education" "Education" NOT NULL,
     "nativeLang" TEXT NOT NULL,
+    "englishLevel" "EnglishLevel" NOT NULL,
     "writingConfidence" INTEGER NOT NULL,
     "aiFamiliarity" INTEGER NOT NULL,
     "aiAttitude" INTEGER NOT NULL,
