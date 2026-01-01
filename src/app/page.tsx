@@ -45,7 +45,7 @@ export default function Page() {
 
   // Prefetch choose page to reduce visual delay
   useEffect(() => {
-    router.prefetch?.('/choose');
+    router.prefetch?.('/pre-questionnaire');
   }, [router]);
 
   // Active session means user must Resume
@@ -57,18 +57,19 @@ export default function Page() {
   const resumeTarget = useMemo(() => {
     if (starting) return null; // avoid flicker just after clicking Start
     switch (run.phase) {
-      case 'choose_workflow': return '/choose';
-      case 'task':            return `/task/${run.workflow}`;
-      case 'round_feedback':  return '/feedback/round';
-      case 'feedback':        return '/feedback/session';
-      default:                return null;
+      case 'pre-questionnaire': return '/pre-questionnaire';
+      case 'choose_workflow':   return '/choose';
+      case 'task':              return `/task/${run.workflow}`;
+      case 'round_feedback':    return '/feedback/round';
+      case 'feedback':          return '/feedback/session';
+      default:                  return null;
     }
   }, [run.phase, run.workflow, starting]);
 
   const start = async () => {
     setStarting(true);
-    send({ type: 'START_SESSION', totalRounds: 3 }); // fixed to 3 (pilot)
-    router.replace('/choose');
+    send({ type: 'START_SESSION', totalRounds: 3 });
+    router.replace('/pre-questionnaire');
 
     const { run } = useExperiment.getState();
     await fetch('/api/session/start', {

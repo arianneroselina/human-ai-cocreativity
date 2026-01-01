@@ -22,6 +22,22 @@ CREATE TABLE "Session" (
 );
 
 -- CreateTable
+CREATE TABLE "PreQuestionnaire" (
+    "id" TEXT NOT NULL,
+    "sessionId" TEXT NOT NULL,
+    "ageGroup" TEXT NOT NULL,
+    "nativeLang" TEXT NOT NULL,
+    "writingConfidence" INTEGER NOT NULL,
+    "aiFamiliarity" INTEGER NOT NULL,
+    "aiAttitude" INTEGER NOT NULL,
+    "comment" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PreQuestionnaire_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Round" (
     "id" TEXT NOT NULL,
     "sessionId" TEXT NOT NULL,
@@ -75,6 +91,9 @@ CREATE TABLE "Feedback" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "PreQuestionnaire_sessionId_key" ON "PreQuestionnaire"("sessionId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Round_sessionId_index_key" ON "Round"("sessionId", "index");
 
 -- CreateIndex
@@ -85,6 +104,9 @@ CREATE UNIQUE INDEX "Feedback_sessionId_key" ON "Feedback"("sessionId");
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "Participant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PreQuestionnaire" ADD CONSTRAINT "PreQuestionnaire_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Round" ADD CONSTRAINT "Round_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

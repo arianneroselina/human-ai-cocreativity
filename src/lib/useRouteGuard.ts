@@ -13,6 +13,7 @@ export function useRouteGuard(allow: PhaseAllow) {
   useEffect(() => {
     if (!allow.includes(run.phase)) {
       if (run.phase === 'idle')         router.replace('/');
+      else if (run.phase === 'pre-questionnaire') router.replace('/pre-questionnaire');
       else if (run.phase === 'choose_workflow') router.replace('/choose');
       else if (run.phase === 'task') {
         if (!run.workflow || !run.locked) {
