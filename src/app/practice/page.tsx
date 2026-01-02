@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
-import { Play, Timer, Shuffle, ArrowRight, Loader2, User, Bot, ArrowLeftRight } from "lucide-react";
+import { Play, Timer, Shuffle, ArrowRight, Loader2 } from "lucide-react";
 import {Workflows} from "@/lib/experiment";
+import Progress from "@/components/ui/progress";
 
 export default function PracticeStartPage() {
   useRouteGuard(["practice"]);
@@ -36,6 +37,8 @@ export default function PracticeStartPage() {
 
   return (
     <main className="min-h-dvh bg-background">
+      <Progress />
+
       <div className="mx-auto max-w-4xl p-6">
         <section className="rounded-2xl border border-border bg-card text-card-foreground shadow-sm">
           <div className="p-6">

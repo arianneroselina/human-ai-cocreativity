@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
@@ -16,6 +16,13 @@ function workflowTitle(wf?: Workflow | null) {
   return meta?.title ?? wf;
 }
 
+function computeNextPracticeWorkflow(r: any): Workflow | null {
+  const order = (r.practiceOrder ?? []) as Workflow[];
+  const current = Number(r.practiceIndex ?? 0);
+  const nextIdx0 = current;
+  return (order[nextIdx0] ?? null) as Workflow | null;
+}
+
 export default function PracticePausePage() {
   useRouteGuard(["practice_pause"]);
 
@@ -24,21 +31,32 @@ export default function PracticePausePage() {
 
   const [secondsLeft, setSecondsLeft] = useState(TOTAL);
   const [loading, setLoading] = useState(false);
+  const busyRef = useRef(false);
 
-  const nextWorkflow = useMemo(() => {
-    const r: any = run as any;
-    return (r.workflow ?? "human") as Workflow;
-  }, [run]);
+  // Freeze the label ONCE so it doesn't change when Skip is clicked
+  const frozenNextWorkflowRef = useRef<Workflow | null>(null);
+  if (frozenNextWorkflowRef.current === null) {
+    frozenNextWorkflowRef.current = computeNextPracticeWorkflow(run as any);
+  }
+  const frozenNextWorkflow = frozenNextWorkflowRef.current;
 
   const startedAtRef = useRef<number | null>(null);
 
   const goNext = () => {
-    if (loading) return;
+    if (busyRef.current) return;
+    busyRef.current = true;
     setLoading(true);
 
     send({ type: "NEXT_ROUND" } as any);
 
-    const wf = ((useExperiment.getState().run as any).workflow ?? nextWorkflow) as Workflow;
+    const nextRun: any = useExperiment.getState().run;
+
+    if (nextRun.phase === "choose_workflow") {
+      router.replace("/choose");
+      return;
+    }
+
+    const wf = (nextRun.workflow ?? "human") as Workflow;
     router.replace(`/task/${wf}`);
   };
 
@@ -75,14 +93,7 @@ export default function PracticePausePage() {
               {/* Ring timer */}
               <div className="relative grid place-items-center">
                 <svg width="120" height="120" viewBox="0 0 120 120" className="rotate-[-90deg]">
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r={radius}
-                    fill="none"
-                    stroke="hsl(var(--muted))"
-                    strokeWidth="10"
-                  />
+                  <circle cx="60" cy="60" r={radius} fill="none" stroke="hsl(var(--muted))" strokeWidth="10" />
                   <circle
                     cx="60"
                     cy="60"
@@ -107,25 +118,19 @@ export default function PracticePausePage() {
 
               <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-muted/40 px-3 py-1 text-sm">
                 <span className="text-muted-foreground">Next:</span>
-                {/*TODO: this flickers to next workflow*/}
-                <span className="font-medium text-foreground">{workflowTitle(nextWorkflow)}</span>
+                <span className="font-medium text-foreground">
+                  {frozenNextWorkflow ? workflowTitle(frozenNextWorkflow) : "Choose workflow (main rounds)"}
+                </span>
               </div>
 
-              {/* Single action */}
               <div className="mt-7">
                 <Button onClick={goNext} disabled={loading} className="inline-flex items-center gap-2">
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <SkipForward className="h-4 w-4" />
-                  )}
+                  {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <SkipForward className="h-4 w-4" />}
                   Skip break
                 </Button>
               </div>
 
-              <div className="mt-2 text-xs text-muted-foreground">
-                Auto-continues when the timer ends.
-              </div>
+              <div className="mt-2 text-xs text-muted-foreground">Auto-continues when the timer ends.</div>
             </div>
           </div>
         </section>

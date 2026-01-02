@@ -7,10 +7,9 @@ import { usePauseResumeHotkeys } from "@/components/ui/shortcut";
 
 interface RoundHeaderProps {
   workflow: string;
-  round: number;
 }
 
-export default function RoundHeader({ workflow, round }: RoundHeaderProps) {
+export default function RoundHeader({ workflow }: RoundHeaderProps) {
   const [paused, setPaused] = useState(false);
   const resumeBtnRef = useRef<HTMLButtonElement>(null);
 
@@ -31,38 +30,36 @@ export default function RoundHeader({ workflow, round }: RoundHeaderProps) {
 
   return (
     <>
-      {round > 0 && (
-        <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="mx-auto max-w-4xl p-4 flex items-center gap-3">
-            <div className="mr-auto">
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">Human-AI Co-Creativity</h1>
-              <p className="text-xs text-muted-foreground">
-                Round {round}: <span className="font-medium text-foreground">{workflow}</span>
-              </p>
-            </div>
-
-            <TimerBadge
-              seconds={300}
-              onDone={() => setPaused(true)}
-              running={!paused}
-              className="bg-background text-foreground"
-            />
-
-            <button
-              type="button"
-              onClick={togglePause}
-              aria-pressed={paused}
-              aria-label={paused ? "Resume" : "Pause"}
-              title={paused ? "Resume" : "Pause"}
-              className={`inline-flex items-center justify-center rounded-full border border-border p-2
-                          hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring
-                          ${paused ? "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700" : ""}`}
-            >
-              {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-            </button>
+      <div className="border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="mx-auto max-w-4xl p-4 flex items-center gap-3">
+          <div className="mr-auto">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">Human-AI Co-Creativity</h1>
+            <p className="text-xs text-muted-foreground">
+              Workflow: <span className="font-medium text-foreground">{workflow}</span>
+            </p>
           </div>
+
+          <TimerBadge
+            seconds={300}
+            onDone={() => setPaused(true)}
+            running={!paused}
+            className="bg-background text-foreground"
+          />
+
+          <button
+            type="button"
+            onClick={togglePause}
+            aria-pressed={paused}
+            aria-label={paused ? "Resume" : "Pause"}
+            title={paused ? "Resume" : "Pause"}
+            className={`inline-flex items-center justify-center rounded-full border border-border p-2
+                        hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring
+                        ${paused ? "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700" : ""}`}
+          >
+            {paused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+          </button>
         </div>
-      )}
+      </div>
 
       {/* Blocking overlay when paused */}
       {paused && (

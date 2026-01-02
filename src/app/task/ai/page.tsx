@@ -100,7 +100,7 @@ export default function AIPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <RoundHeader workflow="AI only" round={run.roundIndex} />
+      <RoundHeader workflow="AI only" />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 type DraftSnapshot = { text: string; aiUsed?: boolean };
 type DraftSetters = { setText: (v: string) => void; setAiUsed?: (v: boolean) => void };
 
+// TODO: remove autosave when moving from practice to main rounds
 export function useAutosave(
   key: string | null | undefined,
   snapshot: DraftSnapshot,

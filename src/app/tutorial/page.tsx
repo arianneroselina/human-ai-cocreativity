@@ -217,7 +217,7 @@ export default function TutorialPage() {
     <main className="min-h-dvh bg-background">
       <div id="tut-page">
         <div id="tut-header">
-          <RoundHeader workflow="Human only" round={run.roundIndex || 1} />
+          <RoundHeader workflow="Human only" />
         </div>
 
         <Progress />

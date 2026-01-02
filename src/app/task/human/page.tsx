@@ -62,8 +62,7 @@ export default function HumanPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <RoundHeader workflow="Human only" round={run.roundIndex} />
-      {/*TODO: remove progress bar in practice rounds?*/}
+      <RoundHeader workflow="Human only" />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

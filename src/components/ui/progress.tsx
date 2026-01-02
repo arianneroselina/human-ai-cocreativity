@@ -1,35 +1,57 @@
 "use client";
 
-import { useExperiment } from '@/stores/useExperiment';
+import { useExperiment } from "@/stores/useExperiment";
 
 export default function Progress() {
   const { run } = useExperiment();
+  const r: any = run;
 
-  const completedRounds = (() => {
+  if (run.phase === "idle") return null;
+
+  const mode: "practice" | "main" = r.mode === "practice" ? "practice" : "main";
+
+  const total = mode === "practice" ? Number(r.practiceTotal ?? 4) : Number(run.totalRounds ?? 3);
+  const index = mode === "practice" ? Number(r.practiceIndex ?? 1) : Number(run.roundIndex ?? 1);
+
+  const completed = (() => {
+    if (mode === "practice") {
+      switch (run.phase) {
+        case "practice_pause":
+          return index;
+        case "task":
+        case "choose_workflow":
+        case "round_feedback":
+          return Math.max(0, index - 1);
+        case "feedback":
+          return total;
+        default:
+          return Math.max(0, index - 1);
+      }
+    }
+
     switch (run.phase) {
-      case 'round_feedback':
-        return run.roundIndex;
-      case 'feedback':
-        return run.totalRounds;
-      case 'choose_workflow':
-      case 'task':
-        return Math.max(0, run.roundIndex - 1);
-      case 'idle':
+      case "round_feedback":
+        return index;
+      case "feedback":
+        return total;
+      case "choose_workflow":
+      case "task":
+        return Math.max(0, index - 1);
       default:
-        return 0;
+        return Math.max(0, index - 1);
     }
   })();
 
-  const pct = Math.round(
-    Math.min(100, Math.max(0, (completedRounds / Math.max(1, run.totalRounds)) * 100))
-  );
+  const pct = Math.round(Math.min(100, Math.max(0, (completed / Math.max(1, total)) * 100)));
 
-  if (run.phase === 'idle') return null;
+  const labelPrefix = mode === "practice" ? "Practice" : "Round";
 
   return (
     <div className="w-full max-w-3xl mx-auto mt-4 px-4">
       <div className="flex items-center justify-between text-sm text-muted-foreground">
-        <span>Round {run.roundIndex} / {run.totalRounds}</span>
+        <span>
+          {labelPrefix}: {index} / {total}
+        </span>
         <span className="text-foreground">{pct}%</span>
       </div>
 
