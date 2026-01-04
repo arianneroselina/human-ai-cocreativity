@@ -6,7 +6,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
 import { Play, Timer, Shuffle, ArrowRight, Loader2 } from "lucide-react";
-import {Workflows} from "@/lib/experiment";
+import { type Workflow, Workflows } from "@/lib/experiment";
 import Progress from "@/components/ui/progress";
 
 export default function PracticeStartPage() {
@@ -25,14 +25,33 @@ export default function PracticeStartPage() {
     []
   );
 
-  const start = () => {
+  const start = async () => {
     if (loading) return;
     setLoading(true);
 
     send({ type: "START_PRACTICE" } as any);
 
-    const next = (useExperiment.getState().run as any).workflow;
-    router.replace(`/task/${next ?? "human"}`);
+    const { run } = useExperiment.getState();
+
+    await fetch('/api/round/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+      }),
+    });
+
+    console.log("Practice Round started:", {
+      sessionId: run.sessionId,
+      roundIndex: run.roundIndex,
+      workflow: run.workflow,
+    });
+
+    const wf = (run.workflow ?? "human") as Workflow;
+    router.replace(`/task/${wf}`);
+    setLoading(false);
   };
 
   return (

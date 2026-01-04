@@ -96,6 +96,7 @@ export default function RoundFeedbackPage() {
       send({ type: "NEXT_ROUND" });
       router.replace("/choose");
     }
+    setLoading(false);
   };
 
   return (

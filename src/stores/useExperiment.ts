@@ -55,6 +55,7 @@ const initial: ExperimentRun = {
   participantId: null,
   sessionId: null,
   totalRounds: 3,
+  totalPracticeRounds: 4,
   roundIndex: 0,
   phase: "idle",
   locked: false,
@@ -95,7 +96,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "round_feedback" || (run.phase === "practice_pause" && r.mode === "practice");
 
           case "FINISH_SESSION":
-            return run.phase === "round_feedback" && run.roundIndex >= run.totalRounds;
+            return run.phase === "round_feedback" && run.roundIndex >= r.totalRounds;
 
           case "RESET":
             return true;
@@ -127,8 +128,7 @@ export const useExperiment = create<Store>()(
               s.tutorialDone = false;
 
               s.mode = "practice";
-              s.practiceTotal = 4;
-              s.practiceIndex = 1;
+              s.totalPracticeRounds = 4;
               s.practiceOrder = shuffle(
                 PRACTICE_WORKFLOWS,
                 `${String(s.participantId)}:${String(s.sessionId)}`
@@ -158,7 +158,7 @@ export const useExperiment = create<Store>()(
               s.mode = "practice";
               s.locked = true;
 
-              const idx = Math.max(0, Number(s.practiceIndex ?? 1) - 1);
+              const idx = Math.max(0, Number(s.roundIndex ?? 1) - 1);
               s.workflow = (s.practiceOrder?.[idx] ?? "human") as Workflow;
 
               s.phase = "task";
@@ -180,14 +180,11 @@ export const useExperiment = create<Store>()(
               if (!can("NEXT_ROUND")) return state;
 
               if (s.phase === "practice_pause" && s.mode === "practice") {
-                const total = Number(s.practiceTotal ?? 4);
-                const current = Number(s.practiceIndex ?? 1);
-
-                if (current < total) {
-                  s.practiceIndex = current + 1;
+                if (s.roundIndex < s.totalPracticeRounds) {
+                  s.roundIndex += 1;
                   s.mode = "practice";
                   s.locked = true;
-                  s.workflow = (s.practiceOrder?.[s.practiceIndex - 1] ?? "human") as Workflow;
+                  s.workflow = (s.practiceOrder?.[s.roundIndex - 1] ?? "human") as Workflow;
                   s.phase = "task";
                 } else {
                   s.mode = "main";
@@ -199,7 +196,7 @@ export const useExperiment = create<Store>()(
               }
 
               if (s.phase === "round_feedback") {
-                if (s.roundIndex < s.totalRounds) {
+                if (s.roundIndex < s.totalRounds + s.totalPracticeRounds) {
                   s.roundIndex += 1;
                   s.mode = "main";
                   s.phase = "choose_workflow";

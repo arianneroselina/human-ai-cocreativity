@@ -27,7 +27,6 @@ export default function Choose() {
   const startRound = async () => {
     setOpen(false);
     send({ type: 'LOCK_WORKFLOW' });
-    router.push(`/task/${choice}`);
 
     const { run } = useExperiment.getState();
     await fetch('/api/round/start', {
@@ -45,6 +44,8 @@ export default function Choose() {
       roundIndex: run.roundIndex,
       workflow: run.workflow,
     });
+
+    router.replace(`/task/${choice}`);
   };
 
   // Re-announce the current choice when a new round starts

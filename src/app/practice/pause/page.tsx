@@ -7,6 +7,7 @@ import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
 import { Loader2, SkipForward } from "lucide-react";
 import { Workflows, type Workflow } from "@/lib/experiment";
+import Progress from "@/components/ui/progress";
 
 const TOTAL = 60;
 
@@ -18,7 +19,7 @@ function workflowTitle(wf?: Workflow | null) {
 
 function computeNextPracticeWorkflow(r: any): Workflow | null {
   const order = (r.practiceOrder ?? []) as Workflow[];
-  const current = Number(r.practiceIndex ?? 0);
+  const current = Number(r.roundIndex ?? 0);
   const nextIdx0 = current;
   return (order[nextIdx0] ?? null) as Workflow | null;
 }
@@ -42,22 +43,38 @@ export default function PracticePausePage() {
 
   const startedAtRef = useRef<number | null>(null);
 
-  const goNext = () => {
+  const goNext = async () => {
     if (busyRef.current) return;
     busyRef.current = true;
     setLoading(true);
 
     send({ type: "NEXT_ROUND" } as any);
 
-    const nextRun: any = useExperiment.getState().run;
+    const { run } = useExperiment.getState();
 
-    if (nextRun.phase === "choose_workflow") {
+    await fetch('/api/round/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+      }),
+    });
+
+    console.log("Practice Round started:", {
+      sessionId: run.sessionId,
+      roundIndex: run.roundIndex,
+      workflow: run.workflow,
+    });
+
+    if (run.phase === "choose_workflow") {
       router.replace("/choose");
-      return;
+    } else {
+      const wf = (run.workflow ?? "human") as Workflow;
+      router.replace(`/task/${wf}`);
     }
-
-    const wf = (nextRun.workflow ?? "human") as Workflow;
-    router.replace(`/task/${wf}`);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -86,6 +103,8 @@ export default function PracticePausePage() {
 
   return (
     <main className="min-h-dvh bg-background">
+      <Progress />
+
       <div className="mx-auto max-w-3xl p-6">
         <section className="rounded-2xl border border-border bg-card text-card-foreground shadow-sm">
           <div className="p-6 sm:p-8">

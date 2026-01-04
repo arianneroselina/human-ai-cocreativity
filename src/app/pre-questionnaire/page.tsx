@@ -82,6 +82,7 @@ export default function PreQuestionnaire() {
 
     send({ type: "FINISH_PREQUESTIONNAIRE" } as any);
     router.replace("/tutorial");
+    setLoading(false);
   };
 
   const languageOptions = useMemo(() => {
