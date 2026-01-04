@@ -56,7 +56,7 @@ const initial: ExperimentRun = {
   sessionId: null,
   totalRounds: 3,
   totalPracticeRounds: 4,
-  roundIndex: 0,
+  roundIndex: 1,
   phase: "idle",
   locked: false,
 } as any;
@@ -96,7 +96,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "round_feedback" || (run.phase === "practice_pause" && r.mode === "practice");
 
           case "FINISH_SESSION":
-            return run.phase === "round_feedback" && run.roundIndex >= r.totalRounds;
+            return run.phase === "round_feedback" && run.roundIndex >= r.totalRounds + r.totalPracticeRounds;
 
           case "RESET":
             return true;
@@ -181,7 +181,6 @@ export const useExperiment = create<Store>()(
 
               if (s.phase === "practice_pause" && s.mode === "practice") {
                 if (s.roundIndex < s.totalPracticeRounds) {
-                  s.roundIndex += 1;
                   s.mode = "practice";
                   s.locked = true;
                   s.workflow = (s.practiceOrder?.[s.roundIndex - 1] ?? "human") as Workflow;
@@ -192,6 +191,7 @@ export const useExperiment = create<Store>()(
                   s.locked = false;
                   s.workflow = undefined;
                 }
+                s.roundIndex += 1;
                 return { run: s };
               }
 

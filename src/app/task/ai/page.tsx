@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -42,6 +42,8 @@ export default function AIPage() {
   const [showMessage, setShowMessage] = useState(false);
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
+
+  const forceSubmitOnceRef = useRef(false);
 
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
@@ -88,6 +90,14 @@ export default function AIPage() {
     send({ type: 'SUBMIT_ROUND' });
   };
 
+  const forceSubmit = useCallback(() => {
+    if (forceSubmitOnceRef.current) return;
+    forceSubmitOnceRef.current = true;
+
+    setLocked(true);
+    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
+  }, [words, meetsRequiredWords, meetsAvoidWords, text, router]);
+
   const submitDisabled = locked || !aiUsed || text.trim().length === 0;
 
   const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
@@ -100,7 +110,12 @@ export default function AIPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <RoundHeader workflow="AI only" />
+      <RoundHeader
+        workflow="AI only"
+        seconds={300}
+        active={!locked}
+        onTimeUp={forceSubmit}
+      />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

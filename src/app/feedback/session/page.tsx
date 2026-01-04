@@ -54,6 +54,7 @@ export default function FeedbackPage() {
       sessionId: run.sessionId,
       participantId: run.participantId,
       totalRounds: run.totalRounds,
+      totalPracticeRounds: run.totalPracticeRounds,
       submittedAt: new Date().toISOString(),
       feedback: {
         satisfaction,

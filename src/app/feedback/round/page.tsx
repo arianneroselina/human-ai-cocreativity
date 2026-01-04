@@ -46,7 +46,13 @@ export default function RoundFeedbackPage() {
     frustration !== null;
 
   const title = useMemo(
-    () => `Round ${run.roundIndex} — quick feedback`,
+    () => {
+      let index = run.roundIndex;
+      if ((run as any).mode === "main") {
+        index = run.roundIndex - (run as any).totalPracticeRounds;
+      }
+      return `Round ${index} — quick feedback`
+    },
     [run.roundIndex]
   );
 
@@ -89,7 +95,7 @@ export default function RoundFeedbackPage() {
       comment,
     });
 
-    if (run.roundIndex >= run.totalRounds) {
+    if (run.roundIndex >= run.totalRounds + run.totalPracticeRounds) {
       send({ type: "FINISH_SESSION" });
       router.replace("/feedback/session");
     } else {
@@ -112,7 +118,7 @@ export default function RoundFeedbackPage() {
             <div className="flex-1">
               <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {(run.roundIndex >= run.totalRounds) ?
+                {(run.roundIndex >= run.totalRounds + run.totalPracticeRounds) ?
                   "Just a few quick questions before finishing the session." :
                   "Just a few quick questions before the next round."
                 }

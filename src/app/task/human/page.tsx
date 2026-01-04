@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -40,6 +40,8 @@ export default function HumanPage() {
   const words = countWords(text);
   const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
 
+  const forceSubmitOnceRef = useRef(false);
+
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const clearDraft = () => setText("");
@@ -49,6 +51,14 @@ export default function HumanPage() {
     submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
     send({ type: "SUBMIT_ROUND" });
   };
+
+  const forceSubmit = useCallback(() => {
+    if (forceSubmitOnceRef.current) return;
+    forceSubmitOnceRef.current = true;
+
+    setLocked(true);
+    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
+  }, [words, meetsRequiredWords, meetsAvoidWords, text, router]);
 
   const submitDisabled = locked || text.trim().length === 0;
 
@@ -62,7 +72,12 @@ export default function HumanPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <RoundHeader workflow="Human only" />
+      <RoundHeader
+        workflow="Human only"
+        seconds={300}
+        active={!locked}
+        onTimeUp={forceSubmit}
+      />
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">

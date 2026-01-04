@@ -7,6 +7,7 @@ export interface ExperimentRun {
   participantId: string | null;
   sessionId: string | null;
   totalRounds: number;
+  totalPracticeRounds: number;
   roundIndex: number;      // 1-based
   workflow?: Workflow;     // chosen for the *current* round
   phase: Phase;

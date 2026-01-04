@@ -65,8 +65,8 @@ function ThemeToggle() {
 export default function Header() {
   return (
     <>
-      <header className="relative w-full bg-primary text-white py-2">
-        {/* Right utilities (absolute) */}
+      <header data-app-header className="relative w-full bg-primary text-white py-2">
+      {/* Right utilities (absolute) */}
         <div className="absolute right-4 top-3/4 -translate-y-1/2 flex items-center gap-2">
           {process.env.NEXT_PUBLIC_APP_TAG && (
             <span className="hidden sm:inline rounded-md border border-white/25 bg-white/10 px-2 py-1 text-xs">
