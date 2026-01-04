@@ -85,13 +85,13 @@ export default function Page() {
     }
   }, [run.phase, run.workflow, starting]);
 
-  const start = async () => {
+  const openConsent = async () => {
+    if (hasActiveSession || starting) return;
     setStarting(true);
 
-    send({ type: "START_SESSION", totalRounds: 3 } as any);
-    router.replace("/pre-questionnaire");
-
+    send({ type: "START_SESSION" } as any);
     const { run } = useExperiment.getState();
+
     await fetch("/api/session/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -102,17 +102,22 @@ export default function Page() {
       }),
     });
 
-    console.log("Starting session:", {
-      participantId: run.participantId,
-      sessionId: run.sessionId,
-      totalRounds: run.totalRounds,
-    });
+    setStarting(false);
+    setShowConsent(true);
   };
 
   const handleConsent = (consent: boolean) => {
     setShowConsent(false);
-    if (consent) start();
-    else alert("You must agree to the consent to participate.");
+
+    if (consent) {
+      router.replace("/pre-questionnaire");
+      return;
+    }
+
+    (useExperiment as any).persist?.clearStorage?.();
+    send({ type: "RESET" } as any);
+    router.replace("/");
+    alert("You must agree to the consent to participate.");
   };
 
   return (
@@ -155,10 +160,9 @@ export default function Page() {
             )}
 
             <Button
-              onClick={() => setShowConsent(true)}
+              onClick={openConsent}
               disabled={hasActiveSession || starting}
               className="inline-flex items-center gap-2 bg-primary"
-              title={hasActiveSession ? "Session in progress — Resume instead" : "Start session"}
             >
               {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
               Start session

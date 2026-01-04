@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware";
 import type { ExperimentRun, Workflow } from "@/lib/experiment";
 
 type Event =
-  | { type: "START_SESSION"; totalRounds?: number }
+  | { type: "START_SESSION" }
   | { type: "FINISH_PREQUESTIONNAIRE" }
   | { type: "FINISH_TUTORIAL" }
   | { type: "START_PRACTICE" }
@@ -54,10 +54,8 @@ const PRACTICE_WORKFLOWS: Workflow[] = ["human", "ai", "human_ai", "ai_human"];
 const initial: ExperimentRun = {
   participantId: null,
   sessionId: null,
-
-  totalRounds: 3, // MAIN rounds (pilot)
+  totalRounds: 3,
   roundIndex: 0,
-
   phase: "idle",
   locked: false,
 } as any;
@@ -119,9 +117,7 @@ export const useExperiment = create<Store>()(
               s.participantId = s.participantId ?? uuid();
               s.sessionId = uuid();
 
-              // MAIN rounds config
-              const mainTotal = Math.min(5, Math.max(3, event.totalRounds ?? s.totalRounds ?? 3));
-              s.totalRounds = mainTotal;
+              s.totalRounds = 3;
               s.roundIndex = 1;
 
               // Reset workflow selection (main)
