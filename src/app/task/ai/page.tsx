@@ -226,7 +226,7 @@ export default function AIPage() {
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
             <TimerBadge
-              workflow="Human only"
+              workflow="AI only"
               seconds={300}
               active={!locked}
               onTimeUp={forceSubmit}

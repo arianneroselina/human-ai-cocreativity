@@ -204,7 +204,7 @@ export default function FeedbackPage() {
         <header className="mb-6 text-center">
           <h1 className="text-3xl font-semibold text-foreground">Final feedback</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Thanks for completing all {run.totalRounds} rounds. A few short questions:
+            Thanks for completing the study. A few short questions:
           </p>
         </header>
 

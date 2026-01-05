@@ -228,7 +228,7 @@ export default function AIHumanWorkPage() {
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <TimerBadge
-                workflow="Human only"
+                workflow="AI → Human"
                 seconds={300}
                 active={!locked}
                 onTimeUp={forceSubmit}

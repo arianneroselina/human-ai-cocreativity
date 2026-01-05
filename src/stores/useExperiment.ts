@@ -158,7 +158,7 @@ export const useExperiment = create<Store>()(
               s.mode = "practice";
               s.locked = true;
 
-              const idx = Math.max(0, Number(s.roundIndex ?? 1) - 1);
+              const idx = Number(s.roundIndex ?? 1) - 1;
               s.workflow = (s.practiceOrder?.[idx] ?? "human") as Workflow;
 
               s.phase = "task";
@@ -183,7 +183,7 @@ export const useExperiment = create<Store>()(
                 if (s.roundIndex < s.totalPracticeRounds) {
                   s.mode = "practice";
                   s.locked = true;
-                  s.workflow = (s.practiceOrder?.[s.roundIndex - 1] ?? "human") as Workflow;
+                  s.workflow = (s.practiceOrder?.[s.roundIndex] ?? "human") as Workflow;
                   s.phase = "task";
                 } else {
                   s.mode = "main";

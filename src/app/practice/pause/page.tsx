@@ -19,9 +19,9 @@ function workflowTitle(wf?: Workflow | null) {
 
 function computeNextPracticeWorkflow(r: any): Workflow | null {
   const order = (r.practiceOrder ?? []) as Workflow[];
-  const current = Math.max(0, Number(r.roundIndex ?? 1) - 1);
-  const nextIdx0 = current;
-  return (order[nextIdx0] ?? null) as Workflow | null;
+  const current = Number(r.roundIndex ?? 1) - 1;
+  const nextIdx = current + 1;
+  return (order[nextIdx] ?? null) as Workflow | null;
 }
 
 export default function PracticePausePage() {
