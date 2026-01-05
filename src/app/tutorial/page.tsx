@@ -11,7 +11,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
-import RoundHeader from "@/components/ui/roundHeader";
+import TimerBadge from "@/components/ui/timerBadge";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -52,9 +52,9 @@ export default function TutorialPage() {
         text: "Quick walkthrough. Click Next.",
       },
       {
-        targetId: "tut-header",
-        title: "Timer",
-        text: "This area shows how much time you have left in a round. Keep an eye on it.",
+        targetId: "tut-timer",
+        title: "Workflow & Timer",
+        text: "This area shows your current workflow type and how much time you have left in this round. Keep an eye on it.",
       },
       {
         targetId: "tut-task",
@@ -68,7 +68,7 @@ export default function TutorialPage() {
       },
       {
         targetId: "tut-status",
-        title: "Autosave & counters",
+        title: "Autosave & Counters",
         text: "This shows when your draft was last saved, plus word and character counts.",
       },
       {
@@ -215,92 +215,116 @@ export default function TutorialPage() {
 
   return (
     <main className="min-h-dvh bg-background">
-      <div id="tut-page">
-        <div id="tut-header">
-          <RoundHeader workflow="Human only" />
-        </div>
+      <div className="tut-page mx-auto w-full max-w-7xl p-6">
+        <div className="relative">
+          <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)_220px] items-start gap-3">
+            {/* Left ghost spacer */}
+            <div
+              className="hidden md:block w-[220px] opacity-0 pointer-events-none select-none"
+              aria-hidden="true"
+            />
 
-        <Progress />
+            {/* Center content */}
+            <div className="min-w-0">
+              <div className="mx-auto max-w-4xl">
+                <Progress />
 
-        <div className="mx-auto max-w-4xl p-6">
-          <div id="tut-task">
-            <TaskDetails />
+                <div className="p-6">
+                  <div id="tut-task">
+                    <TaskDetails />
+                  </div>
+
+                  <section className="mt-4" id="tut-instructions">
+                    <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
+                      <p className="text-sm text-muted-foreground">
+                        Write entirely by yourself.{" "}
+                        <span className="font-medium text-foreground">No AI available.</span>
+                      </p>
+                    </div>
+                  </section>
+
+                  <section className="mt-4">
+                    <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
+                      <div className="mb-2 flex items-center justify-between">
+                        <Label htmlFor="draft" className="text-sm font-medium">
+                          Your draft
+                        </Label>
+
+                        {/* ✅ tutorial step target */}
+                        <div className="flex items-center gap-3" id="tut-status">
+                          <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
+                          <span className="text-xs text-muted-foreground">
+                            {words} words • {text.length} chars
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="relative" id="tut-editor">
+                        <Textarea
+                          ref={(el) => {
+                            draftRef.current = el;
+                          }}
+                          id="draft"
+                          rows={14}
+                          value={text}
+                          onChange={(e) => setText(e.target.value)}
+                          placeholder="Write here..."
+                          readOnly={false}
+                          onCopy={handleCopyPaste}
+                          onPaste={handleCopyPaste}
+                          onCut={handleCopyPaste}
+                          className="bg-background text-foreground placeholder:text-muted-foreground"
+                        />
+
+                        {showCopyMsg && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 rounded-md bg-black/70 px-3 py-2 text-xs text-white shadow-md">
+                            Copy/paste/cut disabled.
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-3 flex items-center justify-between gap-2">
+                        {/* keep Rules visible (real UI), but no tutorial step for it */}
+                        <Rules />
+
+                        <div className="flex gap-2" id="tut-submit">
+                          <Button
+                            variant="secondary"
+                            onClick={() => setText("")}
+                            disabled={text.length === 0}
+                          >
+                            Clear
+                          </Button>
+
+                          {/* looks enabled in tutorial */}
+                          <Button onClick={onTutorialSubmit}>Submit</Button>
+                        </div>
+                      </div>
+
+                      {showSubmitMsg && (
+                        <div className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
+                          Tutorial only — in real rounds, Submit is enabled even if requirements aren’t met.
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                </div>
+              </div>
+            </div>
+
+            <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
+              <div id="tut-timer">
+                <TimerBadge workflow="Human only" seconds={300}/>
+              </div>
+            </div>
           </div>
 
-          <section className="mt-4" id="tut-instructions">
-            <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
-              <p className="text-sm text-muted-foreground">
-                Write entirely by yourself.{" "}
-                <span className="font-medium text-foreground">No AI available.</span>
-              </p>
+          {/* Mobile: keep it on the right */}
+          <div className="md:hidden fixed right-4 top-40 z-40">
+            <div id="tut-timer">
+              <TimerBadge workflow="Human only" seconds={300}/>
             </div>
-          </section>
-
-          <section className="mt-4">
-            <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
-              <div className="mb-2 flex items-center justify-between">
-                <Label htmlFor="draft" className="text-sm font-medium">
-                  Your draft
-                </Label>
-
-                {/* ✅ tutorial step target */}
-                <div className="flex items-center gap-3" id="tut-status">
-                  <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
-                  <span className="text-xs text-muted-foreground">
-                    {words} words • {text.length} chars
-                  </span>
-                </div>
-              </div>
-
-              <div className="relative" id="tut-editor">
-                <Textarea
-                  ref={(el) => {
-                    draftRef.current = el;
-                  }}
-                  id="draft"
-                  rows={14}
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Write here..."
-                  readOnly={false}
-                  onCopy={handleCopyPaste}
-                  onPaste={handleCopyPaste}
-                  onCut={handleCopyPaste}
-                  className="bg-background text-foreground placeholder:text-muted-foreground"
-                />
-
-                {showCopyMsg && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 rounded-md bg-black/70 px-3 py-2 text-xs text-white shadow-md">
-                    Copy/paste/cut disabled.
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-3 flex items-center justify-between gap-2">
-                {/* keep Rules visible (real UI), but no tutorial step for it */}
-                <Rules />
-
-                <div className="flex gap-2" id="tut-submit">
-                  <Button
-                    variant="secondary"
-                    onClick={() => setText("")}
-                    disabled={text.length === 0}
-                  >
-                    Clear
-                  </Button>
-
-                  {/* looks enabled in tutorial */}
-                  <Button onClick={onTutorialSubmit}>Submit</Button>
-                </div>
-              </div>
-
-              {showSubmitMsg && (
-                <div className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
-                  Tutorial only — in real rounds, Submit is enabled even if requirements aren’t met.
-                </div>
-              )}
-            </div>
-          </section>
+          </div>
         </div>
       </div>
 

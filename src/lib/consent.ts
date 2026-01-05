@@ -31,7 +31,7 @@ export const CONSENT_SECTIONS: ConsentSection[] = [
   {
     title: "4. Duration and Tasks",
     body:
-      "The entire session will take approximately 20–30 minutes. During each round, you will choose a workflow and complete the associated writing task.",
+      "The entire session will take approximately 30-50 minutes. During each round, you will choose a workflow and complete the associated writing task.",
   },
   {
     title: "5. What Will Be Recorded",

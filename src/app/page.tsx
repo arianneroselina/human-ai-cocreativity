@@ -123,8 +123,7 @@ export default function Page() {
   return (
     <main className="min-h-dvh bg-background">
       {showConsent && <ConsentModal onConsent={handleConsent} />}
-      <Progress />
-
+      
       <div className="mx-auto max-w-5xl p-6 space-y-6">
         {/* Hero / Start card */}
         <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
@@ -177,7 +176,7 @@ export default function Page() {
             {!hasActiveSession && (
               <div className="mt-1 inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                <span className="text-xs text-foreground">This whole session takes ~20–30 minutes</span>
+                <span className="text-xs text-foreground">This whole session takes ~30-50 minutes</span>
               </div>
             )}
           </div>
