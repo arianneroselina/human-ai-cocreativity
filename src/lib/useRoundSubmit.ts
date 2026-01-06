@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useRef } from "react";
 import { useExperiment } from "@/stores/useExperiment";
 import type { RequirementResult } from "@/lib/taskChecker";
 
@@ -102,4 +103,70 @@ export async function submitData(
   } catch (e: any) {
     return { ok: false, error: e?.message ?? "network error" };
   }
+}
+
+export type RoundCheckResult = {
+  taskId: string;
+  passed: boolean;
+  results: RequirementResult[];
+} | null;
+
+type RouterLike = { replace: (path: string) => void; push: (path: string) => void };
+
+type RunLike = {
+  sessionId: string | null;
+  roundIndex: number;
+  workflow?: string;
+};
+
+export function useRoundSubmit(args: {
+  run: RunLike;
+  router: RouterLike;
+  text: string;
+  words: number;
+  check: RoundCheckResult;
+  setLocked: (v: boolean) => void;
+}) {
+  const { run, router, text, words, check, setLocked } = args;
+
+  // prevents duplicate timer submits
+  const forceSubmitOnceRef = useRef(false);
+
+  const submit = useCallback(() => {
+    if (!run.sessionId || !check) return;
+
+    setLocked(true);
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
+  }, [
+    run.sessionId,
+    run.roundIndex,
+    run.workflow,
+    check,
+    text,
+    words,
+    router,
+    setLocked,
+  ]);
+
+  const forceSubmit = useCallback(() => {
+    if (forceSubmitOnceRef.current) return;
+    forceSubmitOnceRef.current = true;
+    submit();
+  }, [submit]);
+
+  return { submit, forceSubmit };
 }

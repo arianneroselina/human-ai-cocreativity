@@ -1,6 +1,6 @@
 "use client";
 
-import React, {useCallback, useMemo, useRef, useState} from "react";
+import React, { useMemo, useState} from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
@@ -8,7 +8,7 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails, { GeneralAIRules } from "@/components/ui/taskDetails";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
-import { submitData } from "@/lib/submit";
+import { useRoundSubmit } from "@/lib/useRoundSubmit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
@@ -56,9 +56,6 @@ export default function AIPage() {
     return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
   }, [text, run.roundIndex, run.sessionId]);
 
-  const forceSubmitOnceRef = useRef(false);
-  useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
-
   const generateAiDraft = async () => {
     if (aiUsed || loading) return;
     if (!task) {
@@ -105,48 +102,16 @@ export default function AIPage() {
     }
   };
 
-  const submit = () => {
-    if (!run.sessionId || !check) return;
-    setLocked(true);
+  useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
-    submitData(
-      {
-        sessionId: run.sessionId,
-        roundIndex: run.roundIndex,
-        workflow: run.workflow,
-        text,
-        wordCount: words,
-        charCount: text.length,
-        taskId: check.taskId,
-        passed: check.passed,
-        requirementResults: check.results,
-      },
-      router
-    );
-  };
-
-  const forceSubmit = useCallback(() => {
-    if (forceSubmitOnceRef.current) return;
-    forceSubmitOnceRef.current = true;
-
-    if (!run.sessionId || !check) return;
-    setLocked(true);
-
-    submitData(
-      {
-        sessionId: run.sessionId,
-        roundIndex: run.roundIndex,
-        workflow: run.workflow,
-        text,
-        wordCount: words,
-        charCount: text.length,
-        taskId: check.taskId,
-        passed: check.passed,
-        requirementResults: check.results,
-      },
-      router
-    );
-  }, [run.sessionId, run.roundIndex, run.workflow, check, text, words, router]);
+  const { submit, forceSubmit } = useRoundSubmit({
+    run,
+    router,
+    text,
+    words,
+    check,
+    setLocked,
+  });
 
   const submitDisabled = locked || !aiUsed || text.trim().length === 0;
 
