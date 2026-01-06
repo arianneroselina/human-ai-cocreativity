@@ -7,7 +7,7 @@ import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails from "@/components/ui/taskDetails";
 import ConfirmDialog from "@/components/ui/confirm";
-import { countWords, checkWords } from "@/lib/check";
+import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
@@ -25,7 +25,7 @@ export default function HumanPage() {
   useWorkflowGuard();
   usePreventBack(true);
 
-  const { run, send } = useExperiment();
+  const { run } = useExperiment();
   const router = useRouter();
 
   const [text, setText] = useState("");
@@ -37,28 +37,61 @@ export default function HumanPage() {
 
   const readOnly = useMemo(() => locked, [locked]);
   const [showMessage, setShowMessage] = useState(false);
+
   const words = countWords(text);
-  const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
+
+  const check = useMemo(() => {
+    if (!run.sessionId) return null;
+    return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
+  }, [text, run.roundIndex, run.sessionId]);
 
   const forceSubmitOnceRef = useRef(false);
-
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const clearDraft = () => setText("");
 
   const submit = () => {
+    if (!run.sessionId || !check) return;
     setLocked(true);
-    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: "SUBMIT_ROUND" });
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
   };
 
   const forceSubmit = useCallback(() => {
     if (forceSubmitOnceRef.current) return;
     forceSubmitOnceRef.current = true;
 
+    if (!run.sessionId || !check) return;
     setLocked(true);
-    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-  }, [words, meetsRequiredWords, meetsAvoidWords, text, router]);
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
+  }, [run.sessionId, run.roundIndex, run.workflow, check, text, words, router]);
 
   const submitDisabled = locked || text.trim().length === 0;
 
@@ -86,7 +119,7 @@ export default function HumanPage() {
               <div className="mx-auto max-w-4xl">
                 <Progress />
                 <div className="p-6">
-                  <TaskDetails />
+                  <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   {/* Actions */}
                   <section className="mt-4">

@@ -6,7 +6,7 @@ import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import TaskDetails from "@/components/ui/taskDetails";
-import { countWords, checkWords } from "@/lib/check";
+import { countWords } from "@/lib/taskChecker";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
@@ -42,7 +42,6 @@ export default function TutorialPage() {
   const { saving, lastSavedAt } = useAutosave(saveKey, { text }, { setText });
 
   const words = countWords(text);
-  checkWords(text);
 
   const steps: CoachStep[] = useMemo(
     () => [
@@ -231,7 +230,7 @@ export default function TutorialPage() {
 
                 <div className="p-6">
                   <div id="tut-task">
-                    <TaskDetails />
+                    <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
                   </div>
 
                   <section className="mt-4" id="tut-instructions">

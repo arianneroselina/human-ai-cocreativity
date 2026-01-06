@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/shadcn_ui/button";
+import { getPoemTaskById } from "@/data/tasks";
+import { getTaskIdForRound } from "@/lib/taskAssignment";
 
 export const Task = [
   `Write a short poem about a tired student at university. Use the following guidelines:`,
@@ -40,65 +42,62 @@ export const GeneralAIRules = [
   `3) Output ONLY the final edited poem—no markdown fences.`,
 ];
 
-export default function TaskDetails() {
-  const [taskDetailsOpen, setTaskDetailsOpen] = useState(true);
+type TaskDetailsProps = {
+  roundIndex: number; // 1..7
+  sessionId:  string | null;
+};
+
+export default function TaskDetails({ roundIndex, sessionId }: TaskDetailsProps) {
+  const [open, setOpen] = useState(true);
+  const [taskId, setTaskId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const id = getTaskIdForRound(roundIndex, sessionId!);
+    setTaskId(id);
+  }, [roundIndex, sessionId]);
+
+  const task = useMemo(() => (taskId ? getPoemTaskById(taskId) : null), [taskId]);
+
+  if (!task) {
+    return (
+      <section className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-foreground">Task: Loading…</h2>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
-      {/* Info Section: Display the Task Prompt */}
       <div className="mt-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Task: Write a Poem</h2>
+        <h2 className="text-lg font-semibold text-foreground">
+          Title: {task.title}
+        </h2>
         <Button
           variant="ghost"
-          onClick={() => setTaskDetailsOpen(!taskDetailsOpen)}
-          aria-label={taskDetailsOpen ? "Hide Task Details" : "Show Task Details"}
+          onClick={() => setOpen(!open)}
+          aria-label={open ? "Hide Task Details" : "Show Task Details"}
           className="text-muted-foreground"
         >
-          {taskDetailsOpen ? "▲" : "▼"}
+          {open ? "▲" : "▼"}
         </Button>
       </div>
 
-      {taskDetailsOpen && (
+      {open && (
         <div className="mt-4">
-          <p className="mt-2 text-sm text-muted-foreground">{Task[0]}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{task.intro}</p>
 
-          {/* Guidelines List */}
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <span className="text-xl text-primary">📝</span>
-                <div>
-                  <h3 className="font-medium text-foreground">Length</h3>
-                  <p className="text-sm text-muted-foreground">{Task[1]}</p>
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {task.uiItems.map((item, idx) => (
+              <div key={`${task.id}-${idx}`} className="flex items-start gap-3 rounded-md border border-border/60 p-3">
+                <span className="text-xl text-primary">{item.icon}</span>
+                <div className="min-w-0">
+                  <h3 className="font-medium text-foreground">{item.heading}</h3>
+                  <p className="whitespace-pre-line text-sm text-muted-foreground">{item.text}</p>
                 </div>
               </div>
-
-              <div className="flex items-start gap-3">
-                <span className="text-xl text-primary">🔑</span>
-                <div>
-                  <h3 className="font-medium text-foreground">Required Words</h3>
-                  <p className="text-sm text-muted-foreground whitespace-pre-line">{Task[2]}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <span className="text-xl text-primary">❌</span>
-                <div>
-                  <h3 className="font-medium text-foreground">Avoid</h3>
-                  <p className="text-sm text-muted-foreground">{Task[3]}</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <span className="text-xl text-primary">🎨</span>
-                <div>
-                  <h3 className="font-medium text-foreground">Tone and Style</h3>
-                  <p className="text-sm text-muted-foreground">{Task[4]}</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       )}

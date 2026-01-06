@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails, { GeneralAIRules, HumanThenAIRules, Task } from "@/components/ui/taskDetails";
+import TaskDetails, { GeneralAIRules, HumanThenAIRules } from "@/components/ui/taskDetails";
 import ConfirmDialog from "@/components/ui/confirm";
-import { countWords, checkWords } from "@/lib/check";
+import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
@@ -20,13 +20,15 @@ import TimerBadge from "@/components/ui/timerBadge";
 import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
+import { getTaskIdForRound } from "@/lib/taskAssignment";
+import { getPoemTaskById } from "@/data/tasks";
 
 export default function HumanAIPage() {
   useRouteGuard(["task"]);
   useWorkflowGuard();
   usePreventBack(true);
 
-  const { run, send } = useExperiment();
+  const { run } = useExperiment();
   const router = useRouter();
 
   const [text, setText] = useState("");
@@ -40,11 +42,21 @@ export default function HumanAIPage() {
 
   const readOnly = useMemo(() => locked || aiUsed, [locked, aiUsed]);
   const [showMessage, setShowMessage] = useState(false);
+
   const words = countWords(text);
-  const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
+
+  const task = useMemo(() => {
+    if (!run.sessionId) return null;
+    const taskId = getTaskIdForRound(run.roundIndex, run.sessionId);
+    return getPoemTaskById(taskId);
+  }, [run.roundIndex, run.sessionId]);
+
+  const check = useMemo(() => {
+    if (!run.sessionId) return null;
+    return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
+  }, [text, run.roundIndex, run.sessionId]);
 
   const forceSubmitOnceRef = useRef(false);
-
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const askAIToEdit = async () => {
@@ -53,23 +65,26 @@ export default function HumanAIPage() {
       alert("Please write something first before asking AI to edit.");
       return;
     }
+    if (!task) {
+      alert("Task not ready yet. Please try again.");
+      return;
+    }
+
     setLoading(true);
 
     const input = [
-      `Improve the poem under <TEXT> while preserving its core meaning and voice. This was the task:`,
+      `Improve the poem under <TEXT> while preserving its core meaning and voice.`,
+      `Follow the task requirements strictly.`,
       ``,
-      Task[0],
-      `- ${Task[1]}`,
-      `- ${Task[2]}`,
-      `- ${Task[3]}`,
-      `- ${Task[4]}`,
+      `TASK:`,
+      ...task.taskLines.map((l) => `- ${l}`),
       ``,
       GeneralAIRules.join("\n"),
       HumanThenAIRules.join("\n"),
       ``,
       `<TEXT>`,
       text.trim(),
-      `</TEXT>`
+      `</TEXT>`,
     ].join("\n");
 
     try {
@@ -96,27 +111,54 @@ export default function HumanAIPage() {
   const clearDraft = () => setText("");
 
   const submit = () => {
+    if (!run.sessionId || !check) return;
     setLocked(true);
-    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: "SUBMIT_ROUND" });
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
   };
 
   const forceSubmit = useCallback(() => {
     if (forceSubmitOnceRef.current) return;
     forceSubmitOnceRef.current = true;
 
+    if (!run.sessionId || !check) return;
     setLocked(true);
-    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-  }, [words, meetsRequiredWords, meetsAvoidWords, text, router]);
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
+  }, [run.sessionId, run.roundIndex, run.workflow, check, text, words, router]);
 
   const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
   const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     setShowMessage(true);
-    setTimeout(() => {
-      setShowMessage(false);
-    }, 2000);
+    setTimeout(() => setShowMessage(false), 2000);
   };
 
   return (
@@ -125,17 +167,14 @@ export default function HumanAIPage() {
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)_220px] items-start gap-3">
             {/* Left ghost spacer */}
-            <div
-              className="hidden md:block w-[220px] opacity-0 pointer-events-none select-none"
-              aria-hidden="true"
-            />
+            <div className="hidden md:block w-[220px] opacity-0 pointer-events-none select-none" aria-hidden="true" />
 
             {/* Center content */}
             <div className="min-w-0">
               <div className="mx-auto max-w-4xl">
                 <Progress />
                 <div className="p-6">
-                  <TaskDetails />
+                  <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   {/* Actions */}
                   <section className="mt-4">
@@ -238,23 +277,13 @@ export default function HumanAIPage() {
 
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
-              <TimerBadge
-                workflow="Human → AI"
-                seconds={300}
-                active={!locked}
-                onTimeUp={forceSubmit}
-              />
+              <TimerBadge workflow="Human → AI" seconds={300} active={!locked} onTimeUp={forceSubmit} />
             </div>
           </div>
 
-          {/* Mobile: keep it on the right */}
+          {/* Mobile */}
           <div className="md:hidden fixed right-4 top-40 z-40">
-            <TimerBadge
-              workflow="Human → AI"
-              seconds={300}
-              active={!locked}
-              onTimeUp={forceSubmit}
-            />
+            <TimerBadge workflow="Human → AI" seconds={300} active={!locked} onTimeUp={forceSubmit} />
           </div>
         </div>
       </div>

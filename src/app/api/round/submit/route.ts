@@ -1,18 +1,20 @@
-import { prisma } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { prisma } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json();
+
   const {
     sessionId,
     roundIndex,
-    workflow,      // 'human' | 'ai' | 'human_ai' | 'ai_human'
+    workflow, // 'human' | 'ai' | 'human_ai' | 'ai_human'
     text,
-    metrics = {},  // { wordCount, meetsRequiredWords, meetsAvoidWords }
-  } = body;
+    metrics = {},
+    evaluation = {},
+  } = body ?? {};
 
-  if (!sessionId || !roundIndex || !workflow) {
-    return NextResponse.json({ error: 'missing fields' }, { status: 400 });
+  if (!sessionId || typeof roundIndex !== "number" || !workflow) {
+    return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 
   const findRound = await prisma.round.findUnique({
@@ -20,22 +22,38 @@ export async function POST(req: Request) {
   });
 
   if (!findRound) {
-    return NextResponse.json({ error: 'Round not found' }, { status: 404 });
+    return NextResponse.json({ error: "Round not found" }, { status: 404 });
   }
 
   const startedAt = findRound.startedAt;
   const submittedAt = new Date();
   const timeMs = submittedAt.getTime() - startedAt.getTime();
 
+  const wordCount =
+    typeof metrics.wordCount === "number" ? metrics.wordCount : null;
+
+  const charCount =
+    typeof metrics.charCount === "number" ? metrics.charCount : null;
+
+  const taskId = typeof evaluation.taskId === "string" ? evaluation.taskId : null;
+
+  const passed =
+    typeof evaluation.passed === "boolean" ? evaluation.passed : null;
+
+  const requirementResults =
+    evaluation.requirementResults != null ? evaluation.requirementResults : null;
+
   const round = await prisma.round.update({
     where: { id: findRound.id },
     data: {
       submittedAt,
       timeMs,
-      wordCount: metrics.wordCount ?? null,
-      meetsRequiredWords: metrics.meetsRequiredWords ?? null,
-      meetsAvoidWords: metrics.meetsAvoidWords ?? null,
-      text,
+      text: typeof text === "string" ? text : null,
+      wordCount,
+      charCount,
+      taskId,
+      passed,
+      requirementResults,
     },
   });
 

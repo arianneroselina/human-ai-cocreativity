@@ -100,8 +100,10 @@ model Round {
   text               String?
   timeMs             Int?
   wordCount          Int?
-  meetsRequiredWords Boolean?
-  meetsAvoidWords    Boolean?
+  charCount          Int?
+  taskId             String?
+  passed             Boolean?
+  requirementResults Json?
   feedback           RoundFeedback?
 
   @@unique([sessionId, index])

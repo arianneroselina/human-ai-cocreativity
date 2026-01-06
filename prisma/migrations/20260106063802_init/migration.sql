@@ -74,8 +74,10 @@ CREATE TABLE "Round" (
     "text" TEXT,
     "timeMs" INTEGER,
     "wordCount" INTEGER,
-    "meetsRequiredWords" BOOLEAN,
-    "meetsAvoidWords" BOOLEAN,
+    "charCount" INTEGER,
+    "taskId" TEXT,
+    "passed" BOOLEAN,
+    "requirementResults" JSONB,
 
     CONSTRAINT "Round_pkey" PRIMARY KEY ("id")
 );

@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails, { GeneralAIRules, Task } from "@/components/ui/taskDetails";
+import TaskDetails, { GeneralAIRules } from "@/components/ui/taskDetails";
 import ConfirmDialog from "@/components/ui/confirm";
-import { countWords, checkWords } from "@/lib/check";
+import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { submitData } from "@/lib/submit";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
@@ -20,13 +20,15 @@ import TimerBadge from "@/components/ui/timerBadge";
 import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
+import { getTaskIdForRound } from "@/lib/taskAssignment";
+import { getPoemTaskById } from "@/data/tasks";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
   useWorkflowGuard();
   usePreventBack(true);
 
-  const { run, send } = useExperiment();
+  const { run } = useExperiment();
   const router = useRouter();
 
   const [text, setText] = useState("");
@@ -41,25 +43,44 @@ export default function AIHumanWorkPage() {
   // readOnly until AI generates; afterward editable (unless locked)
   const readOnly = useMemo(() => locked || !aiUsed, [locked, aiUsed]);
   const [showMessage, setShowMessage] = useState(false);
+
   const words = countWords(text);
-  const { meetsRequiredWords, meetsAvoidWords } = checkWords(text);
+
+  const task = useMemo(() => {
+    if (!run.sessionId) return null;
+    const taskId = getTaskIdForRound(run.roundIndex, run.sessionId);
+    return getPoemTaskById(taskId);
+  }, [run.roundIndex, run.sessionId]);
+
+  const check = useMemo(() => {
+    if (!run.sessionId) return null;
+    return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
+  }, [text, run.roundIndex, run.sessionId]);
 
   const forceSubmitOnceRef = useRef(false);
-
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const generateAiDraft = async () => {
     if (aiUsed || loading) return;
+    if (!task) {
+      alert("Task not ready yet. Please try again.");
+      return;
+    }
+
     setLoading(true);
 
     const input = [
-      Task[0],
-      `- ${Task[1]}`,
-      `- ${Task[2]}`,
-      `- ${Task[3]}`,
-      `- ${Task[4]}`,
+      `Improve the poem under <TEXT> while preserving its core meaning and voice.`,
+      `Follow the task requirements strictly.`,
+      ``,
+      `TASK:`,
+      ...task.taskLines.map((l) => `- ${l}`),
       ``,
       GeneralAIRules.join("\n"),
+      ``,
+      `<TEXT>`,
+      text.trim(),
+      `</TEXT>`,
     ].join("\n");
 
     try {
@@ -86,18 +107,47 @@ export default function AIHumanWorkPage() {
   const clearDraft = () => setText("");
 
   const submit = () => {
+    if (!run.sessionId || !check) return;
     setLocked(true);
-    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-    send({ type: 'SUBMIT_ROUND' });
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
   };
 
   const forceSubmit = useCallback(() => {
     if (forceSubmitOnceRef.current) return;
     forceSubmitOnceRef.current = true;
 
+    if (!run.sessionId || !check) return;
     setLocked(true);
-    submitData(words, meetsRequiredWords, meetsAvoidWords, text, router);
-  }, [words, meetsRequiredWords, meetsAvoidWords, text, router]);
+
+    submitData(
+      {
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        workflow: run.workflow,
+        text,
+        wordCount: words,
+        charCount: text.length,
+        taskId: check.taskId,
+        passed: check.passed,
+        requirementResults: check.results,
+      },
+      router
+    );
+  }, [run.sessionId, run.roundIndex, run.workflow, check, text, words, router]);
 
   const submitDisabled = locked || text.trim().length === 0 || !aiUsed;
 
@@ -125,7 +175,7 @@ export default function AIHumanWorkPage() {
               <div className="mx-auto max-w-4xl">
                 <Progress />
                 <div className="p-6">
-                  <TaskDetails />
+                  <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   {/* Actions */}
                   <section className="mt-4">

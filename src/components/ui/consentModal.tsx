@@ -3,7 +3,7 @@
 import { Button } from "@/components/shadcn_ui/button";
 import { FC, useEffect, useRef, useState } from "react";
 import { useExperiment } from "@/stores/useExperiment";
-import { CONSENT_SECTIONS, CONSENT_VERSION, buildConsentText } from "@/lib/consent";
+import { CONSENT_SECTIONS, CONSENT_VERSION, buildConsentText } from "@/data/consent";
 
 type ConsentModalProps = {
   onConsent: (consent: boolean) => void;

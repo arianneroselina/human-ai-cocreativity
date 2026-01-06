@@ -1,26 +1,47 @@
 "use client";
 
 import { useExperiment } from "@/stores/useExperiment";
+import type { RequirementResult } from "@/lib/taskChecker";
 
 type SubmitResult =
   | { ok: true; nextRoute: string }
   | { ok: false; error: string };
 
+export type SubmitRoundPayload = {
+  sessionId?: string | null;
+  roundIndex?: number;
+  workflow?: string | undefined;
+
+  text: string;
+  wordCount: number;
+  charCount: number;
+
+  taskId: string;
+  passed: boolean;
+  requirementResults: RequirementResult[];
+};
+
 export async function submitData(
-  words: number,
-  meetsRequiredWords: boolean,
-  meetsAvoidWords: boolean,
-  text: string,
+  payload: SubmitRoundPayload,
   router: { replace: (path: string) => void; push: (path: string) => void }
 ): Promise<SubmitResult> {
-  localStorage.setItem("wordCount", JSON.stringify(words));
-  localStorage.setItem("meetsRequiredWords", JSON.stringify(meetsRequiredWords));
-  localStorage.setItem("meetsAvoidWords", JSON.stringify(meetsAvoidWords));
+  console.log("submitData", { payload, router });
+
+  // local storage (client-side)
+  localStorage.setItem("wordCount", JSON.stringify(payload.wordCount));
+  localStorage.setItem("charCount", JSON.stringify(payload.charCount));
+  localStorage.setItem("taskId", JSON.stringify(payload.taskId));
+  localStorage.setItem("passed", JSON.stringify(payload.passed));
+  localStorage.setItem("requirementResults", JSON.stringify(payload.requirementResults));
 
   const { run } = useExperiment.getState();
 
-  if (!run.sessionId || !run.workflow) {
-    return { ok: false, error: "missing session/workflow" };
+  const sessionId = payload.sessionId ?? run.sessionId;
+  const roundIndex = payload.roundIndex ?? run.roundIndex;
+  const workflow = payload.workflow ?? run.workflow;
+
+  if (!sessionId || !roundIndex || !workflow) {
+    return { ok: false, error: "missing session/workflow/roundIndex" };
   }
 
   try {
@@ -28,11 +49,19 @@ export async function submitData(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        sessionId: run.sessionId,
-        roundIndex: run.roundIndex,
-        workflow: run.workflow,
-        text,
-        metrics: { wordCount: words, meetsRequiredWords, meetsAvoidWords },
+        sessionId,
+        roundIndex,
+        workflow,
+        text: payload.text,
+        evaluation: {
+          taskId: payload.taskId,
+          passed: payload.passed,
+          requirementResults: payload.requirementResults,
+        },
+        metrics: {
+          wordCount: payload.wordCount,
+          charCount: payload.charCount,
+        },
       }),
     });
 
@@ -42,11 +71,19 @@ export async function submitData(
     }
 
     console.log("Round submitted:", {
-      sessionId: run.sessionId,
-      roundIndex: run.roundIndex,
-      workflow: run.workflow,
-      text,
-      metrics: { wordCount: words, meetsRequiredWords, meetsAvoidWords },
+      sessionId,
+      roundIndex,
+      workflow,
+      text: payload.text,
+      evaluation: {
+        taskId: payload.taskId,
+        passed: payload.passed,
+        requirementResults: payload.requirementResults,
+      },
+      metrics: {
+        wordCount: payload.wordCount,
+        charCount: payload.charCount,
+      },
     });
 
     useExperiment.getState().send({ type: "SUBMIT_ROUND" } as any);
