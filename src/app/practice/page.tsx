@@ -20,7 +20,7 @@ export default function PracticeStartPage() {
     () => [
       { icon: <Shuffle className="h-4 w-4" />, text: "4 tasks (random order)" },
       { icon: <Timer className="h-4 w-4" />, text: "5 minutes each" },
-      { icon: <ArrowRight className="h-4 w-4" />, text: "1-min pause between (skippable)" },
+      { icon: <ArrowRight className="h-4 w-4" />, text: "Feedback after each round" },
     ],
     []
   );

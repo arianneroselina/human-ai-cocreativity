@@ -45,7 +45,7 @@ export const CONSENT_SECTIONS: ConsentSection[] = [
   {
     title: "6. Risks and Discomforts",
     body:
-      "There are no known risks beyond those experienced in normal computer use. You may skip any task or withdraw from the study at any time without penalty. Participation is voluntary.",
+      "There are no known risks beyond those experienced in normal computer use. You may withdraw from the study at any time without penalty. Participation is voluntary.",
   },
   {
     title: "7. Confidentiality",

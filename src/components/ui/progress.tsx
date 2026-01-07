@@ -19,8 +19,6 @@ export default function Progress() {
   const completed = (() => {
     if (mode === "practice") {
       switch (run.phase) {
-        case "practice_pause":
-          return index;
         case "task":
         case "choose_workflow":
         case "round_feedback":

@@ -70,8 +70,6 @@ export default function Page() {
         return "/tutorial";
       case "practice":
         return "/practice";
-      case "practice_pause":
-        return "/practice/pause";
       case "choose_workflow":
         return "/choose";
       case "task":

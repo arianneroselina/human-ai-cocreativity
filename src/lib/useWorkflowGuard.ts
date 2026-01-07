@@ -18,12 +18,11 @@ export function useWorkflowGuard() {
     }
 
     // If user is not in "task" phase, bounce them to the correct screen.
-    // (This prevents entering /task/* directly during tutorial, practice pause, etc.)
+    // (This prevents entering /task/* directly during tutorial, choose workflow, etc.)
     if (run.phase !== "task") {
       if (run.phase === "pre-questionnaire") router.replace("/pre-questionnaire");
       else if (run.phase === "tutorial") router.replace("/tutorial");
       else if (run.phase === "practice") router.replace("/practice");
-      else if (run.phase === "practice_pause") router.replace("/practice/pause");
       else if (run.phase === "choose_workflow") router.replace("/choose");
       else if (run.phase === "round_feedback") router.replace("/feedback/round");
       else if (run.phase === "feedback") router.replace("/feedback/session");

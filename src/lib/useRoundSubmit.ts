@@ -91,11 +91,9 @@ export async function submitData(
 
     const nextPhase = useExperiment.getState().run.phase;
     const nextRoute =
-      nextPhase === "practice_pause"
-        ? "/practice/pause"
-        : nextPhase === "round_feedback"
-          ? "/feedback/round"
-          : "/choose";
+      nextPhase === "round_feedback"
+        ? "/feedback/round"
+        : "/choose";
 
     router.replace(nextRoute);
 

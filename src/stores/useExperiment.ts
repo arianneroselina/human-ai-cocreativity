@@ -93,7 +93,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "task";
 
           case "NEXT_ROUND":
-            return run.phase === "round_feedback" || (run.phase === "practice_pause" && r.mode === "practice");
+            return run.phase === "round_feedback";
 
           case "FINISH_SESSION":
             return run.phase === "round_feedback" && run.roundIndex >= r.totalRounds + r.totalPracticeRounds;
@@ -167,19 +167,14 @@ export const useExperiment = create<Store>()(
 
             case "SUBMIT_ROUND": {
               if (!can("SUBMIT_ROUND")) return state;
-
-              if (s.mode === "practice") {
-                s.phase = "practice_pause";
-              } else {
-                s.phase = "round_feedback";
-              }
+              s.phase = "round_feedback";
               return { run: s };
             }
 
             case "NEXT_ROUND": {
               if (!can("NEXT_ROUND")) return state;
 
-              if (s.phase === "practice_pause" && s.mode === "practice") {
+              if (s.mode === "practice") {
                 if (s.roundIndex < s.totalPracticeRounds) {
                   s.mode = "practice";
                   s.locked = true;

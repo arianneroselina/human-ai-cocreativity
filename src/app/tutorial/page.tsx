@@ -169,7 +169,6 @@ export default function TutorialPage() {
   };
 
   const prev = () => setStepIdx((s) => Math.max(0, s - 1));
-  const skip = () => finish();
 
   const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -351,10 +350,6 @@ export default function TutorialPage() {
           </div>
 
           <div className="mt-4 flex items-center justify-between">
-            <Button variant="secondary" onClick={skip}>
-              Skip
-            </Button>
-
             <div className="flex items-center gap-2">
               {!isFirst && (
                 <Button

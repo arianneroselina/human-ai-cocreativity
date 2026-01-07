@@ -50,8 +50,10 @@ export default function RoundFeedbackPage() {
       let index = run.roundIndex;
       if ((run as any).mode === "main") {
         index = run.roundIndex - (run as any).totalPracticeRounds;
+        return `Round ${index} — quick feedback`
+      } else {
+        return `Practice ${index} — quick feedback`
       }
-      return `Round ${index} — quick feedback`
     },
     [run.roundIndex]
   );
@@ -133,7 +135,7 @@ export default function RoundFeedbackPage() {
 
               <div className="mt-5 space-y-5">
                 <LikertRow
-                  label={`1) I liked the workflow "${wf?.title}" I chose this round.`}
+                  label={`1) I liked the workflow "${wf?.title}".`}
                   value={liking}
                   onChange={setLiking}
                   left="Strongly Disagree"

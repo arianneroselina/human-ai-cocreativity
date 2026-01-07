@@ -16,7 +16,6 @@ export function useRouteGuard(allow: PhaseAllow) {
       else if (run.phase === 'pre-questionnaire') router.replace('/pre-questionnaire');
       else if (run.phase === 'tutorial') router.replace('/tutorial');
       else if (run.phase === "practice") router.replace("/practice");
-      else if (run.phase === "practice_pause") router.replace("/practice/pause");
       else if (run.phase === 'choose_workflow') router.replace('/choose');
       else if (run.phase === 'task') {
         if (!run.workflow || !run.locked) {
