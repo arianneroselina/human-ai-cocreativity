@@ -29,13 +29,11 @@ export default function HumanPage() {
   const router = useRouter();
 
   const [text, setText] = useState("");
-  const [locked, setLocked] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
   const { saving, lastSavedAt } = useAutosave(saveKey, { text }, { setText });
 
-  const readOnly = useMemo(() => locked, [locked]);
   const [showMessage, setShowMessage] = useState(false);
 
   const words = countWords(text);
@@ -55,10 +53,9 @@ export default function HumanPage() {
     text,
     words,
     check,
-    setLocked,
   });
 
-  const submitDisabled = locked || text.trim().length === 0;
+  const submitDisabled = text.trim().length === 0;
 
   const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -86,15 +83,6 @@ export default function HumanPage() {
                 <div className="p-6">
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
-                  {/* Actions */}
-                  <section className="mt-4">
-                    <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
-                      <p className="text-sm text-muted-foreground">
-                        Write entirely by yourself. <span className="font-medium text-foreground">No AI available.</span> Submit before time runs out.
-                      </p>
-                    </div>
-                  </section>
-
                   {/* Editor Section */}
                   <section className="mt-4">
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
@@ -112,11 +100,10 @@ export default function HumanPage() {
                           value={text}
                           onChange={(e) => setText(e.target.value)}
                           placeholder="Write here..."
-                          readOnly={readOnly}
                           onCopy={handleCopyPaste}
                           onPaste={handleCopyPaste}
                           onCut={handleCopyPaste}
-                          className={`${readOnly ? "bg-muted" : "bg-background"} text-foreground placeholder:text-muted-foreground`}
+                          className="bg-background text-foreground placeholder:text-muted-foreground"
                         />
                         {showMessage && (
                           <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mt-1 mb-1 bg-black text-white text-xs p-2 rounded-md shadow-md opacity-50 text-center w-auto max-w-xs">
@@ -127,7 +114,7 @@ export default function HumanPage() {
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <Rules />
                         <div className="flex gap-2">
-                          <Button variant="secondary" onClick={clearDraft} disabled={locked || text.length === 0}>
+                          <Button variant="secondary" onClick={clearDraft} disabled={text.length === 0}>
                             Clear
                           </Button>
                           <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
@@ -155,7 +142,6 @@ export default function HumanPage() {
               <TimerBadge
                 workflow="Human only"
                 seconds={300}
-                active={!locked}
                 onTimeUp={forceSubmit}
               />
             </div>
@@ -166,7 +152,6 @@ export default function HumanPage() {
             <TimerBadge
               workflow="Human only"
               seconds={300}
-              active={!locked}
               onTimeUp={forceSubmit}
             />
           </div>

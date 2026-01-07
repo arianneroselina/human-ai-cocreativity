@@ -5,43 +5,6 @@ import { Button } from "@/components/shadcn_ui/button";
 import { getPoemTaskById } from "@/data/tasks";
 import { getTaskIdForRound } from "@/lib/taskAssignment";
 
-export const Task = [
-  `Write a short poem about a tired student at university. Use the following guidelines:`,
-  `Minimum 50 words, maximum 100 words.`,
-  `Use at least 3 of the following words:\n` +
-  `"Tired", "University", "Books", "Sleepless", "Stress", "Midnight", "Coffee", "Assignment", "Brain", "Overwhelmed".`,
-  `Do not use the word "study" or mention specific subjects.`,
-  `Your poem can be serious, humorous, or reflective. Experiment with rhyme and rhythm to convey the tired student's emotions.`,
-];
-
-export const AntiTask = [
-  `Write a short poem about a tired student at university. Use the following guidelines:`,
-  `Minimum 50 words, maximum 100 words.`,
-  `Use only 2 of the following words:\n` +
-  `"Tired", "University", "Books", "Sleepless", "Stress", "Midnight", "Coffee", "Assignment", "Brain", "Overwhelmed".`,
-  `Use the word "study" or mention specific subjects.`,
-  `Your poem can be serious, humorous, or reflective. Experiment with rhyme and rhythm to convey the tired student's emotions.`,
-];
-
-export const HumanThenAIRules = [
-  `Goals:`,
-  `- Strengthen imagery and specificity.`,
-  `- Improve rhythm and line breaks; prefer natural cadence over forced rhyme.`,
-  `- Remove clichés and filler; tighten wording.`,
-  `- Maintain language of the original text.`,
-  `- Keep length within ±10% of original.`,
-  `- Follow the predefined guidelines.`,
-  `Additional Rules:`,
-  `1) Do NOT invent new narrative events; refine what's there.`,
-];
-
-export const GeneralAIRules = [
-  `General Rules:`,
-  `1) Do NOT add explanations, titles, or commentary.`,
-  `2) If a requirement conflicts with goals, requirements win.`,
-  `3) Output ONLY the final edited poem—no markdown fences.`,
-];
-
 type TaskDetailsProps = {
   roundIndex: number; // 1..7
   sessionId:  string | null;

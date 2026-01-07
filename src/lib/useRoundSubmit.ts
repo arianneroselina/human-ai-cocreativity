@@ -125,17 +125,14 @@ export function useRoundSubmit(args: {
   text: string;
   words: number;
   check: RoundCheckResult;
-  setLocked: (v: boolean) => void;
 }) {
-  const { run, router, text, words, check, setLocked } = args;
+  const { run, router, text, words, check } = args;
 
   // prevents duplicate timer submits
   const forceSubmitOnceRef = useRef(false);
 
   const submit = useCallback(() => {
     if (!run.sessionId || !check) return;
-
-    setLocked(true);
 
     submitData(
       {
@@ -159,7 +156,6 @@ export function useRoundSubmit(args: {
     text,
     words,
     router,
-    setLocked,
   ]);
 
   const forceSubmit = useCallback(() => {

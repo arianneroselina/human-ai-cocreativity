@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type DraftSnapshot = { text: string; aiUsed?: boolean };
-type DraftSetters = { setText: (v: string) => void; setAiUsed?: (v: boolean) => void };
+type DraftSnapshot = { text: string; aiLocked?: boolean };
+type DraftSetters = { setText: (v: string) => void; setAiLocked?: (v: boolean) => void };
 
 export function useAutosave(
   key: string | null | undefined,
@@ -19,8 +19,8 @@ export function useAutosave(
   const restoredRef = useRef(false);
 
   const payload = useMemo(
-    () => JSON.stringify({ v: 1, text: snapshot.text ?? "", aiUsed: !!snapshot.aiUsed }),
-    [snapshot.text, snapshot.aiUsed]
+    () => JSON.stringify({ v: 1, text: snapshot.text ?? "", aiLocked: !!snapshot.aiLocked }),
+    [snapshot.text, snapshot.aiLocked]
   );
 
   // Restore once when key is ready
@@ -33,7 +33,7 @@ export function useAutosave(
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === "object") {
           if (typeof parsed.text === "string") setters.setText(parsed.text);
-          if (typeof parsed.aiUsed === "boolean" && setters.setAiUsed) setters.setAiUsed(parsed.aiUsed);
+          if (typeof parsed.aiLocked === "boolean" && setters.setAiLocked) setters.setAiLocked(parsed.aiLocked);
         }
       }
     } catch {

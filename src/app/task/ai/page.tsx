@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useMemo, useState} from "react";
+import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails, { GeneralAIRules } from "@/components/ui/taskDetails";
+import AiChatBox from "@/components/ui/aiChatBox";
+import TaskDetails from "@/components/ui/taskDetails";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { useRoundSubmit } from "@/lib/useRoundSubmit";
@@ -15,16 +16,13 @@ import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
 import Progress from "@/components/ui/progress";
-import { Loader2 } from "lucide-react";
 import TimerBadge from "@/components/ui/timerBadge";
 import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
-import { getTaskIdForRound } from "@/lib/taskAssignment";
-import { getPoemTaskById } from "@/data/tasks";
 
 export default function AIPage() {
-  useRouteGuard(['task']);
+  useRouteGuard(["task"]);
   useWorkflowGuard();
   usePreventBack(true);
 
@@ -32,75 +30,22 @@ export default function AIPage() {
   const router = useRouter();
 
   const [text, setText] = useState("");
-  const [locked, setLocked] = useState(false);
-  const [aiUsed, setAiUsed] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
-  const { saving, lastSavedAt } = useAutosave(saveKey, { text, aiUsed }, { setText, setAiUsed });
+  const { saving, lastSavedAt } = useAutosave(saveKey, { text }, { setText });
+
+  const chatKey = `ai-chat:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
 
   const readOnly = useMemo(() => true, []);
   const [showMessage, setShowMessage] = useState(false);
 
   const words = countWords(text);
 
-  const task = useMemo(() => {
-    if (!run.sessionId) return null;
-    const taskId = getTaskIdForRound(run.roundIndex, run.sessionId);
-    return getPoemTaskById(taskId);
-  }, [run.roundIndex, run.sessionId]);
-
   const check = useMemo(() => {
     if (!run.sessionId) return null;
     return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
   }, [text, run.roundIndex, run.sessionId]);
-
-  const generateAiDraft = async () => {
-    if (aiUsed || loading) return;
-    if (!task) {
-      alert("Task not ready yet. Please try again.");
-      return;
-    }
-
-    setLoading(true);
-
-    const input = [
-      `Improve the poem under <TEXT> while preserving its core meaning and voice.`,
-      `Follow the task requirements strictly.`,
-      ``,
-      `TASK:`,
-      ...task.taskLines.map((l) => `- ${l}`),
-      ``,
-      GeneralAIRules.join("\n"),
-      ``,
-      `<TEXT>`,
-      text.trim(),
-      `</TEXT>`,
-    ].join("\n");
-
-    console.log("Generate AI Prompt:", input);
-
-    try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("AI error", err);
-        return;
-      }
-
-      const data = await res.json();
-      setText(data.text || "");
-      setAiUsed(true);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
@@ -110,17 +55,14 @@ export default function AIPage() {
     text,
     words,
     check,
-    setLocked,
   });
 
-  const submitDisabled = locked || !aiUsed || text.trim().length === 0;
+  const submitDisabled = text.trim().length === 0;
 
   const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     setShowMessage(true);
-    setTimeout(() => {
-      setShowMessage(false);
-    }, 2000);
+    setTimeout(() => setShowMessage(false), 2000);
   };
 
   return (
@@ -129,10 +71,7 @@ export default function AIPage() {
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)_220px] items-start gap-3">
             {/* Left ghost spacer */}
-            <div
-              className="hidden md:block w-[220px] opacity-0 pointer-events-none select-none"
-              aria-hidden="true"
-            />
+            <div className="hidden md:block w-[220px] opacity-0 pointer-events-none select-none" aria-hidden="true" />
 
             {/* Center content */}
             <div className="min-w-0">
@@ -141,42 +80,20 @@ export default function AIPage() {
                 <div className="p-6">
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
-                  {/* Actions */}
-                  <section className="mt-4">
-                    <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
-                      <p className="text-sm text-muted-foreground">
-                        Generate a single AI draft and <span className="font-medium text-foreground">submit without editing</span>.
-                      </p>
-
-                      <div className="flex items-center gap-2 pt-4">
-                        <Button onClick={generateAiDraft} disabled={locked || aiUsed || loading}>
-                          {loading ? (
-                            <>
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              Generating...
-                            </>
-                          ) : aiUsed ? (
-                            "AI Draft Generated"
-                          ) : (
-                            "Generate AI Draft"
-                          )}
-                        </Button>
-                        <span className="ml-auto text-sm text-muted-foreground">
-                          {loading
-                            ? "Generating draft..."
-                            : aiUsed
-                              ? "Review the AI draft and submit."
-                              : "Generate the AI draft to proceed."}
-                        </span>
-                      </div>
-                    </div>
-                  </section>
+                  <AiChatBox
+                    mode="AI_ONLY"
+                    aiLocked={false}
+                    onDraft={(draft) => setText(draft)}
+                    storageKey={chatKey}
+                  />
 
                   {/* Editor (read-only) */}
                   <section className="mt-4">
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
                       <div className="mb-2 flex items-center justify-between">
-                        <Label htmlFor="draft" className="text-sm font-medium">AI draft (read-only)</Label>
+                        <Label htmlFor="draft" className="text-sm font-medium">
+                          AI draft (read-only)
+                        </Label>
                         <div className="flex items-center gap-3">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
                           <span className="text-xs text-muted-foreground">
@@ -194,14 +111,14 @@ export default function AIPage() {
                           onCopy={handleCopyPaste}
                           onPaste={handleCopyPaste}
                           onCut={handleCopyPaste}
-                          placeholder="Click 'Generate AI Draft' to see the output..."
-                          className="bg-muted text-foreground placeholder:text-muted-foreground"
+                          placeholder="Your AI draft will appear here..."
+                          className="bg-muted text-muted-foreground placeholder:text-muted-foreground"
                         />
-                          {showMessage && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mt-1 mb-1 bg-black text-white text-xs p-2 rounded-md shadow-md opacity-50 text-center w-auto max-w-xs">
-                              Copy, paste, and cut are disabled for this field.
-                            </div>
-                          )}
+                        {showMessage && (
+                          <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mt-1 mb-1 bg-black text-white text-xs p-2 rounded-md shadow-md opacity-50 text-center w-auto max-w-xs">
+                            Copy, paste, and cut are disabled for this field.
+                          </div>
+                        )}
                       </div>
 
                       <div className="mt-3 flex items-center justify-between gap-2">
@@ -229,23 +146,13 @@ export default function AIPage() {
 
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
-              <TimerBadge
-                workflow="AI only"
-                seconds={300}
-                active={!locked}
-                onTimeUp={forceSubmit}
-              />
+              <TimerBadge workflow="AI only" seconds={300} onTimeUp={forceSubmit} />
             </div>
           </div>
 
-          {/* Mobile: keep it on the right */}
+          {/* Mobile */}
           <div className="md:hidden fixed right-4 top-40 z-40">
-            <TimerBadge
-              workflow="AI only"
-              seconds={300}
-              active={!locked}
-              onTimeUp={forceSubmit}
-            />
+            <TimerBadge workflow="AI only" seconds={300} onTimeUp={forceSubmit} />
           </div>
         </div>
       </div>
