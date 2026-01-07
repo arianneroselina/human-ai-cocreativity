@@ -113,23 +113,30 @@ export default function HumanPage() {
                       </div>
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <Rules />
-                        <div className="flex gap-2">
-                          <Button variant="secondary" onClick={clearDraft} disabled={text.length === 0}>
+
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={clearDraft}
+                            disabled={text.trim().length === 0}
+                          >
                             Clear
                           </Button>
+
                           <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
                             Submit
                           </Button>
-                          <ConfirmDialog
-                            open={submitOpen}
-                            onOpenChange={setSubmitOpen}
-                            title="Submit your draft?"
-                            description="You won't be able to edit after submitting."
-                            confirmLabel="Submit"
-                            cancelLabel="Cancel"
-                            onConfirm={submit}
-                          />
                         </div>
+
+                        <ConfirmDialog
+                          open={submitOpen}
+                          onOpenChange={setSubmitOpen}
+                          title="Submit your draft?"
+                          description="You won't be able to edit after submitting."
+                          confirmLabel="Submit"
+                          cancelLabel="Cancel"
+                          onConfirm={submit}
+                        />
                       </div>
                     </div>
                   </section>

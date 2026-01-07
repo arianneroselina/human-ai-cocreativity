@@ -89,7 +89,7 @@ export default function AIHumanWorkPage() {
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   <AiChatBox
-                    mode="AI_TO_HUMAN"
+                    mode="ai_human"
                     aiLocked={aiLocked}
                     onLockAi={() => {setAiLocked(true);}}
                     onDraft={(draft) => setText(draft)}
@@ -138,9 +138,19 @@ export default function AIHumanWorkPage() {
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <Rules />
 
-                        <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
-                          Submit
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={clearDraft}
+                            disabled={text.trim().length === 0}
+                          >
+                            Clear
+                          </Button>
+
+                          <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
+                            Submit
+                          </Button>
+                        </div>
 
                         <ConfirmDialog
                           open={submitOpen}

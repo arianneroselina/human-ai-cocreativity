@@ -47,6 +47,8 @@ export default function AIPage() {
     return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
   }, [text, run.roundIndex, run.sessionId]);
 
+  const clearDraft = () => setText("");
+
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
 
   const { submit, forceSubmit } = useRoundSubmit({
@@ -81,7 +83,7 @@ export default function AIPage() {
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   <AiChatBox
-                    mode="AI_ONLY"
+                    mode="ai"
                     aiLocked={false}
                     onDraft={(draft) => setText(draft)}
                     storageKey={chatKey}
@@ -124,9 +126,19 @@ export default function AIPage() {
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <Rules />
 
-                        <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
-                          Submit
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={clearDraft}
+                            disabled={text.trim().length === 0}
+                          >
+                            Clear
+                          </Button>
+
+                          <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
+                            Submit
+                          </Button>
+                        </div>
 
                         <ConfirmDialog
                           open={submitOpen}

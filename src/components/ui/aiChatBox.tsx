@@ -5,16 +5,12 @@ import { Button } from "@/components/shadcn_ui/button";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import ConfirmDialog from "@/components/ui/confirm";
 import { Loader2, Sparkles, MessageSquareText, CheckCircle2 } from "lucide-react";
-
-type AiChatMode =
-  | "AI_ONLY"
-  | "AI_TO_HUMAN"
-  | "HUMAN_TO_AI";
+import {Workflow} from "@/lib/experiment";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 type Props = {
-  mode: AiChatMode;
+  mode: Workflow;
   aiLocked: boolean;
   onLockAi?: () => void;
   onUnlockAi?: () => void;
@@ -65,7 +61,7 @@ export default function AiChatBox({
   const [clearOpen, setClearOpen] = useState(false);
 
   useEffect(() => {
-    if (mode !== "HUMAN_TO_AI") return;
+    if (mode !== "human_ai") return;
 
     const text = baseHumanText?.trim() ?? "";
 
@@ -248,9 +244,9 @@ export default function AiChatBox({
 
   const hasSelection = selectedAssistantIndex !== null;
 
-  const isAiOnly = mode === "AI_ONLY";
-  const isAiToHuman = mode === "AI_TO_HUMAN";
-  const isHumanToAi = mode === "HUMAN_TO_AI";
+  const isAiOnly = mode === "ai";
+  const isAiToHuman = mode === "ai_human";
+  const isHumanToAi = mode === "human_ai";
 
   const canSend = useMemo(() => {
     return !aiLocked && !loading && !!prompt.trim();
@@ -475,6 +471,21 @@ export default function AiChatBox({
                   </Button>
                 </div>
               </div>
+            </div>
+
+            {/* Disclaimer */}
+            <div className="px-3 py-2 text-xs text-muted-foreground border-b border-border/60 bg-muted/40">
+              <strong className="text-foreground">⚠️ Disclaimer:</strong>{" "}
+              {isHumanToAi ? (
+                <>
+                  The AI receives <strong>your draft text</strong> as context, but does{" "}
+                  <strong>not</strong> know the task, rules, or any other context.
+                </>
+              ) : (
+                <>
+                  The AI does <strong>not</strong> know the task, rules, or any other context.
+                </>
+              )}
             </div>
 
             {/* Body */}

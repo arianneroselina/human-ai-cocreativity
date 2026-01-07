@@ -83,7 +83,7 @@ export default function HumanAIPage() {
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   <AiChatBox
-                    mode="HUMAN_TO_AI"
+                    mode="human_ai"
                     aiLocked={aiLocked}
                     defaultOpen={false}
                     onUnlockAi={() => {setAiLocked(false);}}
@@ -135,9 +135,19 @@ export default function HumanAIPage() {
                       <div className="mt-3 flex items-center justify-between gap-2">
                         <Rules />
 
-                        <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
-                          Submit
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={clearDraft}
+                            disabled={text.trim().length === 0}
+                          >
+                            Clear
+                          </Button>
+
+                          <Button onClick={() => setSubmitOpen(true)} disabled={submitDisabled}>
+                            Submit
+                          </Button>
+                        </div>
 
                         <ConfirmDialog
                           open={submitOpen}
