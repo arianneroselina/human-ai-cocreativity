@@ -151,15 +151,6 @@ export default function FeedbackPage() {
                     <FileDown className="h-4 w-4" />
                     Download receipt
                   </Button>
-
-                  <Button
-                    onClick={startNew}
-                    className="inline-flex items-center gap-2"
-                    title="Start a new session"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Start new session
-                  </Button>
                 </div>
 
                 <details className="mt-6 group">
