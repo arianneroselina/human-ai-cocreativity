@@ -9,7 +9,6 @@ import TaskDetails from "@/components/ui/taskDetails";
 import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { usePreventBack } from "@/lib/usePreventBack";
-import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
@@ -22,7 +21,6 @@ import { useRoundSubmit } from "@/lib/useRoundSubmit";
 
 export default function HumanPage() {
   useRouteGuard(["task"]);
-  useWorkflowGuard();
   usePreventBack(true);
 
   const { run } = useExperiment();

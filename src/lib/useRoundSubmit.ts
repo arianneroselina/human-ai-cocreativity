@@ -5,7 +5,7 @@ import { useExperiment } from "@/stores/useExperiment";
 import type { RequirementResult } from "@/lib/taskChecker";
 
 type SubmitResult =
-  | { ok: true; nextRoute: string }
+  | { ok: true }
   | { ok: false; error: string };
 
 export type SubmitRoundPayload = {
@@ -88,16 +88,7 @@ export async function submitData(
     });
 
     useExperiment.getState().send({ type: "SUBMIT_ROUND" } as any);
-
-    const nextPhase = useExperiment.getState().run.phase;
-    const nextRoute =
-      nextPhase === "round_feedback"
-        ? "/feedback/round"
-        : "/choose";
-
-    router.replace(nextRoute);
-
-    return { ok: true, nextRoute };
+    return { ok: true };
   } catch (e: any) {
     return { ok: false, error: e?.message ?? "network error" };
   }

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useExperiment } from "@/stores/useExperiment";
 import { Button } from "@/components/shadcn_ui/button";
-import Progress from "@/components/ui/progress";
 import Rules from "@/components/ui/rules";
 import { Workflows } from "@/lib/experiment";
 import {
@@ -23,11 +22,9 @@ import ConsentModal from "@/components/ui/consentModal";
 
 function DevResetButton() {
   const { send } = useExperiment();
-  const router = useRouter();
 
   const resetAll = () => {
     (useExperiment as any).persist?.clearStorage?.();
-    router.replace("/");
     send({ type: "RESET" });
     alert("Resetted.");
   };
@@ -70,6 +67,8 @@ export default function Page() {
         return "/tutorial";
       case "practice":
         return "/practice";
+      case "practice_complete":
+        return "/practice/complete";
       case "choose_workflow":
         return "/choose";
       case "task":
@@ -106,16 +105,7 @@ export default function Page() {
 
   const handleConsent = (consent: boolean) => {
     setShowConsent(false);
-
-    if (consent) {
-      router.replace("/pre-questionnaire");
-      return;
-    }
-
-    (useExperiment as any).persist?.clearStorage?.();
-    send({ type: "RESET" } as any);
-    router.replace("/");
-    alert("You must agree to the consent to participate.");
+    if (consent) router.replace("/pre-questionnaire");
   };
 
   return (
@@ -280,7 +270,7 @@ export default function Page() {
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                     <li>No names or contact details are collected.</li>
-                    <li>We collect background information (e.g., age group, gender, language) for research analysis.</li>
+                    <li>We collect background information (e.g., age, gender, language) for research analysis.</li>
                     <li>Data is handled in line with GDPR principles.</li>
                   </ul>
                 </div>

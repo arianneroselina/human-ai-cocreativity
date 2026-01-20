@@ -75,15 +75,17 @@ model PreQuestionnaire {
   id                String       @id @default(cuid())
   session           Session      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   sessionId         String       @unique
-  ageGroup          String
-  gender            Gender
-  regionDE          String
-  education         Education
-  nativeLang        String
-  englishLevel      EnglishLevel
-  writingConfidence Int
-  aiFamiliarity     Int
-  aiAttitude        Int
+  age               Int?
+  gender            Gender?
+  regionDE          String?
+  education         Education?
+  nativeLang        String?
+  englishLevel      EnglishLevel?
+  writingConfidence Int?
+  aiasLife          Int?
+  aiasWork          Int?
+  aiasFutureUse     Int?
+  aiasHumanity      Int?
   comment           String?
   createdAt         DateTime     @default(now())
   updatedAt         DateTime     @updatedAt

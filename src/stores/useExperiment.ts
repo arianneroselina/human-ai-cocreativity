@@ -9,7 +9,6 @@ type Event =
   | { type: "FINISH_PREQUESTIONNAIRE" }
   | { type: "FINISH_TUTORIAL" }
   | { type: "START_PRACTICE" }
-  | { type: "FINISH_PRACTICE" }
   | { type: "SELECT_WORKFLOW"; workflow: Workflow }
   | { type: "LOCK_WORKFLOW" }
   | { type: "SUBMIT_ROUND" }
@@ -80,9 +79,6 @@ export const useExperiment = create<Store>()(
           case "FINISH_TUTORIAL":
             return run.phase === "tutorial";
 
-          case "FINISH_PRACTICE":
-            return run.phase === "practice";
-
           case "SELECT_WORKFLOW":
             return run.phase === "choose_workflow" && !run.locked;
 
@@ -93,7 +89,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "task";
 
           case "NEXT_ROUND":
-            return run.phase === "round_feedback";
+            return run.phase === "round_feedback" || run.phase === "practice_complete";
 
           case "FINISH_SESSION":
             return run.phase === "round_feedback" && run.roundIndex >= r.totalRounds + r.totalPracticeRounds;
@@ -179,18 +175,18 @@ export const useExperiment = create<Store>()(
                   s.mode = "practice";
                   s.locked = true;
                   s.workflow = (s.practiceOrder?.[s.roundIndex] ?? "human") as Workflow;
-                  s.phase = "task";
+                  s.phase = "practice";
+                  s.roundIndex += 1;
                 } else {
                   s.mode = "main";
-                  s.phase = "choose_workflow";
+                  s.phase = "practice_complete";
                   s.locked = false;
                   s.workflow = undefined;
                 }
-                s.roundIndex += 1;
                 return { run: s };
               }
 
-              if (s.phase === "round_feedback") {
+              if (s.phase === "round_feedback" || s.phase === "practice_complete") {
                 if (s.roundIndex < s.totalRounds + s.totalPracticeRounds) {
                   s.roundIndex += 1;
                   s.mode = "main";
@@ -204,16 +200,6 @@ export const useExperiment = create<Store>()(
               }
 
               return state;
-            }
-
-            case "FINISH_PRACTICE": {
-              if (!can("FINISH_PRACTICE")) return state;
-
-              s.mode = "main";
-              s.phase = "choose_workflow";
-              s.locked = false;
-              s.workflow = undefined;
-              return { run: s };
             }
 
             case "SELECT_WORKFLOW": {

@@ -57,6 +57,8 @@ export default function AiChatBox({
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const [selectedAssistantIndex, setSelectedAssistantIndex] = useState<number | null>(null);
   const [clearOpen, setClearOpen] = useState(false);
 
@@ -195,6 +197,25 @@ export default function AiChatBox({
     };
   }, [panelWidth, panelHeight]);
 
+  // on new messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [messages]);
+
+  // on open
+  useEffect(() => {
+    if (!open) return;
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "auto",
+        block: "end",
+      });
+    });
+  }, [open]);
+
   // TODO: persist chat history on refresh
   // useEffect(() => {
   //   if (!storageKey) return;
@@ -276,9 +297,6 @@ export default function AiChatBox({
           .join("\n");
 
     return [
-      `You are a writing assistant.`,
-      `Return ONLY a poem. No title. No explanation.`,
-      ``,
       `CHAT HISTORY (for context):`,
       historyBlock,
       ``,
@@ -513,22 +531,9 @@ export default function AiChatBox({
                           ].join(" ")}
                         >
                           <div className={isAssistant ? "max-w-[88%]" : "max-w-[88%]"}>
-                            <div className="mb-1 flex items-center justify-between gap-2">
-                              <div className="text-[11px] text-muted-foreground">
-                                {isAssistant ? "AI" : "You"}
-                                {isSelected ? " • selected" : ""}
-                              </div>
-
-                              {isAssistant && (
-                                <Button
-                                  variant={isSelected ? "default" : "secondary"}
-                                  size="sm"
-                                  onClick={() => selectAsDraft(idx, m.content)}
-                                  disabled={aiLocked}
-                                >
-                                  {isSelected ? "Selected draft" : "Use as draft"}
-                                </Button>
-                              )}
+                            <div className="mb-1 text-[11px] text-muted-foreground">
+                              {isAssistant ? "AI" : "You"}
+                              {isSelected ? " • selected" : ""}
                             </div>
 
                             <div
@@ -543,10 +548,25 @@ export default function AiChatBox({
                             >
                               {m.content}
                             </div>
+
+                            {isAssistant && (
+                              <div className="mt-2 flex justify-end">
+                                  <Button
+                                  variant={isSelected ? "default" : "secondary"}
+                                  size="sm"
+                                  onClick={() => selectAsDraft(idx, m.content)}
+                                  disabled={aiLocked}
+                                >
+                                  {isSelected ? "Selected draft" : "Use as draft"}
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       );
                     })}
+
+                    <div ref={messagesEndRef} />
                   </div>
                 )}
               </div>

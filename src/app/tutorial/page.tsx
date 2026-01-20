@@ -29,7 +29,6 @@ function clamp(n: number, min: number, max: number) {
 export default function TutorialPage() {
   useRouteGuard(["tutorial"]);
 
-  const router = useRouter();
   const { run, send } = useExperiment();
 
   const [text, setText] = useState("");
@@ -160,7 +159,6 @@ export default function TutorialPage() {
 
   const finish = () => {
     send({ type: "FINISH_TUTORIAL" } as any);
-    router.replace("/practice");
   };
 
   const next = () => {

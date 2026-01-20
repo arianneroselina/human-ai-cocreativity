@@ -16,19 +16,20 @@ export function useRouteGuard(allow: PhaseAllow) {
       else if (run.phase === 'pre-questionnaire') router.replace('/pre-questionnaire');
       else if (run.phase === 'tutorial') router.replace('/tutorial');
       else if (run.phase === "practice") router.replace("/practice");
+      else if (run.phase === "practice_complete") router.replace("/practice/complete");
       else if (run.phase === 'choose_workflow') router.replace('/choose');
       else if (run.phase === 'task') {
         if (!run.workflow || !run.locked) {
-          router.replace('/choose');
+          if (run.mode === "practice") router.replace("/practice");
+          else router.replace("/choose");
           return;
         }
         router.replace(`/task/${run.workflow}`);
         return;
       }
-      else if (run.phase === 'round_feedback')  router.replace('/feedback/round');
-      else if (run.phase === 'feedback') {
-        router.replace('/feedback/session');
-      }
+      else if (run.phase === 'round_feedback') router.replace('/feedback/round');
+      else if (run.phase === 'feedback') router.replace('/feedback/session');
+      else router.replace("/"); // fallback
     }
-  }, [allow, run.phase, run.workflow, run.locked, router]);
+  }, [allow, run.phase, run.workflow, run.locked, router, run]);
 }

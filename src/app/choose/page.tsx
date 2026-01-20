@@ -16,7 +16,6 @@ export default function Choose() {
   const { run, send } = useExperiment();
   const [choice, setChoice] = useState<Workflow>("human");
   const [open, setOpen] = useState(false);
-  const router = useRouter();
   const selected = Workflows.find(w => w.key === choice)!;
 
   const pick = (wf: Workflow) => {
@@ -44,8 +43,6 @@ export default function Choose() {
       roundIndex: run.roundIndex,
       workflow: run.workflow,
     });
-
-    router.replace(`/task/${choice}`);
   };
 
   // Re-announce the current choice when a new round starts

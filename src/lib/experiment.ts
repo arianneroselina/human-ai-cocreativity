@@ -1,13 +1,14 @@
 "use client";
 
 export type Workflow = 'human' | 'ai' | 'human_ai' | 'ai_human';
-export type Phase = 'idle' | 'pre-questionnaire' | 'tutorial' | 'practice' | 'choose_workflow' | 'task' | 'round_feedback' | 'feedback';
+export type Phase = 'idle' | 'pre-questionnaire' | 'tutorial' | 'practice' | 'practice_complete' | 'choose_workflow' | 'task' | 'round_feedback' | 'feedback';
 
 export interface ExperimentRun {
   participantId: string | null;
   sessionId: string | null;
   totalRounds: number;
   totalPracticeRounds: number;
+  mode: string | null;
   roundIndex: number;      // 1-based
   workflow?: Workflow;     // chosen for the *current* round
   phase: Phase;

@@ -12,8 +12,8 @@ export default function Progress() {
 
   const total = mode === "practice" ? run.totalPracticeRounds : run.totalRounds;
   let index = run.roundIndex;
-  if ((run as any).mode === "main") {
-    index = run.roundIndex - (run as any).totalPracticeRounds;
+  if (run.mode === "main") {
+    index = run.roundIndex - run .totalPracticeRounds;
   }
 
   const completed = (() => {

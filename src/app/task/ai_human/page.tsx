@@ -10,7 +10,6 @@ import ConfirmDialog from "@/components/ui/confirm";
 import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { useRoundSubmit } from "@/lib/useRoundSubmit";
 import { usePreventBack } from "@/lib/usePreventBack";
-import { useWorkflowGuard } from "@/lib/useWorkflowGuard";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import Rules from "@/components/ui/rules";
@@ -23,7 +22,6 @@ import AiChatBox from "@/components/ui/aiChatBox";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
-  useWorkflowGuard();
   usePreventBack(true);
 
   const { run } = useExperiment();

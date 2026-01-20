@@ -14,7 +14,6 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 export default function RoundFeedbackPage() {
   useRouteGuard(["round_feedback"]);
 
-  const router = useRouter();
   const { run, send } = useExperiment();
   const [loading, setLoading] = useState(false);
 
@@ -48,14 +47,14 @@ export default function RoundFeedbackPage() {
   const title = useMemo(
     () => {
       let index = run.roundIndex;
-      if ((run as any).mode === "main") {
-        index = run.roundIndex - (run as any).totalPracticeRounds;
+      if (run.mode === "main") {
+        index = run.roundIndex - run.totalPracticeRounds;
         return `Round ${index} — quick feedback`
       } else {
         return `Practice ${index} — quick feedback`
       }
     },
-    [run.roundIndex]
+    [run]
   );
 
   const handleSubmit = async () => {
@@ -99,10 +98,9 @@ export default function RoundFeedbackPage() {
 
     if (run.roundIndex >= run.totalRounds + run.totalPracticeRounds) {
       send({ type: "FINISH_SESSION" });
-      router.replace("/feedback/session");
     } else {
       send({ type: "NEXT_ROUND" });
-      router.replace("/choose");
+      // TODO: and for practice? no start round
     }
     setLoading(false);
   };

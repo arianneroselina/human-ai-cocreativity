@@ -4,7 +4,8 @@ import { NextResponse } from "next/server";
 const isLikert = (v: unknown) =>
   Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
 
-const isNonEmpty = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+const isAge = (v: unknown) =>
+  Number.isInteger(v) && (v as number) >= 18 && (v as number) <= 120;
 
 const GENDERS = new Set(["female", "male", "prefer_not_to_say"]);
 const EDUCATIONS = new Set(["secondary", "bachelor", "master", "phd", "other", "prefer_not_to_say"]);
@@ -22,15 +23,22 @@ export async function POST(req: Request) {
   const {
     participantId,
     sessionId,
-    ageGroup,
+
+    // personal
+    age,
     gender,
     regionDE,
     education,
     nativeLang,
     englishLevel,
     writingConfidence,
-    aiFamiliarity,
-    aiAttitude,
+
+    // AIAS-4
+    aiasLife,
+    aiasWork,
+    aiasFutureUse,
+    aiasHumanity,
+
     comment,
   } = await req.json();
 
@@ -38,31 +46,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 
-  if (!isNonEmpty(ageGroup) || !isLangCode(nativeLang)) {
+  if (!isAge(age)
+    || !isLangCode(nativeLang)
+    || !GENDERS.has(gender)
+    || !isRegionDE(regionDE)
+    || !EDUCATIONS.has(education)
+    || !ENGLISH_LEVELS.has(englishLevel)
+    || !isLikert(writingConfidence)
+    || !isLikert(aiasLife)
+    || !isLikert(aiasWork)
+    || !isLikert(aiasFutureUse)
+    || !isLikert(aiasHumanity)) {
     return NextResponse.json({ error: "missing/invalid fields" }, { status: 400 });
   }
 
-  if (!GENDERS.has(gender)) {
-    return NextResponse.json({ error: "missing/invalid fields" }, { status: 400 });
-  }
-
-  if (!isRegionDE(regionDE)) {
-    return NextResponse.json({ error: "invalid regionDE" }, { status: 400 });
-  }
-
-  if (!EDUCATIONS.has(education)) {
-    return NextResponse.json({ error: "missing/invalid fields" }, { status: 400 });
-  }
-
-  if (!ENGLISH_LEVELS.has(englishLevel)) {
-    return NextResponse.json({ error: "missing/invalid fields" }, { status: 400 });
-  }
-
-  if (!isLikert(writingConfidence) || !isLikert(aiFamiliarity) || !isLikert(aiAttitude)) {
-    return NextResponse.json({ error: "missing/invalid fields" }, { status: 400 });
-  }
-
-  // Ensure session exists + belongs to participant
   const session = await prisma.session.findUnique({
     where: { id: sessionId },
     select: { id: true, participantId: true },
@@ -80,27 +77,35 @@ export async function POST(req: Request) {
     where: { sessionId },
     create: {
       sessionId,
-      ageGroup: ageGroup.trim(),
+      age,
       gender,
       regionDE: String(regionDE).trim(),
       education,
       nativeLang: nativeLang.trim(),
       englishLevel,
       writingConfidence: Number(writingConfidence),
-      aiFamiliarity: Number(aiFamiliarity),
-      aiAttitude: Number(aiAttitude),
+
+      aiasLife: Number(aiasLife),
+      aiasWork: Number(aiasWork),
+      aiasFutureUse: Number(aiasFutureUse),
+      aiasHumanity: Number(aiasHumanity),
+
       comment: comment ? String(comment).slice(0, 200) : null,
     },
     update: {
-      ageGroup: ageGroup.trim(),
+      age,
       gender,
       regionDE: String(regionDE).trim(),
       education,
       nativeLang: nativeLang.trim(),
       englishLevel,
       writingConfidence: Number(writingConfidence),
-      aiFamiliarity: Number(aiFamiliarity),
-      aiAttitude: Number(aiAttitude),
+
+      aiasLife: Number(aiasLife),
+      aiasWork: Number(aiasWork),
+      aiasFutureUse: Number(aiasFutureUse),
+      aiasHumanity: Number(aiasHumanity),
+
       comment: comment ? String(comment).slice(0, 200) : null,
     },
   });

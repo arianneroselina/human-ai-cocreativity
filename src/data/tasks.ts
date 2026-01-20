@@ -287,44 +287,9 @@ export const POEM_TASKS: PoemTask[] = [
     ],
   },
 
-  // TASK 6 - Robot vs Human
+  // TASK 6 - Train station dawn
   {
-    id: "t6-robot",
-    title: "Tiny robot wakes up",
-    intro: "Write a short poem: Robot vs Human.",
-    uiItems: [
-      { icon: "🤖", heading: "Form", text: "Exactly 4 lines." },
-      { icon: "📏", heading: "Length", text: "Max 9 words per line.\nMax 36 words total." },
-      { icon: "🔑", heading: "Must include", text: 'Include "battery" and "blink".' },
-      { icon: "❓", heading: "Punctuation", text: "Exactly ONE question mark total." },
-    ],
-    taskLines: [
-      "Write a short poem where a tiny robot wakes up and talks to a human.",
-      'Exactly 4 lines.',
-      "Max 9 words per line. Max 36 words total.",
-      'Include "battery" and "blink".',
-      "Exactly ONE question mark in the entire poem.",
-    ],
-    requirements: [
-      { type: "lineCount", id: "lines-4", label: "Exactly 4 lines", exact: 4 },
-      { type: "maxWordsPerLine", id: "maxwpl-9", label: "Max 9 words per line", max: 9 },
-      { type: "wordCount", id: "maxwords-36", label: "Max 36 words total", max: 72 },
-      {
-        type: "mustIncludeWords",
-        id: "must-battery-blink",
-        label: 'Must include "battery" and "blink"',
-        words: ["battery", "blink"],
-        mode: "all",
-        caseSensitive: false,
-        wholeWord: false,
-      },
-      { type: "punctuationExactCount", id: "qmark-1", label: "Exactly 1 question mark", char: "?", count: 1 },
-    ],
-  },
-
-  // TASK 7 - Train station dawn
-  {
-    id: "t7-dawn-station",
+    id: "t6-dawn-station",
     title: "Train station at dawn",
     intro: "Write a short poem about a train station at dawn.",
     uiItems: [
@@ -359,9 +324,9 @@ export const POEM_TASKS: PoemTask[] = [
     ],
   },
 
-  // TASK 8 - Power outage timeline
+  // TASK 7 - Power outage timeline
   {
-    id: "t8-outage-timeline",
+    id: "t7-outage-timeline",
     title: "Power outage timeline (timestamps)",
     intro: "Write a short poem as a timeline during a power outage.",
     uiItems: [

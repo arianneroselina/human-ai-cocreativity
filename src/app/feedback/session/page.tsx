@@ -14,7 +14,6 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 export default function FeedbackPage() {
   useRouteGuard(["feedback"]);
 
-  const router = useRouter();
   const { run, send } = useExperiment();
 
   const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
@@ -111,7 +110,6 @@ export default function FeedbackPage() {
   const startNew = () => {
     (useExperiment as any).persist?.clearStorage?.();
     send({ type: "RESET" });
-    router.replace("/");
   };
 
   if (submitted) {
