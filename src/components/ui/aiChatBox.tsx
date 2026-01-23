@@ -63,6 +63,12 @@ export default function AiChatBox({
   const [clearOpen, setClearOpen] = useState(false);
 
   useEffect(() => {
+    const openChat = () => setOpen(true);
+    document.addEventListener("open-ai-chat", openChat);
+    return () => document.removeEventListener("open-ai-chat", openChat);
+  }, []);
+
+  useEffect(() => {
     if (mode !== "human_ai") return;
 
     const text = baseHumanText?.trim() ?? "";
@@ -364,13 +370,12 @@ export default function AiChatBox({
           <button
             type="button"
             onClick={() => setOpen(true)}
+            disabled={isHumanToAi && aiLocked}
             className={[
-              "group relative flex items-center gap-2 rounded-full px-4 py-3 shadow-2xl",
-              "border border-border/60",
-              "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50",
-              "text-primary-foreground",
-              "hover:from-primary hover:via-primary/80 hover:to-primary/60",
-              "transition-all",
+              "group relative flex items-center gap-2 rounded-full px-4 py-3 shadow-2xl border border-border/60",
+              "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50 text-primary-foreground",
+              !aiLocked ? "hover:from-primary hover:via-primary/80 hover:to-primary/60 transition-all" : "",
+              aiLocked ? "opacity-50 cursor-not-allowed" : "",
             ].join(" ")}
             aria-label="Open AI chat"
           >
@@ -401,8 +406,8 @@ export default function AiChatBox({
               )}
 
               <span className="ml-1 text-[11px] opacity-80 group-hover:opacity-100">
-        Open
-      </span>
+                Open
+              </span>
             </div>
           </button>
         )}
@@ -465,13 +470,17 @@ export default function AiChatBox({
                     onClick={() => setClearOpen(true)}
                     disabled={aiLocked || (messages.length === 0 && !prompt)}
                   >
-                    Clear chat
+                    Clear
                   </Button>
 
                   {!isAiOnly && (
                     <>
                       {isAiToHuman && !aiLocked && (
-                        <Button size="sm" onClick={() => setLockOpen(true)}>
+                        <Button
+                          size="sm"
+                          onClick={() => setLockOpen(true)}
+                          className={hasSelection ? "animate-pulse" : ""}
+                        >
                           Lock AI
                         </Button>
                       )}
@@ -552,7 +561,7 @@ export default function AiChatBox({
                             {isAssistant && (
                               <div className="mt-2 flex justify-end">
                                   <Button
-                                  variant={isSelected ? "default" : "secondary"}
+                                  variant={isSelected ? "selected" : "secondary"}
                                   size="sm"
                                   onClick={() => selectAsDraft(idx, m.content)}
                                   disabled={aiLocked}

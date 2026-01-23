@@ -19,6 +19,7 @@ import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 import AiChatBox from "@/components/ui/aiChatBox";
+import { Sparkles } from "lucide-react";
 
 export default function HumanAIPage() {
   useRouteGuard(["task"]);
@@ -29,6 +30,7 @@ export default function HumanAIPage() {
 
   const [text, setText] = useState("");
   const [aiLocked, setAiLocked] = useState(true);
+  const [unlockAi, setUnlockAi] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
 
   const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
@@ -37,6 +39,10 @@ export default function HumanAIPage() {
 
   const readOnly = useMemo(() => !aiLocked, [aiLocked]);
   const [showMessage, setShowMessage] = useState(false);
+
+  const MIN_CHARS_FOR_AI = 50;
+  const charsLeft = Math.max(0, MIN_CHARS_FOR_AI - text.length);
+  const readyForAi = charsLeft === 0;
 
   const words = countWords(text);
 
@@ -84,7 +90,9 @@ export default function HumanAIPage() {
                     mode="human_ai"
                     aiLocked={aiLocked}
                     defaultOpen={false}
-                    onUnlockAi={() => {setAiLocked(false);}}
+                    onUnlockAi={() => {
+                      setAiLocked(false);
+                    }}
                     onLockAi={() => {setAiLocked(true);}}
                     onDraft={(draft) => {setText(draft);}}
                     baseHumanText={text}
@@ -128,6 +136,38 @@ export default function HumanAIPage() {
                             Copy, paste, and cut are disabled for this field.
                           </div>
                         )}
+
+                        <div className="relative group mt-4 flex justify-end">
+                          <Button
+                            size="lg"
+                            disabled={!readyForAi || !aiLocked}
+                            className={["px-6 shadow-lg transition-all",
+                              readyForAi
+                                ? "bg-primary text-primary-foreground animate-pulse"
+                                : "bg-muted text-muted-foreground",
+                            ].join(" ")}
+                            onClick={() => setUnlockAi(true)}
+                          >
+                            Unlock AI Chat
+                            <Sparkles className="h-4 w-4 opacity-95" />
+                          </Button>
+
+                          {!readyForAi && (
+                            <div
+                              className="
+                                absolute -top-10 right-0
+                                rounded-md bg-black px-3 py-1.5
+                                text-xs text-white
+                                opacity-0 group-hover:opacity-80
+                                transition-opacity
+                                pointer-events-none
+                                whitespace-nowrap
+                              "
+                            >
+                              Unlocks after {MIN_CHARS_FOR_AI} characters ({charsLeft} to go)
+                            </div>
+                          )}
+                        </div>
                       </div>
 
                       <div className="mt-3 flex items-center justify-between gap-2">
@@ -146,6 +186,22 @@ export default function HumanAIPage() {
                             Submit
                           </Button>
                         </div>
+
+                        <ConfirmDialog
+                          open={unlockAi}
+                          onOpenChange={setAiLocked}
+                          title="Unlock AI Chat?"
+                          description="After unlocking, you won't be able to edit your draft manually anymore."
+                          confirmLabel="Unlock AI"
+                          cancelLabel="Cancel"
+                          onConfirm={() => {
+                            setUnlockAi(false)
+                            setAiLocked(false);
+                            requestAnimationFrame(() => {
+                              document.dispatchEvent(new CustomEvent("open-ai-chat"));
+                            });
+                          }}
+                        />
 
                         <ConfirmDialog
                           open={submitOpen}
