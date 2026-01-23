@@ -5,7 +5,7 @@ import { Button } from "@/components/shadcn_ui/button";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import ConfirmDialog from "@/components/ui/confirm";
 import { Loader2, Sparkles, MessageSquareText, CheckCircle2 } from "lucide-react";
-import {Workflow} from "@/lib/experiment";
+import { Workflow } from "@/lib/experiment";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
@@ -51,55 +51,99 @@ export default function AiChatBox({
                                     defaultOpen = true,
                                   }: Props) {
   const [open, setOpen] = useState(defaultOpen);
-  const [lockOpen, setLockOpen] = useState(false);
-  const [unlockOpen, setUnlockOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-
   const [selectedAssistantIndex, setSelectedAssistantIndex] = useState<number | null>(null);
   const [clearOpen, setClearOpen] = useState(false);
+  const [lockOpen, setLockOpen] = useState(false);
+  const [unlockOpen, setUnlockOpen] = useState(false);
 
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  /* ------------------------------------------------------------
+   * Open AI chat automatically
+   * ------------------------------------------------------------ */
   useEffect(() => {
     const openChat = () => setOpen(true);
     document.addEventListener("open-ai-chat", openChat);
     return () => document.removeEventListener("open-ai-chat", openChat);
   }, []);
 
+  /* ------------------------------------------------------------
+   * Draft mirroring (while AI is locked)
+   * ------------------------------------------------------------ */
   useEffect(() => {
     if (mode !== "human_ai") return;
+    if (!aiLocked) return;
 
     const text = baseHumanText?.trim() ?? "";
+    if (!text) return;
 
     setMessages((prev) => {
       if (!text) return prev;
 
-      // no messages yet → create base user message
+      // no messages yet -> create base user message
       if (prev.length === 0) {
         return [{ role: "user", content: text }];
       }
 
-      // first message is not user → insert
+      // first message is not user -> insert
       if (prev[0].role !== "user") {
         return [{ role: "user", content: text }, ...prev];
       }
 
-      // first user message already matches → do nothing
+      // first user message already matches -> do nothing
       if (prev[0].content === text) {
         return prev;
       }
 
-      // update first user message, keep rest (AI replies)
-      return [
-        { ...prev[0], content: text },
-        ...prev.slice(1),
-      ];
+      return [{ ...prev[0], content: text }];
     });
-  }, [mode, baseHumanText]);
+  }, [mode, baseHumanText, aiLocked]);
 
-  // --- adjustable size ---
+  /* ------------------------------------------------------------
+   * Autosave chat (after AI unlock)
+   * ------------------------------------------------------------ */
+  useEffect(() => {
+    if (!storageKey) return;
+    if (aiLocked) return;
+
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.messages)) {
+        setMessages(parsed.messages);
+      }
+      if (typeof parsed.selectedAssistantIndex === "number") {
+        setSelectedAssistantIndex(parsed.selectedAssistantIndex);
+      }
+    } catch {
+      // ignore corrupt storage
+    }
+  }, [storageKey, aiLocked]);
+
+  useEffect(() => {
+    if (!storageKey) return;
+    if (aiLocked) return;
+
+    try {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({
+          messages,
+          selectedAssistantIndex,
+        })
+      );
+    } catch {}
+  }, [messages, selectedAssistantIndex, storageKey, aiLocked]);
+
+  /* ------------------------------------------------------------
+   * Adjustable size
+   * ------------------------------------------------------------ */
   const [panelWidth, setPanelWidth] = useState<number>(DEFAULT_W);
   const [panelHeight, setPanelHeight] = useState<number>(DEFAULT_H);
 
@@ -203,6 +247,9 @@ export default function AiChatBox({
     };
   }, [panelWidth, panelHeight]);
 
+  /* ------------------------------------------------------------
+   * Scroll behavior
+   * ------------------------------------------------------------ */
   // on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
@@ -222,74 +269,45 @@ export default function AiChatBox({
     });
   }, [open]);
 
-  // TODO: persist chat history on refresh
-  // useEffect(() => {
-  //   if (!storageKey) return;
-  //
-  //   try {
-  //     const raw = localStorage.getItem(storageKey);
-  //     if (!raw) return;
-  //
-  //     const parsed = JSON.parse(raw);
-  //     if (Array.isArray(parsed.messages)) {
-  //       setMessages(parsed.messages);
-  //     }
-  //     if (typeof parsed.selectedAssistantIndex === "number") {
-  //       setSelectedAssistantIndex(parsed.selectedAssistantIndex);
-  //     }
-  //   } catch {
-  //     // ignore corrupt storage
-  //   }
-  // }, [storageKey]);
-  //
-  // useEffect(() => {
-  //   if (!storageKey) return;
-  //
-  //   try {
-  //     localStorage.setItem(
-  //       storageKey,
-  //       JSON.stringify({
-  //         messages,
-  //         selectedAssistantIndex,
-  //       })
-  //     );
-  //   } catch {}
-  // }, [messages, selectedAssistantIndex, storageKey]);
-
-  // --- copy/paste block (prompt) ---
-  const [showMessage, setShowMessage] = useState(false);
-  const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    e.preventDefault();
-    setShowMessage(true);
-    setTimeout(() => setShowMessage(false), 2000);
-  };
-
-  const assistantCount = useMemo(
-    () => messages.filter((m) => m.role === "assistant").length,
-    [messages]
+  /* ------------------------------------------------------------
+   * Sending messages
+   * ------------------------------------------------------------ */
+  const canSend = useMemo(
+    () => !aiLocked && !loading && !!prompt.trim(),
+    [aiLocked, loading, prompt]
   );
 
-  const hasSelection = selectedAssistantIndex !== null;
+  const send = async () => {
+    if (!canSend) return;
 
-  const isAiOnly = mode === "ai";
-  const isAiToHuman = mode === "ai_human";
-  const isHumanToAi = mode === "human_ai";
+    const userMsg = prompt.trim();
+    setPrompt("");
+    setLoading(true);
 
-  const canSend = useMemo(() => {
-    return !aiLocked && !loading && !!prompt.trim();
-  }, [aiLocked, loading, prompt]);
+    const historyBefore = messages;
+    setMessages((m) => [...m, { role: "user", content: userMsg }]);
 
-  const lockAi = () => {
-    setOpen(false);
-    if (onLockAi) {
-      onLockAi();
-    }
-  };
+    const input = buildInput(userMsg, historyBefore);
 
-  const unlockAi = () => {
-    setOpen(true);
-    if (onUnlockAi) {
-      onUnlockAi();
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ input: input, history: historyBefore }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        console.error("AI error", err);
+        alert("AI request failed. Please try again.");
+        return;
+      }
+
+      const data = await res.json();
+      const aiText = (data?.text ?? "").trim();
+      setMessages((m) => [...m, { role: "assistant", content: aiText }]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -311,56 +329,60 @@ export default function AiChatBox({
     ].join("\n");
   };
 
-  const send = async () => {
-    if (!canSend) return;
-
-    const userMsg = prompt.trim();
-    setPrompt("");
-    setLoading(true);
-
-    const historyBefore = messages;
-    setMessages((m) => [...m, { role: "user", content: userMsg }]);
-
-    const input = buildInput(userMsg, historyBefore);
-
-    try {
-      const res = await fetch("/api/ai", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("AI error", err);
-        alert("AI request failed. Please try again.");
-        return;
-      }
-
-      const data = await res.json();
-      const aiText = (data?.text ?? "").trim();
-      setMessages((m) => [...m, { role: "assistant", content: aiText }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const selectAsDraft = (assistantMsgIndex: number, content: string) => {
-    setSelectedAssistantIndex(assistantMsgIndex);
+  /* ------------------------------------------------------------
+   * Draft selection
+   * ------------------------------------------------------------ */
+  const selectAsDraft = (idx: number, content: string) => {
+    setSelectedAssistantIndex(idx);
     onDraft(content);
   };
 
+  /* ------------------------------------------------------------
+   * Clear chat
+   * ------------------------------------------------------------ */
   const clearChat = () => {
     setMessages([]);
     setPrompt("");
     setSelectedAssistantIndex(null);
 
     if (storageKey) {
-      try {
-        localStorage.removeItem(storageKey);
-      } catch {}
+      localStorage.removeItem(storageKey);
     }
   };
+
+  /* ------------------------------------------------------------
+   * Block copy/paste
+   * ------------------------------------------------------------ */
+  const [showMessage, setShowMessage] = useState(false);
+  const handleCopyPaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    setShowMessage(true);
+    setTimeout(() => setShowMessage(false), 2000);
+  };
+
+  /* ------------------------------------------------------------
+   * Lock/unlock AI
+   * ------------------------------------------------------------ */
+  const lockAi = () => {
+    setOpen(false);
+    if (onLockAi) {
+      onLockAi();
+    }
+  };
+
+  const unlockAi = () => {
+    setOpen(true);
+    if (onUnlockAi) {
+      onUnlockAi();
+    }
+  };
+
+  const isAiOnly = mode === "ai";
+  const isAiToHuman = mode === "ai_human";
+  const isHumanToAi = mode === "human_ai";
+
+  const assistantCount = messages.filter((m) => m.role === "assistant").length;
+  const hasSelection = selectedAssistantIndex !== null;
 
   return (
     <>
@@ -640,11 +662,12 @@ export default function AiChatBox({
         )}
       </div>
 
+      {/* Dialogs */}
       <ConfirmDialog
         open={clearOpen}
         onOpenChange={setClearOpen}
         title="Clear chat?"
-        description="This will remove all chat messages and your current selection."
+        description="This will remove all chat messages."
         confirmLabel="Clear"
         cancelLabel="Cancel"
         onConfirm={clearChat}
@@ -653,8 +676,8 @@ export default function AiChatBox({
       <ConfirmDialog
         open={lockOpen}
         onOpenChange={setLockOpen}
-        title="Lock AI for this round?"
-        description="After locking, you can't ask the AI again in this round."
+        title="Lock AI?"
+        description="You won't be able to ask the AI again."
         confirmLabel="Lock AI"
         cancelLabel="Cancel"
         onConfirm={lockAi}
@@ -663,8 +686,8 @@ export default function AiChatBox({
       <ConfirmDialog
         open={unlockOpen}
         onOpenChange={setUnlockOpen}
-        title="Unlock AI for this round?"
-        description="After unlocking, you can't edit your text manually again in this round."
+        title="Unlock AI?"
+        description="You won't be able to edit your draft manually anymore."
         confirmLabel="Unlock AI"
         cancelLabel="Cancel"
         onConfirm={unlockAi}
