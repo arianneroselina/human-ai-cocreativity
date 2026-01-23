@@ -85,12 +85,17 @@ export default function HumanPage() {
                   <section className="mt-4">
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
                       <div className="mb-2 flex items-center justify-between">
-                        <Label htmlFor="draft" className="text-sm font-medium"> Your draft </Label>
+                        <Label htmlFor="draft" className="text-sm font-medium">
+                          Draft
+                        </Label>
                         <div className="flex items-center gap-3">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
-                          <span className="text-xs text-muted-foreground"> {words} words • {text.length} chars </span>
+                          <span className="text-xs text-muted-foreground">
+                            {words} words • {text.length} chars
+                          </span>
                         </div>
                       </div>
+
                       <div className="relative">
                         <Textarea
                           id="draft"

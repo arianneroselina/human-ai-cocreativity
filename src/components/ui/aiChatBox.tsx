@@ -539,15 +539,26 @@ export default function AiChatBox({
 
             {/* Body */}
             <div className="p-3 flex flex-1 min-h-0 flex-col">
-              {/* Chat history (fills remaining space even when empty) */}
               <div className="flex-1 min-h-0 overflow-auto rounded-xl border border-border bg-background/60 p-2">
-                {messages.length === 0 ? (
-                  <div className="h-full flex items-center justify-center p-3">
-                    <div className="text-sm text-muted-foreground">
-                      No messages yet.
-                    </div>
+                {messages.length === 0 && !aiLocked ? (
+                  <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
+                    No messages yet.
+
+                    {isHumanToAi && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          setMessages([{ role: "user", content: baseHumanText ?? "" }])
+                        }
+                        disabled={!baseHumanText}
+                      >
+                        Start with current draft
+                      </Button>
+                    )}
                   </div>
-                ) : (
+                )
+                : (
                   <div className="space-y-3 p-1">
                     {messages.map((m, idx) => {
                       const isAssistant = m.role === "assistant";

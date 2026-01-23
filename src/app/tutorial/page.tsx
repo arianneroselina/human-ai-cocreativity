@@ -243,10 +243,8 @@ export default function TutorialPage() {
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
                       <div className="mb-2 flex items-center justify-between">
                         <Label htmlFor="draft" className="text-sm font-medium">
-                          Your draft
+                          Draft
                         </Label>
-
-                        {/* ✅ tutorial step target */}
                         <div className="flex items-center gap-3" id="tut-status">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
                           <span className="text-xs text-muted-foreground">

@@ -92,7 +92,7 @@ export default function AIPage() {
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
                       <div className="mb-2 flex items-center justify-between">
                         <Label htmlFor="draft" className="text-sm font-medium">
-                          AI draft (read-only)
+                          Draft (read-only)
                         </Label>
                         <div className="flex items-center gap-3">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
