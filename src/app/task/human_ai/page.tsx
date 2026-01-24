@@ -192,7 +192,7 @@ export default function HumanAIPage() {
                   <AiChatBox
                     mode={run.workflow}
                     aiLocked={aiLocked}
-                    defaultOpen={!aiLocked || false}
+                    defaultOpen={false}
                     onLockAi={() => {setAiLocked(true);}}
                     onDraft={(draft) => {setText(draft);}}
                     baseHumanText={text}

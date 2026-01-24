@@ -452,6 +452,13 @@ export default function AiChatBox({
     }
   };
 
+  useEffect(() => {
+    if (!aiLocked) {
+      setOpen(true);
+    }
+  }, [aiLocked]);
+
+
   const isAiOnly = mode === "ai";
   const isAiToHuman = mode === "ai_human";
   const isHumanToAi = mode === "human_ai";
