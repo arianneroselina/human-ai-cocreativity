@@ -2,7 +2,7 @@
 CREATE TYPE "Workflow" AS ENUM ('human', 'ai', 'human_ai', 'ai_human');
 
 -- CreateEnum
-CREATE TYPE "Gender" AS ENUM ('female', 'male', 'prefer_not_to_say');
+CREATE TYPE "Gender" AS ENUM ('female', 'male', 'other', 'prefer_not_to_say');
 
 -- CreateEnum
 CREATE TYPE "Education" AS ENUM ('secondary', 'bachelor', 'master', 'phd', 'other', 'prefer_not_to_say');
