@@ -79,6 +79,10 @@ const ConsentModal: FC<ConsentModalProps> = ({ onConsent }) => {
     }
   };
 
+  const onClose = () => {
+    onConsent(false);
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
@@ -86,9 +90,20 @@ const ConsentModal: FC<ConsentModalProps> = ({ onConsent }) => {
       aria-modal="true"
       aria-label="Informed Consent"
     >
-      <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg">
+      <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-lg relative">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+        >
+          ✕
+        </button>
+
         <h2 className="text-xl font-semibold">Informed Consent Form</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Please read the following information carefully.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Please read the following information carefully.
+        </p>
 
         <div
           ref={scrollContainerRef}

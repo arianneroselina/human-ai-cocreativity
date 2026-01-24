@@ -19,6 +19,7 @@ import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 import AiChatBox from "@/components/ui/aiChatBox";
+import {Workflows} from "@/lib/experiment";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
@@ -85,6 +86,62 @@ export default function AIHumanWorkPage() {
                 <Progress />
                 <div className="p-6">
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
+
+                  {/* Workflow description */}
+                  <div className="mb-4 mt-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/50 p-5 shadow-sm">
+                    <p className="font-semibold mb-4 text-purple-900 text-center">
+                      {Workflows.find(w => w.key === run.workflow)?.label} workflow
+                    </p>
+
+                    <div className="flex items-center gap-3 text-xs">
+                      {/* Step 1 */}
+                      <div className="flex flex-col items-center gap-1 flex-1 group">
+                        <div className="w-10 h-10 rounded-2xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                          <span className="text-lg font-bold">📝</span>
+                        </div>
+                        <span className="font-medium text-purple-900 text-center leading-tight min-h-[2.5ex] px-1">Chat & pick AI draft</span>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="w-8 flex justify-center">
+                        <div className="w-6 h-1.5 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full shadow-sm"></div>
+                      </div>
+
+                      {/* Step 2 */}
+                      <div className="flex flex-col items-center gap-1 flex-1 group">
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                          <span className="text-lg font-bold">🔒</span>
+                        </div>
+                        <span className="font-medium text-indigo-900 text-center leading-tight min-h-[2.5ex] px-1">Lock AI</span>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="w-8 flex justify-center">
+                        <div className="w-6 h-1.5 bg-gradient-to-r from-indigo-400 to-emerald-500 rounded-full shadow-sm"></div>
+                      </div>
+
+                      {/* Step 3 */}
+                      <div className="flex flex-col items-center gap-1 flex-1 group">
+                        <div className="w-10 h-10 rounded-2xl bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                          <span className="text-lg font-bold">✏️</span>
+                        </div>
+                        <span className="font-medium text-emerald-900 text-center leading-tight min-h-[2.5ex] px-1">Edit draft</span>
+                      </div>
+
+                      {/* Arrow */}
+                      <div className="w-8 flex justify-center">
+                        <div className="w-6 h-1.5 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full shadow-sm"></div>
+                      </div>
+
+                      {/* Step 4 */}
+                      <div className="flex flex-col items-center gap-1 flex-1 group">
+                        <div className="w-10 h-10 rounded-2xl bg-green-100 border-2 border-green-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                          <span className="text-lg font-bold">✅</span>
+                        </div>
+                        <span className="font-medium text-green-900 text-center leading-tight min-h-[2.5ex] px-1">Submit</span>
+                      </div>
+                    </div>
+                  </div>
 
                   <AiChatBox
                     mode="ai_human"
@@ -168,13 +225,21 @@ export default function AIHumanWorkPage() {
 
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
-              <TimerBadge workflow="AI → Human" seconds={300} onTimeUp={forceSubmit}/>
+              <TimerBadge
+                workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
+                seconds={300}
+                onTimeUp={forceSubmit}
+              />
             </div>
           </div>
 
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
-            <TimerBadge workflow="AI → Human" seconds={300} onTimeUp={forceSubmit}/>
+            <TimerBadge
+              workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
+              seconds={300}
+              onTimeUp={forceSubmit}
+            />
           </div>
         </div>
       </div>

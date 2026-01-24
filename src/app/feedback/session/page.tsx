@@ -160,7 +160,7 @@ export default function FeedbackPage() {
                   </summary>
                   <div className="mt-3 text-sm text-muted-foreground">
                     <p>
-                      We’re studying how people collaborate with AI under time limits and how this affects
+                      We&#39;re studying how people collaborate with AI under time limits and how this affects
                       efficiency, quality, and trust. In some conditions, AI responses may intentionally include minor
                       mistakes to study trust dynamics.
                     </p>
@@ -193,7 +193,7 @@ export default function FeedbackPage() {
         <header className="mb-6 text-center">
           <h1 className="text-3xl font-semibold text-foreground">Final feedback</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Thanks for completing the study. A few short questions:
+            Thanks for completing the study. A few questions:
           </p>
         </header>
 

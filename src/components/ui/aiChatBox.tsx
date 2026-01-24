@@ -10,7 +10,7 @@ import { Workflow } from "@/lib/experiment";
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 type Props = {
-  mode: Workflow;
+  mode: Workflow | undefined;
   aiLocked: boolean;
   onLockAi?: () => void;
   onUnlockAi?: () => void;

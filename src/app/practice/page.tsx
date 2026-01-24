@@ -66,8 +66,8 @@ export default function PracticeStartPage() {
 
             <p className="mt-1 text-sm text-muted-foreground">
               {isFirstPracticeRound
-                ? "You’ll complete a few short practice tasks to get familiar with the different workflows."
-                : "You’re continuing the practice phase. Try this round as best as you can."}
+                ? "You'll complete a few short practice tasks to get familiar with the different workflows."
+                : "You're continuing the practice phase."}
             </p>
 
             <div className="mt-5 flex flex-wrap gap-2">
@@ -80,6 +80,12 @@ export default function PracticeStartPage() {
                   <span className="font-medium text-foreground">{it.text}</span>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-4">
+              <p className="text-sm font-medium text-amber-900">
+                💡 <strong>Do your best!</strong> Practice results will be used in the study too.
+              </p>
             </div>
 
             {isFirstPracticeRound && (

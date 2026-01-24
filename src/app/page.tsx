@@ -82,30 +82,35 @@ export default function Page() {
     }
   }, [run.phase, run.workflow, starting]);
 
-  const openConsent = async () => {
+  const openConsent = () => {
     if (hasActiveSession || starting) return;
-    setStarting(true);
-
-    send({ type: "START_SESSION" } as any);
-    const { run } = useExperiment.getState();
-
-    await fetch("/api/session/start", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        participantId: run.participantId,
-        sessionId: run.sessionId,
-        totalRounds: run.totalRounds,
-      }),
-    });
-
-    setStarting(false);
     setShowConsent(true);
   };
 
-  const handleConsent = (consent: boolean) => {
+  const handleConsent = async (consent: boolean) => {
     setShowConsent(false);
-    if (consent) router.replace("/pre-questionnaire");
+    if (!consent || hasActiveSession || starting) return;
+
+    try {
+      setStarting(true);
+
+      send({ type: "START_SESSION" } as any);
+      const { run } = useExperiment.getState();
+
+      await fetch("/api/session/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participantId: run.participantId,
+          sessionId: run.sessionId,
+          totalRounds: run.totalRounds,
+        }),
+      });
+
+      router.replace("/pre-questionnaire");
+    } finally {
+      setStarting(false);
+    }
   };
 
   return (
@@ -177,12 +182,12 @@ export default function Page() {
             <div className="flex-1">
               <h3 className="text-xl font-semibold tracking-tight">What this study is about</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                We’re exploring how people collaborate with AI on time-boxed writing tasks, and how this affects
+                We&#39;re exploring how people collaborate with AI on time-boxed creative writing tasks, and how this affects
                 <span className="font-medium text-foreground"> efficiency</span>,{" "}
                 <span className="font-medium text-foreground">output quality</span>,{" "}
                 <span className="font-medium text-foreground">workflow choices</span>, and{" "}
                 <span className="font-medium text-foreground">trust in AI</span>.
-                You’ll first do a short practice section, then continue with the main rounds.
+                You&#39;ll first do a short practice section, then continue with the main rounds.
               </p>
             </div>
 
@@ -232,8 +237,8 @@ export default function Page() {
                     <li>
                       <span className="font-medium text-foreground">Main:</span> 3 rounds (you choose a workflow each round).
                     </li>
-                    <li>Each round: complete a timed writing task.</li>
-                    <li>Short feedback at the end.</li>
+                    <li>Each round: complete a timed creative writing task.</li>
+                    <li>Short feedback at the end of each round.</li>
                   </ul>
                 </div>
 
@@ -246,6 +251,7 @@ export default function Page() {
                     <li>Task duration and timing.</li>
                     <li>Workflow used in each round.</li>
                     <li>The final text output.</li>
+                    <li>Feedback.</li>
                   </ul>
                 </div>
               </div>
@@ -266,7 +272,7 @@ export default function Page() {
                 <div className="rounded-lg border border-border bg-card p-4">
                   <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <EyeOff className="h-4 w-4" />
-                    Privacy & anonymization
+                    Privacy
                   </div>
                   <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
                     <li>No names or contact details are collected.</li>

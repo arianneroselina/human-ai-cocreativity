@@ -20,12 +20,13 @@ function formatMMSS(totalSeconds: number) {
 export default function TimerBadge({ workflow, seconds = 300, active = true, onTimeUp }: RoundHeaderProps) {
   const [paused, setPaused] = useState(false);
   const [remaining, setRemaining] = useState(seconds);
+  const [didWarn1Min, setDidWarn1Min] = useState(false);
+  const [didForceSubmit, setDidForceSubmit] = useState(false);
+
+  const resetKey = useMemo(() => seconds, [seconds]);
 
   const resumeBtnRef = useRef<HTMLButtonElement>(null);
-
   const endAtRef = useRef<number | null>(null);
-  const didWarn1MinRef = useRef(false);
-  const didForceSubmitRef = useRef(false);
 
   // keep latest callback without re-triggering effects
   const onTimeUpRef = useRef(onTimeUp);
@@ -37,10 +38,10 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
   useEffect(() => {
     setPaused(false);
     setRemaining(seconds);
-    didWarn1MinRef.current = false;
-    didForceSubmitRef.current = false;
+    setDidWarn1Min(false);
+    setDidForceSubmit(false);
     endAtRef.current = Date.now() + seconds * 1000;
-  }, [seconds]);
+  }, [resetKey]);
 
   const togglePause = useCallback(() => setPaused((p) => !p), []);
   usePauseResumeHotkeys(paused, setPaused);
@@ -66,13 +67,11 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
     }
 
     endAtRef.current = Date.now() + remaining * 1000;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [paused, active]);
+  }, [paused, active, remaining]);
 
   // Main ticker
   useEffect(() => {
     if (!active) return;
-    if (paused) return;
 
     const tick = () => {
       const endAt = endAtRef.current;
@@ -81,16 +80,13 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
       const left = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
       setRemaining(left);
 
-      // 1-minute warning
-      if (left <= 60 && left > 10 && !didWarn1MinRef.current) {
-        didWarn1MinRef.current = true;
+      if (left <= 60 && left > 10 && !didWarn1Min) {
+        setDidWarn1Min(true);
       }
 
       // time up -> force submit once
-      if (left === 0 && !didForceSubmitRef.current) {
-        didForceSubmitRef.current = true;
-
-        // small delay
+      if (left === 0 && !didForceSubmit) {
+        setDidForceSubmit(true);
         window.setTimeout(() => {
           onTimeUpRef.current?.();
         }, 700);
@@ -100,9 +96,9 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
     const id = window.setInterval(tick, 250);
     tick();
     return () => window.clearInterval(id);
-  }, [active, paused]);
+  }, [active, didWarn1Min, didForceSubmit]);
 
-  const showOneMinute = didWarn1MinRef.current && remaining <= 60 && remaining > 10;
+  const showOneMinute = didWarn1Min && remaining <= 60 && remaining > 10;
   const showFinal = remaining <= 10 && remaining > 0;
   const showSubmitting = remaining === 0;
 

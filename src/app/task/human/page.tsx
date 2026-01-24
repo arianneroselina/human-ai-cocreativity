@@ -18,6 +18,7 @@ import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 import { useRoundSubmit } from "@/lib/useRoundSubmit";
+import {Workflows} from "@/lib/experiment";
 
 export default function HumanPage() {
   useRouteGuard(["task"]);
@@ -80,6 +81,22 @@ export default function HumanPage() {
                 <Progress />
                 <div className="p-6">
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
+
+                  {/* Workflow description */}
+                  <div className="mb-4 mt-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/50 p-5 shadow-sm">
+                    <p className="font-semibold mb-4 text-purple-900 text-center">
+                      {Workflows.find(w => w.key === run.workflow)?.label} workflow
+                    </p>
+
+                    <div className="flex items-center justify-center text-xs">
+                      <div className="flex flex-col items-center gap-1 group">
+                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-slate-100 border-2 border-gray-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                          <span className="text-xl font-bold">✍️</span>
+                        </div>
+                        <span className="font-medium text-gray-900 text-center leading-tight px-2 pt-1">Write your draft and submit</span>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Editor Section */}
                   <section className="mt-4">
@@ -150,7 +167,7 @@ export default function HumanPage() {
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <TimerBadge
-                workflow="Human only"
+                workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
                 seconds={300}
                 onTimeUp={forceSubmit}
               />
@@ -160,7 +177,7 @@ export default function HumanPage() {
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
             <TimerBadge
-              workflow="Human only"
+              workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
               seconds={300}
               onTimeUp={forceSubmit}
             />

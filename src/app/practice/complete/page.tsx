@@ -26,7 +26,7 @@ export default function PracticeCompletePage() {
           </div>
 
           <p className="mt-4 text-muted-foreground">
-            You’ve completed all practice rounds and experienced each collaboration workflow.
+            You&#39;ve completed all practice rounds and experienced each collaboration workflow.
           </p>
 
           <div className="mt-6 rounded-lg border border-border bg-muted p-4 text-sm">

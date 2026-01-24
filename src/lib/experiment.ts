@@ -22,8 +22,32 @@ export const Workflows: Array<{
   desc: string;
   icon: string;
 }> = [
-  { key: "human", label: "Human", title: "Human only", desc: "Write everything yourself. No AI involved.", icon: "✍️" },
-  { key: "ai", label: "AI", title: "AI only", desc: "Generate a single AI draft, then submit (read-only).", icon: "🤖" },
-  { key: "human_ai", label: "Human→AI", title: "You then AI", desc: "Write first, then AI edits once. Locks after AI.", icon: "🧠→🤖" },
-  { key: "ai_human", label: "AI→Human", title: "AI then you", desc: "Start with AI draft once, then you can edit.", icon: "🤖→🧠" },
+  {
+    key: "human",
+    label: "Human",
+    title: "Human only",
+    desc: "Write entirely on your own without any AI assistance.",
+    icon: "✍️"
+  },
+  {
+    key: "ai",
+    label: "AI",
+    title: "AI only",
+    desc: "Chat with the AI, pick a response as your draft, then submit.",
+    icon: "🤖"
+  },
+  {
+    key: "human_ai",
+    label: "Human→AI",
+    title: "You then AI",
+    desc: "Write first, then unlock AI to refine or choose from its suggestions.",
+    icon: "🧠→🤖"
+  },
+  {
+    key: "ai_human",
+    label: "AI→Human",
+    title: "AI then you",
+    desc: "Start with AI's draft, lock it, then edit and submit your version.",
+    icon: "🤖→🧠"
+  },
 ];

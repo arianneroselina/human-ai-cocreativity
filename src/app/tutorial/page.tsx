@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
@@ -57,12 +56,12 @@ export default function TutorialPage() {
       {
         targetId: "tut-task",
         title: "Task prompt",
-        text: "Read the task here: what to write, and any required/avoid words.",
+        text: "Read the task description here: what you should write and all specific requirements.",
       },
       {
         targetId: "tut-instructions",
-        title: "Workflow rule",
-        text: "Human-only means: write by yourself. No AI assistance during this workflow.",
+        title: "Workflow steps",
+        text: "Your workflow is e.g. 'Human only', and here are the steps you need to complete.",
       },
       {
         targetId: "tut-status",
@@ -72,7 +71,7 @@ export default function TutorialPage() {
       {
         targetId: "tut-editor",
         title: "Write your draft",
-        text: "Type your answer here. You can edit freely until you submit.",
+        text: "Type your answer here. When AI is active, this editor is read-only.",
       },
       {
         targetId: "tut-submit",
@@ -231,11 +230,19 @@ export default function TutorialPage() {
                   </div>
 
                   <section className="mt-4" id="tut-instructions">
-                    <div className="items-center rounded-lg border border-border bg-card p-6 text-card-foreground shadow-sm">
-                      <p className="text-sm text-muted-foreground">
-                        Write entirely by yourself.{" "}
-                        <span className="font-medium text-foreground">No AI available.</span>
+                    <div className="mb-4 mt-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/50 p-5 shadow-sm">
+                      <p className="font-semibold mb-4 text-purple-900 text-center">
+                        Human only workflow
                       </p>
+
+                      <div className="flex items-center justify-center text-xs">
+                        <div className="flex flex-col items-center gap-1 group">
+                          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-slate-100 border-2 border-gray-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
+                            <span className="text-xl font-bold">✍️</span>
+                          </div>
+                          <span className="font-medium text-gray-900 text-center leading-tight px-2 pt-1">Write your draft and submit</span>
+                        </div>
+                      </div>
                     </div>
                   </section>
 
@@ -297,7 +304,7 @@ export default function TutorialPage() {
 
                       {showSubmitMsg && (
                         <div className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
-                          Tutorial only — in real rounds, Submit is enabled even if requirements aren’t met.
+                          Tutorial only — in real rounds, Submit is enabled even if requirements aren&#39;t met.
                         </div>
                       )}
                     </div>
