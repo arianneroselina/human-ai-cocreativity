@@ -18,16 +18,18 @@ export function useSubmitHotkey(onSubmit: () => void, deps: any[] = []) {
 
 export function usePauseResumeHotkeys(
   paused: boolean,
-  setPaused: React.Dispatch<React.SetStateAction<boolean>>
+  setPaused: (value: boolean) => void
 ) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!paused) return;
+
       if (e.key === " " || e.key === "Escape") {
         e.preventDefault();
         setPaused(false);
       }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [paused, setPaused]);

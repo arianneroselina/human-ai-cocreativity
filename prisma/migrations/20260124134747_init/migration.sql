@@ -120,6 +120,29 @@ CREATE TABLE "Feedback" (
     CONSTRAINT "Feedback_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "AiChat" (
+    "id" TEXT NOT NULL,
+    "roundId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "AiChat_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "AiChatMessage" (
+    "id" TEXT NOT NULL,
+    "chatId" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "content" TEXT,
+    "action" TEXT,
+    "selected" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AiChatMessage_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Consent_sessionId_key" ON "Consent"("sessionId");
 
@@ -134,6 +157,9 @@ CREATE UNIQUE INDEX "RoundFeedback_sessionId_roundIndex_key" ON "RoundFeedback"(
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Feedback_sessionId_key" ON "Feedback"("sessionId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "AiChat_roundId_key" ON "AiChat"("roundId");
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "Participant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -152,3 +178,9 @@ ALTER TABLE "RoundFeedback" ADD CONSTRAINT "RoundFeedback_sessionId_roundIndex_f
 
 -- AddForeignKey
 ALTER TABLE "Feedback" ADD CONSTRAINT "Feedback_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AiChat" ADD CONSTRAINT "AiChat_roundId_fkey" FOREIGN KEY ("roundId") REFERENCES "Round"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "AiChatMessage" ADD CONSTRAINT "AiChatMessage_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "AiChat"("id") ON DELETE CASCADE ON UPDATE CASCADE;

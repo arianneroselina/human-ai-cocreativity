@@ -2,8 +2,6 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const body = await req.json();
-
   const {
     sessionId,
     roundIndex,
@@ -11,7 +9,7 @@ export async function POST(req: Request) {
     text,
     metrics = {},
     evaluation = {},
-  } = body ?? {};
+  } = await req.json();
 
   if (!sessionId || typeof roundIndex !== "number" || !workflow) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });

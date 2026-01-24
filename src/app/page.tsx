@@ -252,6 +252,7 @@ export default function Page() {
                     <li>Workflow used in each round.</li>
                     <li>The final text output.</li>
                     <li>Feedback.</li>
+                    <li>AI chat messages and actions.</li>
                   </ul>
                 </div>
               </div>

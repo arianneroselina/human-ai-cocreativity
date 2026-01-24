@@ -1,4 +1,4 @@
-export const CONSENT_VERSION = "2026-01-24-v3";
+export const CONSENT_VERSION = "2026-01-24-v4";
 
 export type ConsentSection = {
   title: string;
@@ -45,8 +45,9 @@ export const CONSENT_SECTIONS: ConsentSection[] = [
       "The following information will be recorded (pseudonymous) for research purposes:\n" +
       " - Task duration and timing\n" +
       " - The workflow you use in each round\n" +
-      " - The final text output you submit after each round (including practice and main rounds)\n" +
+      " - The final text output you submit after each round\n" +
       " - Your responses to the feedback surveys\n" +
+      " - Your interactions with the AI during the task, including chat messages and actions\n" +
       "No direct identifiers (e.g., name, email) are collected in this system.",
   },
   {

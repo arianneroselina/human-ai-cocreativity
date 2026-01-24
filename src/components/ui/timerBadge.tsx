@@ -3,6 +3,7 @@
 import { Pause, Play, AlertTriangle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePauseResumeHotkeys } from "@/components/ui/shortcut";
+import { usePause } from "@/components/ui/pauseContext";
 
 interface RoundHeaderProps {
   workflow: string;
@@ -18,7 +19,8 @@ function formatMMSS(totalSeconds: number) {
 }
 
 export default function TimerBadge({ workflow, seconds = 300, active = true, onTimeUp }: RoundHeaderProps) {
-  const [paused, setPaused] = useState(false);
+  const { paused, setPaused } = usePause();
+
   const [remaining, setRemaining] = useState(seconds);
   const [didWarn1Min, setDidWarn1Min] = useState(false);
   const [didForceSubmit, setDidForceSubmit] = useState(false);
@@ -43,7 +45,10 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
     endAtRef.current = Date.now() + seconds * 1000;
   }, [resetKey]);
 
-  const togglePause = useCallback(() => setPaused((p) => !p), []);
+  const togglePause = useCallback(() => {
+    setPaused(!paused);
+  }, [paused, setPaused]);
+
   usePauseResumeHotkeys(paused, setPaused);
 
   // Pause overlay behavior (scroll lock + focus)

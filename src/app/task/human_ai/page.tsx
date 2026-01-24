@@ -147,13 +147,15 @@ export default function HumanAIPage() {
                     mode={run.workflow}
                     aiLocked={aiLocked}
                     defaultOpen={false}
-                    onUnlockAi={() => {
-                      setAiLocked(false);
-                    }}
                     onLockAi={() => {setAiLocked(true);}}
                     onDraft={(draft) => {setText(draft);}}
                     baseHumanText={text}
                     storageKey={chatKey}
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      participantId: run.participantId!,
+                    }}
                   />
 
                   {/* Editor */}

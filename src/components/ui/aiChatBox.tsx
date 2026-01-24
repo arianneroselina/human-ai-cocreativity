@@ -6,6 +6,7 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 import ConfirmDialog from "@/components/ui/confirm";
 import { Loader2, Sparkles, MessageSquareText, CheckCircle2 } from "lucide-react";
 import { Workflow } from "@/lib/experiment";
+import { usePause } from "@/components/ui/pauseContext";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
@@ -13,11 +14,11 @@ type Props = {
   mode: Workflow | undefined;
   aiLocked: boolean;
   onLockAi?: () => void;
-  onUnlockAi?: () => void;
   onDraft: (draftText: string) => void;
   baseHumanText?: string;
   storageKey?: string;
   defaultOpen?: boolean;
+  run?: { sessionId: string; roundIndex: number; participantId: string };
 };
 
 const WIDTH_STORAGE_KEY = "ai_chat_width";
@@ -44,11 +45,11 @@ export default function AiChatBox({
                                     mode,
                                     aiLocked,
                                     onLockAi,
-                                    onUnlockAi,
                                     onDraft,
                                     baseHumanText,
                                     storageKey,
                                     defaultOpen = true,
+                                    run,
                                   }: Props) {
   const [open, setOpen] = useState(defaultOpen);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -58,9 +59,11 @@ export default function AiChatBox({
   const [selectedAssistantIndex, setSelectedAssistantIndex] = useState<number | null>(null);
   const [clearOpen, setClearOpen] = useState(false);
   const [lockOpen, setLockOpen] = useState(false);
-  const [unlockOpen, setUnlockOpen] = useState(false);
+
+  const { paused } = usePause();
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const baseMessagePersistedRef = useRef(false);
 
   /* ------------------------------------------------------------
    * Open AI chat automatically
@@ -102,6 +105,26 @@ export default function AiChatBox({
       return [{ ...prev[0], content: text }];
     });
   }, [mode, baseHumanText, aiLocked]);
+
+  useEffect(() => {
+    if (!run) return;
+    if (mode !== "human_ai") return;
+    if (aiLocked) return;
+    if (baseMessagePersistedRef.current) return;
+
+    const first = messages[0];
+    if (!first) return;
+    if (first.role !== "user") return;
+
+    baseMessagePersistedRef.current = true;
+
+    void persistChatEvent({
+      sessionId: run.sessionId,
+      roundIndex: run.roundIndex,
+      role: "user",
+      content: first.content,
+    });
+  }, [messages, aiLocked, mode, run]);
 
   /* ------------------------------------------------------------
    * Autosave chat (after AI unlock)
@@ -273,8 +296,8 @@ export default function AiChatBox({
    * Sending messages
    * ------------------------------------------------------------ */
   const canSend = useMemo(
-    () => !aiLocked && !loading && !!prompt.trim(),
-    [aiLocked, loading, prompt]
+    () => !paused && !aiLocked && !loading && !!prompt.trim(),
+    [paused, aiLocked, loading, prompt]
   );
 
   const send = async () => {
@@ -286,6 +309,15 @@ export default function AiChatBox({
 
     const historyBefore = messages;
     setMessages((m) => [...m, { role: "user", content: userMsg }]);
+
+    if (run) {
+      void persistChatEvent({
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        role: "user",
+        content: userMsg,
+      });
+    }
 
     const input = buildInput(userMsg, historyBefore);
 
@@ -306,6 +338,15 @@ export default function AiChatBox({
       const data = await res.json();
       const aiText = (data?.text ?? "").trim();
       setMessages((m) => [...m, { role: "assistant", content: aiText }]);
+
+      if (run) {
+        void persistChatEvent({
+          sessionId: run.sessionId,
+          roundIndex: run.roundIndex,
+          role: "assistant",
+          content: aiText,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -335,6 +376,17 @@ export default function AiChatBox({
   const selectAsDraft = (idx: number, content: string) => {
     setSelectedAssistantIndex(idx);
     onDraft(content);
+
+    if (run) {
+      void persistChatEvent({
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        role: "assistant",
+        content,
+        action: "select",
+        selected: true,
+      });
+    }
   };
 
   /* ------------------------------------------------------------
@@ -348,7 +400,37 @@ export default function AiChatBox({
     if (storageKey) {
       localStorage.removeItem(storageKey);
     }
+
+    if (run) {
+      void persistChatEvent({
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        action: "clear",
+      });
+    }
   };
+
+  /* ------------------------------------------------------------
+   * Store chat in DB
+   * ------------------------------------------------------------ */
+  async function persistChatEvent(payload: {
+    sessionId: string;
+    roundIndex: number;
+    role?: "user" | "assistant";
+    content?: string;
+    action?: "clear" | "select";
+    selected?: boolean;
+  }) {
+    try {
+      await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error("persistChatEvent failed", err);
+    }
+  }
 
   /* ------------------------------------------------------------
    * Block copy/paste
@@ -361,19 +443,12 @@ export default function AiChatBox({
   };
 
   /* ------------------------------------------------------------
-   * Lock/unlock AI
+   * Lock AI
    * ------------------------------------------------------------ */
   const lockAi = () => {
     setOpen(false);
     if (onLockAi) {
       onLockAi();
-    }
-  };
-
-  const unlockAi = () => {
-    setOpen(true);
-    if (onUnlockAi) {
-      onUnlockAi();
     }
   };
 
@@ -383,6 +458,10 @@ export default function AiChatBox({
 
   const assistantCount = messages.filter((m) => m.role === "assistant").length;
   const hasSelection = selectedAssistantIndex !== null;
+
+  if (paused) {
+    return null;
+  }
 
   return (
     <>
@@ -504,12 +583,6 @@ export default function AiChatBox({
                           className={hasSelection ? "animate-pulse" : ""}
                         >
                           Lock AI
-                        </Button>
-                      )}
-
-                      {isHumanToAi && aiLocked && (
-                        <Button size="sm" onClick={() => setUnlockOpen(true)}>
-                          Unlock AI
                         </Button>
                       )}
                     </>
@@ -692,16 +765,6 @@ export default function AiChatBox({
         confirmLabel="Lock AI"
         cancelLabel="Cancel"
         onConfirm={lockAi}
-      />
-
-      <ConfirmDialog
-        open={unlockOpen}
-        onOpenChange={setUnlockOpen}
-        title="Unlock AI?"
-        description="You won't be able to edit your draft manually anymore."
-        confirmLabel="Unlock AI"
-        cancelLabel="Cancel"
-        onConfirm={unlockAi}
       />
     </>
   );

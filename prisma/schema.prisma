@@ -107,6 +107,7 @@ model Round {
   passed             Boolean?
   requirementResults Json?
   feedback           RoundFeedback?
+  aiChat             AiChat?
 
   @@unique([sessionId, index])
 }
@@ -143,4 +144,24 @@ model Feedback {
   workflowRating Workflow?
   comments       String?
   createdAt      DateTime @default(now())
+}
+
+model AiChat {
+  id        String   @id @default(cuid())
+  round     Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  AiChatMessage[]
+}
+
+model AiChatMessage {
+  id         String   @id @default(cuid())
+  chat       AiChat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId     String
+  role       String   // "user" | "assistant" | "system"
+  content    String?
+  action     String?  // "select" | "clear"
+  selected   Boolean  @default(false)
+  createdAt  DateTime @default(now())
 }

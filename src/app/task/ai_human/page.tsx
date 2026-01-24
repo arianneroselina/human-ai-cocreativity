@@ -149,6 +149,11 @@ export default function AIHumanWorkPage() {
                     onLockAi={() => {setAiLocked(true);}}
                     onDraft={(draft) => setText(draft)}
                     storageKey={chatKey}
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      participantId: run.participantId!,
+                    }}
                   />
 
                   {/* Editor */}

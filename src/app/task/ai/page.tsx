@@ -102,6 +102,11 @@ export default function AIPage() {
                     aiLocked={false}
                     onDraft={(draft) => setText(draft)}
                     storageKey={chatKey}
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      participantId: run.participantId!,
+                    }}
                   />
 
                   {/* Editor (read-only) */}
