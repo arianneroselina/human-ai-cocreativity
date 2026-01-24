@@ -10,7 +10,7 @@ import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import { ClipboardList, Loader2 } from "lucide-react";
 
-type Gender = "female" | "male" | "prefer_not_to_say";
+type Gender = "female" | "male" | "other" | "prefer_not_to_say";
 type Education = "secondary" | "bachelor" | "master" | "phd" | "other" | "prefer_not_to_say";
 type EnglishLevel = "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "native" | "prefer_not_to_say";
 
@@ -167,6 +167,7 @@ export default function PreQuestionnaire() {
                     <option value="" disabled>Select gender…</option>
                     <option value="female">Female</option>
                     <option value="male">Male</option>
+                    <option value="other">Other</option>
                     <option value="prefer_not_to_say">Prefer not to say</option>
                   </select>
                 </div>

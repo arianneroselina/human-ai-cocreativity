@@ -185,7 +185,7 @@ export const POEM_TASKS: PoemTask[] = [
         type: "mustIncludeWords",
         id: "sounds-2",
         label: "At least 2 sound-words",
-        words: ["jingle", "clink", "click"],
+        words: ["jingle", "jingling", "clink", "click"],
         mode: "atLeast",
         atLeast: 2,
         caseSensitive: false,

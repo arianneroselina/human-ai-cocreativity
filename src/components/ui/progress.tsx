@@ -4,11 +4,10 @@ import { useExperiment } from "@/stores/useExperiment";
 
 export default function Progress() {
   const { run } = useExperiment();
-  const r: any = run;
 
   if (run.phase === "idle") return null;
 
-  const mode: "practice" | "main" = r.mode === "practice" ? "practice" : "main";
+  const mode: "practice" | "main" = run.mode === "practice" ? "practice" : "main";
 
   const total = mode === "practice" ? run.totalPracticeRounds : run.totalRounds;
   let index = run.roundIndex;

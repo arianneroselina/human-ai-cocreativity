@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ExperimentRun, Workflow } from "@/lib/experiment";
+import { ExperimentRun, Workflow, WORKFLOW_VALUES } from "@/lib/experiment";
 
 type Event =
   | { type: "START_SESSION" }
@@ -48,8 +48,6 @@ function shuffle<T>(arr: T[], seed: string): T[] {
   return a;
 }
 
-const PRACTICE_WORKFLOWS: Workflow[] = ["human", "ai", "human_ai", "ai_human"];
-
 const initial: ExperimentRun = {
   participantId: null,
   sessionId: null,
@@ -67,7 +65,6 @@ export const useExperiment = create<Store>()(
 
       can(type) {
         const { run } = get();
-        const r: any = run;
 
         switch (type) {
           case "START_SESSION":
@@ -83,7 +80,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "choose_workflow" && !run.locked;
 
           case "LOCK_WORKFLOW":
-            return run.phase === "choose_workflow" && !!r.workflow;
+            return run.phase === "choose_workflow" && !!run.workflow;
 
           case "SUBMIT_ROUND":
             return run.phase === "task";
@@ -92,7 +89,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "round_feedback" || run.phase === "practice_complete";
 
           case "FINISH_SESSION":
-            return run.phase === "round_feedback" && run.roundIndex >= r.totalRounds + r.totalPracticeRounds;
+            return run.phase === "round_feedback" && run.roundIndex >= run.totalRounds + run.totalPracticeRounds;
 
           case "RESET":
             return true;
@@ -126,7 +123,7 @@ export const useExperiment = create<Store>()(
               s.mode = "practice";
               s.totalPracticeRounds = 4;
               s.practiceOrder = shuffle(
-                PRACTICE_WORKFLOWS,
+                WORKFLOW_VALUES,
                 `${String(s.participantId)}:${String(s.sessionId)}`
               );
 

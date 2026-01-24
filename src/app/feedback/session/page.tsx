@@ -107,11 +107,6 @@ export default function FeedbackPage() {
     });
   };
 
-  const startNew = () => {
-    (useExperiment as any).persist?.clearStorage?.();
-    send({ type: "RESET" });
-  };
-
   if (submitted) {
     return (
       <main className="min-h-dvh bg-background">

@@ -19,7 +19,7 @@ import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 import AiChatBox from "@/components/ui/aiChatBox";
-import {Workflows} from "@/lib/experiment";
+import { AiHuman, Workflows } from "@/lib/experiment";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
@@ -88,63 +88,109 @@ export default function AIHumanWorkPage() {
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   {/* Workflow description */}
-                  <div className="mb-4 mt-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/50 p-5 shadow-sm">
-                    <p className="font-semibold mb-4 text-purple-900 text-center">
+                  <div
+                    className={[
+                      "mb-4 mt-4 rounded-xl p-5 shadow-2xl",
+                      "border border-border/60",
+                      "bg-gradient-to-r from-primary/10 via-primary/5 to-background",
+                    ].join(" ")}
+                  >
+                    <p className="font-semibold mb-4 text-center text-foreground">
                       {Workflows.find(w => w.key === run.workflow)?.label} workflow
                     </p>
 
                     <div className="flex items-center gap-3 text-xs">
                       {/* Step 1 */}
                       <div className="flex flex-col items-center gap-1 flex-1 group">
-                        <div className="w-10 h-10 rounded-2xl bg-purple-100 border-2 border-purple-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-                          <span className="text-lg font-bold">📝</span>
+                        <div
+                          className={[
+                            "w-10 h-10 rounded-2xl flex items-center justify-center",
+                            "border border-border/60 shadow-md transition-all",
+                            "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50",
+                            "text-primary-foreground",
+                            "group-hover:shadow-lg",
+                          ].join(" ")}
+                        >
+                          <span className="text-lg">📝</span>
                         </div>
-                        <span className="font-medium text-purple-900 text-center leading-tight min-h-[2.5ex] px-1">Chat & pick AI draft</span>
+                        <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Chat & pick draft
+                        </span>
                       </div>
 
                       {/* Arrow */}
                       <div className="w-8 flex justify-center">
-                        <div className="w-6 h-1.5 bg-gradient-to-r from-purple-400 to-indigo-500 rounded-full shadow-sm"></div>
+                        <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/60 to-primary/30" />
                       </div>
 
                       {/* Step 2 */}
                       <div className="flex flex-col items-center gap-1 flex-1 group">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-100 border-2 border-indigo-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-                          <span className="text-lg font-bold">🔒</span>
+                        <div
+                          className={[
+                            "w-10 h-10 rounded-2xl flex items-center justify-center",
+                            "border border-border/60 shadow-md transition-all",
+                            "bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40",
+                            "text-primary-foreground",
+                            "group-hover:shadow-lg",
+                          ].join(" ")}
+                        >
+                          <span className="text-lg">🔒</span>
                         </div>
-                        <span className="font-medium text-indigo-900 text-center leading-tight min-h-[2.5ex] px-1">Lock AI</span>
+                        <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Lock AI
+                        </span>
                       </div>
 
                       {/* Arrow */}
                       <div className="w-8 flex justify-center">
-                        <div className="w-6 h-1.5 bg-gradient-to-r from-indigo-400 to-emerald-500 rounded-full shadow-sm"></div>
+                        <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/60 to-primary/30" />
                       </div>
 
                       {/* Step 3 */}
                       <div className="flex flex-col items-center gap-1 flex-1 group">
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-100 border-2 border-emerald-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-                          <span className="text-lg font-bold">✏️</span>
+                        <div
+                          className={[
+                            "w-10 h-10 rounded-2xl flex items-center justify-center",
+                            "border border-border/60 shadow-md transition-all",
+                            "bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30",
+                            "text-primary-foreground",
+                            "group-hover:shadow-lg",
+                          ].join(" ")}
+                        >
+                          <span className="text-lg">✏️</span>
                         </div>
-                        <span className="font-medium text-emerald-900 text-center leading-tight min-h-[2.5ex] px-1">Edit draft</span>
+                        <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Edit draft
+                        </span>
                       </div>
 
                       {/* Arrow */}
                       <div className="w-8 flex justify-center">
-                        <div className="w-6 h-1.5 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full shadow-sm"></div>
+                        <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/60 to-primary/30" />
                       </div>
 
                       {/* Step 4 */}
                       <div className="flex flex-col items-center gap-1 flex-1 group">
-                        <div className="w-10 h-10 rounded-2xl bg-green-100 border-2 border-green-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-                          <span className="text-lg font-bold">✅</span>
+                        <div
+                          className={[
+                            "w-10 h-10 rounded-2xl flex items-center justify-center",
+                            "border border-border/60 shadow-md transition-all",
+                            "bg-gradient-to-r from-primary via-primary/80 to-primary/60",
+                            "text-primary-foreground",
+                            "group-hover:shadow-lg",
+                          ].join(" ")}
+                        >
+                          <span className="text-lg">✅</span>
                         </div>
-                        <span className="font-medium text-green-900 text-center leading-tight min-h-[2.5ex] px-1">Submit</span>
+                        <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Submit
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <AiChatBox
-                    mode="ai_human"
+                    mode={run.workflow}
                     aiLocked={aiLocked}
                     onLockAi={() => {setAiLocked(true);}}
                     onDraft={(draft) => setText(draft)}

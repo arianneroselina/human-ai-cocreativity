@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { usesAI } from "@/lib/experiment";
 
-const usesAI = (wf: string) => wf === "ai" || wf === "human_ai" || wf === "ai_human";
 const isLikert = (v: unknown) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
 
 export async function POST(req: Request) {

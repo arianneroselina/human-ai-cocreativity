@@ -7,7 +7,7 @@ const isLikert = (v: unknown) =>
 const isAge = (v: unknown) =>
   Number.isInteger(v) && (v as number) >= 18 && (v as number) <= 120;
 
-const GENDERS = new Set(["female", "male", "prefer_not_to_say"]);
+const GENDERS = new Set(["female", "male", "other", "prefer_not_to_say"]);
 const EDUCATIONS = new Set(["secondary", "bachelor", "master", "phd", "other", "prefer_not_to_say"]);
 const ENGLISH_LEVELS = new Set(["a1", "a2", "b1", "b2", "c1", "c2", "native", "prefer_not_to_say"]);
 

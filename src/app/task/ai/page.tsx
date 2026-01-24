@@ -19,7 +19,7 @@ import TimerBadge from "@/components/ui/timerBadge";
 import { useSubmitHotkey } from "@/components/ui/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
-import {Workflows} from "@/lib/experiment";
+import { Workflows } from "@/lib/experiment";
 
 export default function AIPage() {
   useRouteGuard(["task"]);
@@ -82,23 +82,40 @@ export default function AIPage() {
                   <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
 
                   {/* Workflow description */}
-                  <div className="mb-4 mt-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200/50 p-5 shadow-sm">
-                    <p className="font-semibold mb-4 text-purple-900 text-center">
+                  <div
+                    className={[
+                      "mb-4 mt-4 rounded-xl p-5 shadow-2xl",
+                      "border border-border/60",
+                      "bg-gradient-to-r from-primary/10 via-primary/5 to-background",
+                    ].join(" ")}
+                  >
+                    <p className="font-semibold mb-4 text-center text-foreground">
                       {Workflows.find(w => w.key === run.workflow)?.label} workflow
                     </p>
 
                     <div className="flex items-center justify-center text-xs">
                       <div className="flex flex-col items-center gap-1 group">
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-100 to-slate-100 border-2 border-gray-200 flex items-center justify-center shadow-md group-hover:shadow-lg transition-all">
-                          <span className="text-xl font-bold">🤖</span>
+                        <div
+                          className={[
+                            "w-12 h-12 rounded-2xl flex items-center justify-center",
+                            "border border-border/60 shadow-md transition-all",
+                            "bg-gradient-to-br from-primary/90 via-primary/70 to-primary/50",
+                            "text-primary-foreground",
+                            "group-hover:shadow-lg",
+                          ].join(" ")}
+                        >
+                          <span className="text-xl">🤖</span>
                         </div>
-                        <span className="font-medium text-gray-900 text-center leading-tight px-2 pt-1">Chat with AI, pick draft, submit</span>
+
+                        <span className="font-medium text-foreground text-center leading-tight px-2 pt-1">
+                          Chat with AI, pick draft, submit
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <AiChatBox
-                    mode="ai"
+                    mode={run.workflow}
                     aiLocked={false}
                     onDraft={(draft) => setText(draft)}
                     storageKey={chatKey}

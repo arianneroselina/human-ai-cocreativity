@@ -7,7 +7,7 @@ import { Button } from "@/components/shadcn_ui/button";
 import Progress from "@/components/ui/progress";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { Workflows, type Workflow } from "@/lib/experiment";
+import { Workflows, type Workflow, usesAI } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 
 export default function RoundFeedbackPage() {
@@ -17,9 +17,8 @@ export default function RoundFeedbackPage() {
   const [loading, setLoading] = useState(false);
 
   const workflowKey = run.workflow as Workflow;
-  const wf = Workflows.find((w) => w.key === workflowKey);
-  const workflowUsesAI =
-    workflowKey === "ai" || workflowKey === "human_ai" || workflowKey === "ai_human";
+  const wf = Workflows.find(w => w.key === workflowKey);
+  const workflowUsesAI = usesAI(workflowKey);
 
   const [liking, setLiking] = useState<Likert | null>(null);
   const [trust, setTrust] = useState<Likert | null>(null); // AI only
@@ -99,7 +98,6 @@ export default function RoundFeedbackPage() {
       send({ type: "FINISH_SESSION" });
     } else {
       send({ type: "NEXT_ROUND" });
-      // TODO: and for practice? no start round
     }
     setLoading(false);
   };
