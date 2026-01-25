@@ -48,10 +48,7 @@ export default function HumanAIPage() {
   const words = countWords(text);
 
   const check = useMemo(() => {
-    if (!run.taskId) {
-      console.error("taskId is not available")
-      return null;
-    }
+    if (!run.taskId) return null;
     return checkPoemAgainstRound(text, run.taskId);
   }, [run.taskId, text]);
 
