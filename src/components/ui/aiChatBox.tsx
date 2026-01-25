@@ -5,13 +5,13 @@ import { Button } from "@/components/shadcn_ui/button";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import ConfirmDialog from "@/components/ui/confirm";
 import { Loader2, Sparkles, MessageSquareText, CheckCircle2 } from "lucide-react";
-import { Workflow } from "@/lib/experiment";
+import { Ai, AiHuman, HumanAi, usesAI, Workflow } from "@/lib/experiment";
 import { usePause } from "@/components/ui/pauseContext";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 type Props = {
-  mode: Workflow | undefined;
+  workflow: Workflow;
   aiLocked: boolean;
   onLockAi?: () => void;
   onDraft: (draftText: string) => void;
@@ -42,7 +42,7 @@ function clampHistory(msgs: ChatMsg[], maxPairs: number) {
 }
 
 export default function AiChatBox({
-                                    mode,
+                                    workflow,
                                     aiLocked,
                                     onLockAi,
                                     onDraft,
@@ -75,10 +75,10 @@ export default function AiChatBox({
   }, []);
 
   /* ------------------------------------------------------------
-   * Draft mirroring (while AI is locked)
+   * Mirror draft (while AI is locked)
    * ------------------------------------------------------------ */
   useEffect(() => {
-    if (mode !== "human_ai") return;
+    if (workflow !== "human_ai") return;
     if (!aiLocked) return;
 
     const text = baseHumanText?.trim() ?? "";
@@ -104,11 +104,11 @@ export default function AiChatBox({
 
       return [{ ...prev[0], content: text }];
     });
-  }, [mode, baseHumanText, aiLocked]);
+  }, [workflow, baseHumanText, aiLocked]);
 
   useEffect(() => {
     if (!run) return;
-    if (mode !== "human_ai") return;
+    if (workflow !== "human_ai") return;
     if (aiLocked) return;
     if (baseMessagePersistedRef.current) return;
 
@@ -122,16 +122,17 @@ export default function AiChatBox({
       sessionId: run.sessionId,
       roundIndex: run.roundIndex,
       role: "user",
+      action: "seed_with_draft",
       content: first.content,
     });
-  }, [messages, aiLocked, mode, run]);
+  }, [messages, aiLocked, workflow, run]);
 
   /* ------------------------------------------------------------
-   * Autosave chat (after AI unlock)
-   * ------------------------------------------------------------ */
+ * Restore chat (Autosave)
+ * ------------------------------------------------------------ */
   useEffect(() => {
     if (!storageKey) return;
-    if (aiLocked) return;
+    //if (aiLocked) return;
 
     try {
       const raw = localStorage.getItem(storageKey);
@@ -322,21 +323,41 @@ export default function AiChatBox({
     const input = buildInput(userMsg, historyBefore);
 
     try {
+      let isTrustBreakRound = false;
+      if (run) {
+        isTrustBreakRound = run.roundIndex === 5 && usesAI(workflow);
+      }
+
       const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: input, history: historyBefore }),
+        body: JSON.stringify({
+          input: input,
+          isTrustBreakRound: isTrustBreakRound,
+          history: historyBefore,
+        }),
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        console.error("AI error", err);
+        console.error("Error in AI message", err);
         alert("AI request failed. Please try again.");
         return;
       }
 
       const data = await res.json();
       const aiText = (data?.text ?? "").trim();
+
+      if (data.trustBreakInjected) {
+        if (run) {
+          void persistChatEvent({
+            sessionId: run.sessionId,
+            roundIndex: run.roundIndex,
+            action: "trust_break",
+          });
+        }
+      }
+
       setMessages((m) => [...m, { role: "assistant", content: aiText }]);
 
       if (run) {
@@ -411,14 +432,33 @@ export default function AiChatBox({
   };
 
   /* ------------------------------------------------------------
+   * Seed message with current draft
+   * ------------------------------------------------------------ */
+  async function seedMessage() {
+    if (!baseHumanText) return;
+
+    if (run) {
+      void persistChatEvent({
+        sessionId: run.sessionId,
+        roundIndex: run.roundIndex,
+        role: "user",
+        action: "seed_with_draft",
+        content: baseHumanText,
+      });
+    }
+
+    setMessages([{ role: "user", content: baseHumanText },]);
+  }
+
+  /* ------------------------------------------------------------
    * Store chat in DB
    * ------------------------------------------------------------ */
   async function persistChatEvent(payload: {
-    sessionId: string;
+    sessionId: string | null;
     roundIndex: number;
     role?: "user" | "assistant";
     content?: string;
-    action?: "clear" | "select";
+    action?: "clear" | "select" | "seed_with_draft" | "trust_break";
     selected?: boolean;
   }) {
     try {
@@ -458,10 +498,9 @@ export default function AiChatBox({
     }
   }, [aiLocked]);
 
-
-  const isAiOnly = mode === "ai";
-  const isAiToHuman = mode === "ai_human";
-  const isHumanToAi = mode === "human_ai";
+  const isAiOnly = workflow === Ai;
+  const isAiToHuman = workflow === AiHuman;
+  const isHumanToAi = workflow === HumanAi;
 
   const assistantCount = messages.filter((m) => m.role === "assistant").length;
   const hasSelection = selectedAssistantIndex !== null;
@@ -478,7 +517,7 @@ export default function AiChatBox({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            disabled={isHumanToAi && aiLocked}
+            disabled={aiLocked}
             className={[
               "group relative flex items-center gap-2 rounded-full px-4 py-3 shadow-2xl border border-border/60",
               "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50 text-primary-foreground",
@@ -581,18 +620,15 @@ export default function AiChatBox({
                     Clear
                   </Button>
 
-                  {!isAiOnly && (
-                    <>
-                      {isAiToHuman && !aiLocked && (
-                        <Button
-                          size="sm"
-                          onClick={() => setLockOpen(true)}
-                          className={hasSelection ? "animate-pulse" : ""}
-                        >
-                          Lock AI
-                        </Button>
-                      )}
-                    </>
+                  {isAiToHuman && !aiLocked && (
+                    <Button
+                      size="sm"
+                      onClick={() => setLockOpen(true)}
+                      className={hasSelection ? "animate-pulse" : ""}
+                      disabled={!hasSelection}
+                    >
+                      Lock AI
+                    </Button>
                   )}
 
                   <Button variant="ghost" size="sm" onClick={() => setOpen(false)} aria-label="Collapse chat">
@@ -624,18 +660,15 @@ export default function AiChatBox({
                   <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
                     No messages yet.
 
-                    {isHumanToAi && (
+                    {baseHumanText &&
                       <Button
                         size="sm"
                         variant="secondary"
-                        onClick={() =>
-                          setMessages([{ role: "user", content: baseHumanText ?? "" }])
-                        }
-                        disabled={!baseHumanText}
+                        onClick={seedMessage}
                       >
                         Start with current draft
                       </Button>
-                    )}
+                    }
                   </div>
                 )
                 : (
@@ -673,7 +706,7 @@ export default function AiChatBox({
 
                             {isAssistant && (
                               <div className="mt-2 flex justify-end">
-                                  <Button
+                                <Button
                                   variant={isSelected ? "selected" : "secondary"}
                                   size="sm"
                                   onClick={() => selectAsDraft(idx, m.content)}

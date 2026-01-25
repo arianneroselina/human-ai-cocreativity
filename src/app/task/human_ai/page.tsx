@@ -190,7 +190,7 @@ export default function HumanAIPage() {
                   </div>
 
                   <AiChatBox
-                    mode={run.workflow}
+                    workflow={run.workflow!}
                     aiLocked={aiLocked}
                     defaultOpen={false}
                     onLockAi={() => {setAiLocked(true);}}

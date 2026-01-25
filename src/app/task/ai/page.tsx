@@ -115,9 +115,10 @@ export default function AIPage() {
                   </div>
 
                   <AiChatBox
-                    mode={run.workflow}
+                    workflow={run.workflow!}
                     aiLocked={false}
                     onDraft={(draft) => setText(draft)}
+                    baseHumanText={text}
                     storageKey={chatKey}
                     run={{
                       sessionId: run.sessionId!,
