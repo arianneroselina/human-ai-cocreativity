@@ -1,22 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { getPoemTaskById } from "@/data/tasks";
-import { getTaskIdForRound } from "@/lib/taskAssignment";
 
-type TaskDetailsProps = {
-  roundIndex: number; // 1..7
-  sessionId:  string | null;
-};
-
-export default function TaskDetails({ roundIndex, sessionId }: TaskDetailsProps) {
-  const [taskId, setTaskId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const id = getTaskIdForRound(roundIndex, sessionId!);
-    setTaskId(id);
-  }, [roundIndex, sessionId]);
-
+export default function TaskDetails({ taskId }: {
+  taskId: string
+}) {
   const task = useMemo(() => (taskId ? getPoemTaskById(taskId) : null), [taskId]);
 
   if (!task) {

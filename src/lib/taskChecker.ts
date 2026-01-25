@@ -1,6 +1,5 @@
 import type { PoemTask, RequirementSpec } from "@/data/tasks";
 import { getPoemTaskById } from "@/data/tasks";
-import { getTaskIdForRound } from "@/lib/taskAssignment";
 
 export function splitNonEmptyLines(text: string): string[] {
   return text
@@ -52,12 +51,6 @@ function countWordOccurrences(text: string, word: string, wholeWord: boolean, ca
 function countChar(text: string, char: string): number {
   if (!char) return 0;
   return text.split(char).length - 1;
-}
-
-function firstAlphaChar(line: string): string {
-  const s = stripStructuralPrefix(line);
-  const m = s.match(/[A-Za-z]/);
-  return m ? m[0] : "";
 }
 
 export type RequirementResult = {
@@ -188,8 +181,7 @@ export function checkPoemAgainstTask(poem: string, task: PoemTask): CheckResult 
   return { passed, results };
 }
 
-export function checkPoemAgainstRound(poem: string, roundIndex: number, sessionId: string): CheckResult & { taskId: string } {
-  const taskId = getTaskIdForRound(roundIndex, sessionId);
+export function checkPoemAgainstRound(poem: string, taskId: string): CheckResult {
   const task = getPoemTaskById(taskId);
-  return { taskId, ...checkPoemAgainstTask(poem, task) };
+  return { ...checkPoemAgainstTask(poem, task) };
 }

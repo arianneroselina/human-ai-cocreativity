@@ -98,13 +98,13 @@ model Round {
   sessionId          String
   index              Int
   workflow           Workflow
+  taskId             String
   startedAt          DateTime       @default(now())
   submittedAt        DateTime?
   text               String?
   timeMs             Int?
   wordCount          Int?
   charCount          Int?
-  taskId             String?
   passed             Boolean?
   requirementResults Json?
   feedback           RoundFeedback?
@@ -119,6 +119,7 @@ model RoundFeedback {
   sessionId      String
   roundIndex     Int
   workflow       Workflow
+  taskId         String
   liking         Int?
   trust          Int?
   satisfaction   Int?

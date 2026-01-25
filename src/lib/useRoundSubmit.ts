@@ -2,7 +2,7 @@
 
 import { useCallback, useRef } from "react";
 import { useExperiment } from "@/stores/useExperiment";
-import type { RequirementResult } from "@/lib/taskChecker";
+import { CheckResult, RequirementResult } from "@/lib/taskChecker";
 
 type SubmitResult =
   | { ok: true }
@@ -12,12 +12,12 @@ export type SubmitRoundPayload = {
   sessionId?: string | null;
   roundIndex?: number;
   workflow?: string | undefined;
+  taskId: string;
 
   text: string;
   wordCount: number;
   charCount: number;
 
-  taskId: string;
   passed: boolean;
   requirementResults: RequirementResult[];
 };
@@ -31,7 +31,6 @@ export async function submitData(
   // local storage (client-side)
   localStorage.setItem("wordCount", JSON.stringify(payload.wordCount));
   localStorage.setItem("charCount", JSON.stringify(payload.charCount));
-  localStorage.setItem("taskId", JSON.stringify(payload.taskId));
   localStorage.setItem("passed", JSON.stringify(payload.passed));
   localStorage.setItem("requirementResults", JSON.stringify(payload.requirementResults));
 
@@ -40,10 +39,7 @@ export async function submitData(
   const sessionId = payload.sessionId ?? run.sessionId;
   const roundIndex = payload.roundIndex ?? run.roundIndex;
   const workflow = payload.workflow ?? run.workflow;
-
-  if (!sessionId || !roundIndex || !workflow) {
-    return { ok: false, error: "missing session/workflow/roundIndex" };
-  }
+  const taskId = payload.taskId ?? run.taskId;
 
   try {
     const res = await fetch("/api/round/submit", {
@@ -53,9 +49,9 @@ export async function submitData(
         sessionId,
         roundIndex,
         workflow,
+        taskId,
         text: payload.text,
         evaluation: {
-          taskId: payload.taskId,
           passed: payload.passed,
           requirementResults: payload.requirementResults,
         },
@@ -94,18 +90,13 @@ export async function submitData(
   }
 }
 
-export type RoundCheckResult = {
-  taskId: string;
-  passed: boolean;
-  results: RequirementResult[];
-} | null;
-
 type RouterLike = { replace: (path: string) => void; push: (path: string) => void };
 
 type RunLike = {
   sessionId: string | null;
   roundIndex: number;
   workflow?: string;
+  taskId?: string;
 };
 
 export function useRoundSubmit(args: {
@@ -113,7 +104,7 @@ export function useRoundSubmit(args: {
   router: RouterLike;
   text: string;
   words: number;
-  check: RoundCheckResult;
+  check: CheckResult | null;
 }) {
   const { run, router, text, words, check } = args;
 
@@ -128,24 +119,16 @@ export function useRoundSubmit(args: {
         sessionId: run.sessionId,
         roundIndex: run.roundIndex,
         workflow: run.workflow,
+        taskId: run.taskId!,
         text,
         wordCount: words,
         charCount: text.length,
-        taskId: check.taskId,
-        passed: check.passed,
+        passed: check?.passed,
         requirementResults: check.results,
       },
       router
     );
-  }, [
-    run.sessionId,
-    run.roundIndex,
-    run.workflow,
-    check,
-    text,
-    words,
-    router,
-  ]);
+  }, [run.sessionId, run.roundIndex, run.workflow, run.taskId, check, text, words, router]);
 
   const forceSubmit = useCallback(() => {
     if (forceSubmitOnceRef.current) return;

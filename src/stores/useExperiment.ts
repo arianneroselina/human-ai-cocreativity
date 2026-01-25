@@ -2,7 +2,8 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ExperimentRun, Workflow, WORKFLOW_VALUES } from "@/lib/experiment";
+import { ExperimentRun, Workflow } from "@/lib/experiment";
+import { createRandomAssignments } from "@/lib/roundAssignment";
 
 type Event =
   | { type: "START_SESSION" }
@@ -24,28 +25,6 @@ interface Store {
 
 function uuid() {
   return globalThis.crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2);
-}
-
-/** Deterministic PRNG seeded from string */
-function makeRng(seed: string) {
-  let x = 0;
-  for (let i = 0; i < seed.length; i++) x = (x * 31 + seed.charCodeAt(i)) >>> 0;
-  return () => {
-    x ^= x << 13;
-    x ^= x >>> 17;
-    x ^= x << 5;
-    return (x >>> 0) / 0xffffffff;
-  };
-}
-
-function shuffle<T>(arr: T[], seed: string): T[] {
-  const rng = makeRng(seed);
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
 }
 
 const initial: ExperimentRun = {
@@ -114,18 +93,20 @@ export const useExperiment = create<Store>()(
               s.totalRounds = 3;
               s.roundIndex = 1;
 
+              s.assignments = createRandomAssignments({
+                totalPracticeRounds: s.totalPracticeRounds,
+                totalMainRounds: s.totalRounds,
+              });
+
               // Reset workflow selection (main)
-              s.workflow = undefined;
+              s.workflow = s.assignments[0]?.workflow as Workflow;
+              s.taskId = s.assignments[0]?.taskId;
               s.locked = false;
 
               s.tutorialDone = false;
 
               s.mode = "practice";
               s.totalPracticeRounds = 4;
-              s.practiceOrder = shuffle(
-                WORKFLOW_VALUES,
-                `${String(s.participantId)}:${String(s.sessionId)}`
-              );
 
               s.phase = "pre-questionnaire";
               return { run: s };
@@ -152,7 +133,8 @@ export const useExperiment = create<Store>()(
               s.locked = true;
 
               const idx = Number(s.roundIndex ?? 1) - 1;
-              s.workflow = (s.practiceOrder?.[idx] ?? "human") as Workflow;
+              s.workflow = s.assignments[idx]?.workflow as Workflow;
+              s.taskId = s.assignments[idx]?.taskId;
 
               s.phase = "task";
               return { run: s };
@@ -171,7 +153,8 @@ export const useExperiment = create<Store>()(
                 if (s.roundIndex < s.totalPracticeRounds) {
                   s.mode = "practice";
                   s.locked = true;
-                  s.workflow = (s.practiceOrder?.[s.roundIndex] ?? "human") as Workflow;
+                  s.workflow = s.assignments[s.roundIndex]?.workflow as Workflow // roundIndex is not yet updated
+                  s.taskId = s.assignments[s.roundIndex]?.taskId
                   s.phase = "practice";
                   s.roundIndex += 1;
                 } else {
@@ -185,11 +168,12 @@ export const useExperiment = create<Store>()(
 
               if (s.phase === "round_feedback" || s.phase === "practice_complete") {
                 if (s.roundIndex < s.totalRounds + s.totalPracticeRounds) {
-                  s.roundIndex += 1;
                   s.mode = "main";
                   s.phase = "choose_workflow";
                   s.locked = false;
                   s.workflow = undefined;
+                  s.taskId = s.assignments[s.roundIndex]?.taskId // roundIndex is not yet updated
+                  s.roundIndex += 1;
                 } else {
                   s.phase = "feedback";
                 }

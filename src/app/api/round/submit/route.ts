@@ -6,12 +6,13 @@ export async function POST(req: Request) {
     sessionId,
     roundIndex,
     workflow, // 'human' | 'ai' | 'human_ai' | 'ai_human'
+    taskId,
     text,
     metrics = {},
     evaluation = {},
   } = await req.json();
 
-  if (!sessionId || typeof roundIndex !== "number" || !workflow) {
+  if (!sessionId || !roundIndex || !workflow || !taskId) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 
@@ -33,8 +34,6 @@ export async function POST(req: Request) {
   const charCount =
     typeof metrics.charCount === "number" ? metrics.charCount : null;
 
-  const taskId = typeof evaluation.taskId === "string" ? evaluation.taskId : null;
-
   const passed =
     typeof evaluation.passed === "boolean" ? evaluation.passed : null;
 
@@ -49,7 +48,6 @@ export async function POST(req: Request) {
       text: typeof text === "string" ? text : null,
       wordCount,
       charCount,
-      taskId,
       passed,
       requirementResults,
     },

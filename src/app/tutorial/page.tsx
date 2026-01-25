@@ -226,7 +226,7 @@ export default function TutorialPage() {
 
                 <div className="p-6">
                   <div id="tut-task">
-                    <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
+                    <TaskDetails taskId={run.taskId!} />
                   </div>
 
                   <section className="mt-4" id="tut-instructions">

@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     selected,
   } = await req.json();
 
-  if (!sessionId || typeof roundIndex !== "number") {
+  if (!sessionId || !roundIndex) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 

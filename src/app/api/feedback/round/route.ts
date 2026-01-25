@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { usesAI } from "@/lib/experiment";
 
+const usesAI = (w: unknown) => {return w === "ai" || w === "human_ai" || w === "ai_human";}
 const isLikert = (v: unknown) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
 
 export async function POST(req: Request) {
@@ -9,6 +9,7 @@ export async function POST(req: Request) {
     sessionId,
     roundIndex,
     workflow,
+    taskId,
     liking,
     trust,
     satisfaction,
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
     comment,
   } = await req.json();
 
-  if (!sessionId || typeof roundIndex !== "number" || !workflow) {
+  if (!sessionId || !roundIndex || !workflow || !taskId) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 
@@ -35,6 +36,7 @@ export async function POST(req: Request) {
     where: { sessionId_index: { sessionId, index: roundIndex } },
     select: { id: true },
   });
+
   if (!round) {
     return NextResponse.json({ error: "round not found" }, { status: 404 });
   }
@@ -46,6 +48,7 @@ export async function POST(req: Request) {
       sessionId,
       roundIndex,
       workflow,
+      taskId,
       liking: liking ?? null,
       trust: trustVal, // null for human-only workflows
       satisfaction: satisfaction ?? null,
@@ -58,6 +61,7 @@ export async function POST(req: Request) {
     },
     update: {
       workflow,
+      taskId,
       liking: liking ?? null,
       trust: trustVal,
       satisfaction: satisfaction ?? null,

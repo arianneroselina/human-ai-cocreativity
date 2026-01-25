@@ -43,9 +43,12 @@ export default function AIHumanWorkPage() {
   const words = countWords(text);
 
   const check = useMemo(() => {
-    if (!run.sessionId) return null;
-    return checkPoemAgainstRound(text, run.roundIndex, run.sessionId);
-  }, [text, run.roundIndex, run.sessionId]);
+    if (!run.taskId) {
+      console.error("taskId is not available")
+      return null;
+    }
+    return checkPoemAgainstRound(text, run.taskId);
+  }, [run.taskId, text]);
 
   const clearDraft = () => setText("");
 
@@ -85,7 +88,7 @@ export default function AIHumanWorkPage() {
               <div className="mx-auto max-w-4xl">
                 <Progress />
                 <div className="p-6">
-                  <TaskDetails roundIndex={run.roundIndex} sessionId={run.sessionId} />
+                  <TaskDetails taskId={run.taskId!} />
 
                   {/* Workflow description */}
                   <div

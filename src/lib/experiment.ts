@@ -1,5 +1,7 @@
 "use client";
 
+import { RoundAssignment } from "@/lib/roundAssignment";
+
 export const Human = "human"
 export const Ai = "ai"
 export const HumanAi = "human_ai"
@@ -11,23 +13,25 @@ export type Phase = 'idle' | 'pre-questionnaire' | 'tutorial' | 'practice' | 'pr
 export const WORKFLOW_VALUES = [Human, Ai, HumanAi, AiHuman];
 
 export interface ExperimentRun {
-  participantId: string | null;
-  sessionId: string | null;
-  totalRounds: number;
+  participantId:       string | null;
+  sessionId:           string | null;
+  totalRounds:         number;
   totalPracticeRounds: number;
-  mode: string | null;
-  roundIndex: number;      // 1-based
-  workflow?: Workflow;     // chosen for the *current* round
-  phase: Phase;
-  locked: boolean;         // once true, workflow cannot be changed this round
+  mode:                string | null;
+  roundIndex:          number;        // 1-based
+  assignments:         RoundAssignment[]
+  workflow?:           Workflow;      // chosen for the *current* round
+  taskId?:             string;
+  phase:               Phase;
+  locked:              boolean;       // once true, workflow cannot be changed this round
 }
 
 export const Workflows: Array<{
-  key: Workflow;
+  key:   Workflow;
   label: string;
   title: string;
-  desc: string;
-  icon: string;
+  desc:  string;
+  icon:  string;
 }> = [
   {
     key: Human,

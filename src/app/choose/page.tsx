@@ -35,6 +35,7 @@ export default function Choose() {
         sessionId: run.sessionId,
         roundIndex: run.roundIndex,
         workflow: run.workflow,
+        taskId: run.taskId,
       }),
     });
 
