@@ -21,6 +21,7 @@ interface Store {
   run: ExperimentRun;
   can(event: Event["type"]): boolean;
   send(event: Event): void;
+  setRoundStarted: (startedAt: string) => void;
 }
 
 function uuid() {
@@ -41,6 +42,15 @@ export const useExperiment = create<Store>()(
   persist(
     (set, get) => ({
       run: initial,
+
+      setRoundStarted(startedAt) {
+        set((state) => ({
+          run: {
+            ...state.run,
+            startedAt,
+          },
+        }));
+      },
 
       can(type) {
         const { run } = get();

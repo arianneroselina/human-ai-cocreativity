@@ -27,8 +27,9 @@ export default function Choose() {
     setOpen(false);
     send({ type: 'LOCK_WORKFLOW' });
 
-    const { run } = useExperiment.getState();
-    await fetch('/api/round/start', {
+    const { run, setRoundStarted } = useExperiment.getState();
+
+    const res = await fetch('/api/round/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -39,10 +40,14 @@ export default function Choose() {
       }),
     });
 
+    const data = await res.json();
+    setRoundStarted(data.startedAt);
+
     console.log("Round started:", {
       sessionId: run.sessionId,
       roundIndex: run.roundIndex,
       workflow: run.workflow,
+      startedAt: data.startedAt,
     });
   };
 

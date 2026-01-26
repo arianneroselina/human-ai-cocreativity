@@ -32,9 +32,9 @@ export default function PracticeStartPage() {
 
     send({ type: "START_PRACTICE" } as any);
 
-    const { run } = useExperiment.getState();
+    const { run, setRoundStarted } = useExperiment.getState();
 
-    await fetch('/api/round/start', {
+    const res = await fetch('/api/round/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,10 +45,14 @@ export default function PracticeStartPage() {
       }),
     });
 
+    const data = await res.json();
+    setRoundStarted(data.startedAt);
+
     console.log("Practice Round started:", {
       sessionId: run.sessionId,
       roundIndex: run.roundIndex,
       workflow: run.workflow,
+      startedAt: data.startedAt,
     });
 
     setLoading(false);

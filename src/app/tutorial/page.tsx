@@ -332,7 +332,10 @@ export default function TutorialPage() {
 
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <div id="tut-timer">
-                <TimerBadge workflow="Human only" seconds={300}/>
+                <TimerBadge
+                  workflow="Human only"
+                  demo
+                />
               </div>
             </div>
           </div>
@@ -340,7 +343,10 @@ export default function TutorialPage() {
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
             <div id="tut-timer">
-              <TimerBadge workflow="Human only" seconds={300}/>
+              <TimerBadge
+                workflow="Human only"
+                demo
+              />
             </div>
           </div>
         </div>

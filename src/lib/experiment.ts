@@ -17,13 +17,14 @@ export interface ExperimentRun {
   sessionId:           string | null;
   totalRounds:         number;
   totalPracticeRounds: number;
-  mode:                string | null;
-  roundIndex:          number;        // 1-based
-  assignments:         RoundAssignment[]
-  workflow?:           Workflow;      // chosen for the *current* round
-  taskId?:             string;
   phase:               Phase;
-  locked:              boolean;       // once true, workflow cannot be changed this round
+  mode:                string | null;     // "practice" / "main"
+  roundIndex:          number;            // current round index, 1-based
+  assignments:         RoundAssignment[]  // task and workflow assignments
+  workflow?:           Workflow;          // current round workflow
+  locked:              boolean;           // once true, workflow cannot be changed this round
+  taskId?:             string;            // current round task ID
+  startedAt?:          string;            // current round startedAt time
 }
 
 export const Workflows: Array<{

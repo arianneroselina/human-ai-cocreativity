@@ -22,5 +22,5 @@ export async function POST(req: Request) {
     },
   });
 
-  return NextResponse.json({ ok: true, roundId: round.id });
+  return NextResponse.json({ ok: true, startedAt: round.startedAt });
 }

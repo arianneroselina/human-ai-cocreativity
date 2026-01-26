@@ -5,10 +5,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePauseResumeHotkeys } from "@/components/ui/shortcut";
 import { usePause } from "@/components/ui/pauseContext";
 
-interface RoundHeaderProps {
+interface TimerBadgeProps {
   workflow: string;
   seconds?: number;
-  active?: boolean;
+  startedAt?: string;
+  demo?: boolean;
   onTimeUp?: () => void;
 }
 
@@ -18,40 +19,51 @@ function formatMMSS(totalSeconds: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-export default function TimerBadge({ workflow, seconds = 300, active = true, onTimeUp }: RoundHeaderProps) {
+export default function TimerBadge({
+                                     workflow,
+                                     seconds = 300,
+                                     startedAt,
+                                     demo,
+                                     onTimeUp,
+                                   }: TimerBadgeProps) {
   const { paused, setPaused } = usePause();
 
   const [remaining, setRemaining] = useState(seconds);
   const [didWarn1Min, setDidWarn1Min] = useState(false);
   const [didForceSubmit, setDidForceSubmit] = useState(false);
 
-  const resetKey = useMemo(() => seconds, [seconds]);
-
   const resumeBtnRef = useRef<HTMLButtonElement>(null);
-  const endAtRef = useRef<number | null>(null);
-
-  // keep latest callback without re-triggering effects
   const onTimeUpRef = useRef(onTimeUp);
+
   useEffect(() => {
     onTimeUpRef.current = onTimeUp;
   }, [onTimeUp]);
 
-  // init/reset when seconds changes (new task)
+  const endAtRef = useRef<number | null>(null);
+
   useEffect(() => {
-    setPaused(false);
-    setRemaining(seconds);
+    if (demo) {
+      endAtRef.current = Date.now() + seconds * 1000;
+      return;
+    }
+
+    if (!startedAt) {
+      endAtRef.current = null;
+      return;
+    }
+
+    endAtRef.current =
+      new Date(startedAt).getTime() + seconds * 1000;
+  }, [startedAt, seconds, demo]);
+
+
+  // Reset warning flags if task changes
+  useEffect(() => {
     setDidWarn1Min(false);
     setDidForceSubmit(false);
-    endAtRef.current = Date.now() + seconds * 1000;
-  }, [resetKey]);
+  }, [startedAt, seconds]);
 
-  const togglePause = useCallback(() => {
-    setPaused(!paused);
-  }, [paused, setPaused]);
-
-  usePauseResumeHotkeys(paused, setPaused);
-
-  // Pause overlay behavior (scroll lock + focus)
+  // Pause overlay
   useEffect(() => {
     if (!paused) return;
     const prev = document.body.style.overflow;
@@ -62,27 +74,23 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
     };
   }, [paused]);
 
-  // When pausing/resuming, recompute endAt based on remaining
-  useEffect(() => {
-    if (!active) return;
+  const togglePause = useCallback(() => {
+    setPaused(!paused);
+  }, [paused, setPaused]);
 
-    if (paused) {
-      endAtRef.current = null;
-      return;
-    }
-
-    endAtRef.current = Date.now() + remaining * 1000;
-  }, [paused, active, remaining]);
+  usePauseResumeHotkeys(paused, setPaused);
 
   // Main ticker
   useEffect(() => {
-    if (!active) return;
-
     const tick = () => {
-      const endAt = endAtRef.current;
-      if (!endAt) return;
+      if (paused) return;
+      if (!endAtRef.current) return;
 
-      const left = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+      const left = Math.max(
+        0,
+        Math.ceil((endAtRef.current - Date.now()) / 1000)
+      );
+
       setRemaining(left);
 
       if (left <= 60 && left > 10 && !didWarn1Min) {
@@ -98,24 +106,28 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
       }
     };
 
-    const id = window.setInterval(tick, 250);
     tick();
+    const id = window.setInterval(tick, 250);
     return () => window.clearInterval(id);
-  }, [active, didWarn1Min, didForceSubmit]);
+  }, [paused, didWarn1Min, didForceSubmit]);
 
   const showOneMinute = didWarn1Min && remaining <= 60 && remaining > 10;
   const showFinal = remaining <= 10 && remaining > 0;
   const showSubmitting = remaining === 0;
 
   const warningText =
-    showOneMinute ? "1 minute left." :
-      showFinal ? `Auto-submit in ${remaining}s.` :
-        showSubmitting ? "Submitting now..." :
-          null;
+    showOneMinute
+      ? "1 minute left."
+      : showFinal
+        ? `Auto-submit in ${remaining}s.`
+        : showSubmitting
+          ? "Submitting now..."
+          : null;
 
   const timeBadgeClasses = useMemo(() => {
     if (showFinal) return "border-red-300 bg-red-50 text-red-700 animate-pulse";
-    if (remaining <= 60) return "border-yellow-300 bg-yellow-50 text-yellow-800";
+    if (remaining <= 60)
+      return "border-yellow-300 bg-yellow-50 text-yellow-800";
     return "border-border bg-background text-foreground";
   }, [showFinal, remaining]);
 
@@ -126,7 +138,9 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
         <div className="text-sm font-semibold">{workflow}</div>
 
         <div className="flex justify-between items-center">
-          <span className={`tabular-nums rounded-lg p-2 text-sm font-semibold ${timeBadgeClasses}`}>
+          <span
+            className={`tabular-nums rounded-lg p-2 text-sm font-semibold ${timeBadgeClasses}`}
+          >
             {formatMMSS(remaining)}
           </span>
 
@@ -136,7 +150,11 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
               togglePause();
             }}
             className={`inline-flex items-center justify-center rounded-full border border-border p-2 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring
-              ${paused ? "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700" : ""}`}
+              ${
+              paused
+                ? "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700"
+                : ""
+            }`}
             aria-label={paused ? "Resume" : "Pause"}
             title={paused ? "Resume" : "Pause"}
           >
@@ -150,7 +168,11 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
         <div className="flex justify-start mt-4">
           <div
             className={`inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm shadow-lg
-              ${showFinal || showSubmitting ? "border-red-300 bg-red-50 text-red-700 animate-pulse" : "border-yellow-300 bg-yellow-50 text-yellow-800"}`}
+              ${
+              showFinal || showSubmitting
+                ? "border-red-300 bg-red-50 text-red-700 animate-pulse"
+                : "border-yellow-300 bg-yellow-50 text-yellow-800"
+            }`}
           >
             <AlertTriangle className="h-3 w-3" />
             <span>{warningText}</span>
@@ -158,7 +180,7 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
         </div>
       )}
 
-      {/* Blocking overlay when paused */}
+      {/* Pause overlay */}
       {paused && (
         <div
           role="dialog"
@@ -167,8 +189,12 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
           className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
         >
           <div className="mx-4 max-w-md rounded-xl bg-card text-card-foreground p-6 shadow-xl border border-border">
-            <h2 id="paused-title" className="text-xl font-semibold">Paused</h2>
-            <p className="mt-2 text-sm text-muted-foreground">Timer is stopped. Resume to continue.</p>
+            <h2 id="paused-title" className="text-xl font-semibold">
+              Paused
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Timer is stopped. Resume to continue.
+            </p>
 
             <div className="mt-6 flex items-center justify-center">
               <button
@@ -182,8 +208,14 @@ export default function TimerBadge({ workflow, seconds = 300, active = true, onT
 
             <p className="mt-4 text-xs text-muted-foreground text-center">
               Tip: Press{" "}
-              <kbd className="rounded border border-border bg-muted px-2 py-1">Space</kbd> or{" "}
-              <kbd className="rounded border border-border bg-muted px-2 py-1">Esc</kbd> to resume.
+              <kbd className="rounded border border-border bg-muted px-2 py-1">
+                Space
+              </kbd>{" "}
+              or{" "}
+              <kbd className="rounded border border-border bg-muted px-2 py-1">
+                Esc
+              </kbd>{" "}
+              to resume.
             </p>
           </div>
         </div>

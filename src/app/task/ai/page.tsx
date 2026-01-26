@@ -198,7 +198,7 @@ export default function AIPage() {
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <TimerBadge
                 workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
-                seconds={300}
+                startedAt={run.startedAt!}
                 onTimeUp={forceSubmit}
               />
             </div>
@@ -208,7 +208,7 @@ export default function AIPage() {
           <div className="md:hidden fixed right-4 top-40 z-40">
             <TimerBadge
               workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
-              seconds={300}
+              startedAt={run.startedAt!}
               onTimeUp={forceSubmit}
             />
           </div>
