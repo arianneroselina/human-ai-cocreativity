@@ -134,13 +134,13 @@ export default function TimerBadge({
 
   return (
     <>
-      <div className="w-[120px] mb-4 rounded-xl px-4 py-2 border border-border bg-card text-card-foreground shadow-lg flex flex-col hover:shadow-xl transition-shadow">
+      <div className="w-[120px] mb-4 rounded-xl px-4 py-2 border border-border bg-card text-card-foreground shadow-lg flex flex-col transition-shadow">
         <div className="text-xs text-muted-foreground">Workflow</div>
         <div className="text-sm font-semibold">{workflow}</div>
 
         <div className="flex justify-between items-center">
           <span
-            className={`tabular-nums rounded-lg p-2 text-sm font-semibold ${timeBadgeClasses}`}
+            className={`tabular-nums rounded-lg p-2 text-xs font-semibold ${timeBadgeClasses}`}
           >
             {formatMMSS(remaining)}
           </span>

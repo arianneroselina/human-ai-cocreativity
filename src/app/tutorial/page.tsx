@@ -245,102 +245,53 @@ export default function TutorialPage() {
                   <section className="mt-4" id="tut-instructions">
                     <div
                       className={[
-                        "mb-4 mt-4 rounded-xl p-5 shadow-2xl",
+                        "mb-3 mt-3 rounded-xl p-3 shadow-2xl",
                         "border border-border/60",
                         "bg-gradient-to-r from-primary/10 via-primary/5 to-background",
                       ].join(" ")}
                     >
-                      <p className="font-semibold mb-4 text-center text-foreground">
-                        {Workflows.find(w => w.key === run.workflow)?.label} workflow
-                      </p>
+                      {/* Title + description */}
+                      <div className="text-center mb-3">
+                        <p className="font-semibold text-sm text-foreground">
+                          {Workflows.find(w => w.key === "human_ai")?.label} workflow
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {Workflows.find(w => w.key === "human_ai")?.desc}
+                        </p>
+                      </div>
 
-                      <div className="flex items-center gap-3 text-xs">
-                        {/* Step 1 */}
-                        <div className="flex flex-col items-center gap-1 flex-1 group">
-                          <div
-                            className={[
-                              "w-10 h-10 rounded-2xl flex items-center justify-center",
-                              "border border-border/60 shadow-md transition-all",
-                              "bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30",
-                              "text-primary-foreground",
-                              "group-hover:shadow-lg",
-                            ].join(" ")}
-                          >
-                            <span className="text-lg">✍️</span>
-                          </div>
-                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
-                          Write draft
-                        </span>
-                        </div>
+                      {/* Steps */}
+                      <div className="flex items-center gap-2 text-[11px]">
+                        {[
+                          { icon: "✍️", label: "Write draft" },
+                          { icon: "🔓", label: "Unlock AI" },
+                          { icon: "🤖", label: "Chat & pick edit" },
+                          { icon: "✅", label: "Submit" },
+                        ].map((step, i) => (
+                          <React.Fragment key={step.label}>
+                            <div className="flex flex-col items-center gap-0.5 flex-1">
+                              <div
+                                className={[
+                                  "w-8 h-8 rounded-xl flex items-center justify-center",
+                                  "border border-border/60 shadow-md transition-all",
+                                  "bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40",
+                                  "text-primary-foreground text-sm group-hover:shadow-lg",
+                                ].join(" ")}
+                              >
+                                {step.icon}
+                              </div>
+                              <span className="font-medium text-foreground leading-tight text-center">
+                              {step.label}
+                            </span>
+                            </div>
 
-                        {/* Arrow */}
-                        <div className="w-8 flex justify-center">
-                          <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/50 to-primary/30" />
-                        </div>
-
-                        {/* Step 2 */}
-                        <div className="flex flex-col items-center gap-1 flex-1 group">
-                          <div
-                            className={[
-                              "w-10 h-10 rounded-2xl flex items-center justify-center",
-                              "border border-border/60 shadow-md transition-all",
-                              "bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40",
-                              "text-primary-foreground",
-                              "group-hover:shadow-lg",
-                            ].join(" ")}
-                          >
-                            <span className="text-lg">🔓</span>
-                          </div>
-                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
-                          Unlock AI (50+ chars)
-                        </span>
-                        </div>
-
-                        {/* Arrow */}
-                        <div className="w-8 flex justify-center">
-                          <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/50 to-primary/30" />
-                        </div>
-
-                        {/* Step 3 */}
-                        <div className="flex flex-col items-center gap-1 flex-1 group">
-                          <div
-                            className={[
-                              "w-10 h-10 rounded-2xl flex items-center justify-center",
-                              "border border-border/60 shadow-md transition-all",
-                              "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50",
-                              "text-primary-foreground",
-                              "group-hover:shadow-lg",
-                            ].join(" ")}
-                          >
-                            <span className="text-lg">🤖</span>
-                          </div>
-                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
-                          Chat & pick edit
-                        </span>
-                        </div>
-
-                        {/* Arrow */}
-                        <div className="w-8 flex justify-center">
-                          <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/50 to-primary/30" />
-                        </div>
-
-                        {/* Step 4 */}
-                        <div className="flex flex-col items-center gap-1 flex-1 group">
-                          <div
-                            className={[
-                              "w-10 h-10 rounded-2xl flex items-center justify-center",
-                              "border border-border/60 shadow-md transition-all",
-                              "bg-gradient-to-r from-primary via-primary/80 to-primary/60",
-                              "text-primary-foreground",
-                              "group-hover:shadow-lg",
-                            ].join(" ")}
-                          >
-                            <span className="text-lg">✅</span>
-                          </div>
-                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
-                          Submit
-                        </span>
-                        </div>
+                            {i < 3 && (
+                              <div className="w-4 flex justify-center">
+                                <div className="w-4 h-1 rounded-full bg-primary/40" />
+                              </div>
+                            )}
+                          </React.Fragment>
+                        ))}
                       </div>
                     </div>
                   </section>

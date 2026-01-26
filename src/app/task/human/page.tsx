@@ -122,7 +122,7 @@ export default function HumanPage() {
                               </span>
                           </div>
 
-                          {i < 3 && (
+                          {i < 1 && (
                             <div className="w-4 flex justify-center">
                               <div className="w-4 h-1 rounded-full bg-primary/40" />
                             </div>

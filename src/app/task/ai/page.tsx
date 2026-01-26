@@ -121,7 +121,7 @@ export default function AIPage() {
                               </span>
                           </div>
 
-                          {i < 3 && (
+                          {i < 1 && (
                             <div className="w-4 flex justify-center">
                               <div className="w-4 h-1 rounded-full bg-primary/40" />
                             </div>
@@ -170,7 +170,7 @@ export default function AIPage() {
                           onCopy={handleCopyPaste}
                           onPaste={handleCopyPaste}
                           onCut={handleCopyPaste}
-                          placeholder="Your AI draft will appear here..."
+                          placeholder="Use the AI chat (bottom-right) to generate drafts."
                           className="bg-muted text-muted-foreground placeholder:text-muted-foreground"
                         />
                         {showMessage && (
