@@ -79,41 +79,60 @@ export default function HumanPage() {
             <div className="min-w-0">
               <div className="mx-auto max-w-4xl">
                 <Progress />
-                <div className="p-6">
-                  <TaskDetails taskId={run.taskId!} />
 
+                <div className="p-6">
                   {/* Workflow description */}
                   <div
                     className={[
-                      "mb-4 mt-4 rounded-xl p-5 shadow-2xl",
+                      "mb-3 mt-3 rounded-xl p-3 shadow-2xl",
                       "border border-border/60",
                       "bg-gradient-to-r from-primary/10 via-primary/5 to-background",
                     ].join(" ")}
                   >
-                    <p className="font-semibold mb-4 text-center text-foreground">
-                      {Workflows.find(w => w.key === run.workflow)?.label} workflow
-                    </p>
+                    {/* Title + description */}
+                    <div className="text-center mb-3">
+                      <p className="font-semibold text-sm text-foreground">
+                        {Workflows.find(w => w.key === run.workflow)?.label} workflow
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">
+                        {Workflows.find(w => w.key === run.workflow)?.desc}
+                      </p>
+                    </div>
 
-                    <div className="flex items-center justify-center text-xs">
-                      <div className="flex flex-col items-center gap-1 group">
-                        <div
-                          className={[
-                            "w-12 h-12 rounded-2xl flex items-center justify-center",
-                            "border border-border/60 shadow-md transition-all",
-                            "bg-gradient-to-br from-primary/80 via-primary/60 to-primary/40",
-                            "text-primary-foreground",
-                            "group-hover:shadow-lg",
-                          ].join(" ")}
-                        >
-                          <span className="text-xl">✍️</span>
-                        </div>
+                    {/* Steps */}
+                    <div className="flex items-center gap-2 text-[11px]">
+                      {[
+                        { icon: "✍️", label: "Write draft" },
+                        { icon: "✅", label: "Submit" },
+                      ].map((step, i) => (
+                        <React.Fragment key={step.label}>
+                          <div className="flex flex-col items-center gap-0.5 flex-1">
+                            <div
+                              className={[
+                                "w-8 h-8 rounded-xl flex items-center justify-center",
+                                "border border-border/60 shadow-md transition-all",
+                                "bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40",
+                                "text-primary-foreground text-sm group-hover:shadow-lg",
+                              ].join(" ")}
+                            >
+                              {step.icon}
+                            </div>
+                            <span className="font-medium text-foreground leading-tight text-center">
+                                {step.label}
+                              </span>
+                          </div>
 
-                        <span className="font-medium text-foreground text-center leading-tight px-2 pt-1">
-                          Write your draft and submit
-                        </span>
-                      </div>
+                          {i < 3 && (
+                            <div className="w-4 flex justify-center">
+                              <div className="w-4 h-1 rounded-full bg-primary/40" />
+                            </div>
+                          )}
+                        </React.Fragment>
+                      ))}
                     </div>
                   </div>
+
+                  <TaskDetails taskId={run.taskId!} />
 
                   {/* Editor Section */}
                   <section className="mt-4">

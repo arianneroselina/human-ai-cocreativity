@@ -16,7 +16,7 @@ type EnglishLevel = "a1" | "a2" | "b1" | "b2" | "c1" | "c2" | "native" | "prefer
 
 export default function PreQuestionnaire() {
   useRouteGuard(["pre-questionnaire"]);
-  const { run, send } = useExperiment();
+  const { send } = useExperiment();
 
   const [loading, setLoading] = useState(false);
 
@@ -190,7 +190,7 @@ export default function PreQuestionnaire() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm text-foreground">Education</label>
+                  <label className="text-sm text-foreground">Highest education</label>
                   <select
                     value={education}
                     onChange={(e) => setEducation(e.target.value as any)}
@@ -208,7 +208,7 @@ export default function PreQuestionnaire() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm text-foreground">Language</label>
+                  <label className="text-sm text-foreground">Native language</label>
                   <select
                     value={nativeLang}
                     onChange={(e) => setNativeLang(e.target.value)}
@@ -223,7 +223,7 @@ export default function PreQuestionnaire() {
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm text-foreground">English</label>
+                  <label className="text-sm text-foreground">English level</label>
                   <select
                     value={englishLevel}
                     onChange={(e) => setEnglishLevel(e.target.value as any)}

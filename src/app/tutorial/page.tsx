@@ -14,6 +14,8 @@ import TimerBadge from "@/components/ui/timerBadge";
 import { useAutosave } from "@/lib/useAutosave";
 import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Workflows } from "@/lib/experiment";
+import AiChatBox from "@/components/ui/aiChatBox";
 
 type CoachStep = {
   targetId: string;
@@ -54,14 +56,14 @@ export default function TutorialPage() {
         text: "This area shows your current workflow type and how much time you have left in this round. Keep an eye on it.",
       },
       {
+        targetId: "tut-instructions",
+        title: "Workflow steps",
+        text: "Your workflow is e.g. 'Human→AI', and here are the steps you need to complete.",
+      },
+      {
         targetId: "tut-task",
         title: "Task prompt",
         text: "Read the task description here: what you should write and all specific requirements.",
-      },
-      {
-        targetId: "tut-instructions",
-        title: "Workflow steps",
-        text: "Your workflow is e.g. 'Human only', and here are the steps you need to complete.",
       },
       {
         targetId: "tut-status",
@@ -72,6 +74,11 @@ export default function TutorialPage() {
         targetId: "tut-editor",
         title: "Write your draft",
         text: "Type your answer here. When AI is active, this editor is read-only.",
+      },
+      {
+        targetId: "tut-ai-chat",
+        title: "AI Chat Box",
+        text: "In AI-assisted workflows, you can chat with the AI and select a response to use as your draft.",
       },
       {
         targetId: "tut-submit",
@@ -90,6 +97,16 @@ export default function TutorialPage() {
   const rafRef = useRef<number | null>(null);
 
   const [vp, setVp] = useState({ w: 0, h: 0 });
+
+  const [aiLocked, setAiLocked] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (step.targetId === "tut-ai-chat") {
+      setAiLocked(false)
+    } else if (!aiLocked) {
+      setAiLocked(true)
+    }
+  }, [aiLocked, step.targetId]);
 
   const measure = () => {
     const el = document.getElementById(step.targetId);
@@ -225,10 +242,6 @@ export default function TutorialPage() {
                 <Progress />
 
                 <div className="p-6">
-                  <div id="tut-task">
-                    <TaskDetails taskId={run.taskId!} />
-                  </div>
-
                   <section className="mt-4" id="tut-instructions">
                     <div
                       className={[
@@ -238,30 +251,110 @@ export default function TutorialPage() {
                       ].join(" ")}
                     >
                       <p className="font-semibold mb-4 text-center text-foreground">
-                        Human only workflow
+                        {Workflows.find(w => w.key === run.workflow)?.label} workflow
                       </p>
 
-                      <div className="flex items-center justify-center text-xs">
-                        <div className="flex flex-col items-center gap-1 group">
+                      <div className="flex items-center gap-3 text-xs">
+                        {/* Step 1 */}
+                        <div className="flex flex-col items-center gap-1 flex-1 group">
                           <div
                             className={[
-                              "w-12 h-12 rounded-2xl flex items-center justify-center",
+                              "w-10 h-10 rounded-2xl flex items-center justify-center",
                               "border border-border/60 shadow-md transition-all",
-                              "bg-gradient-to-br from-primary/80 via-primary/60 to-primary/40",
+                              "bg-gradient-to-r from-primary/70 via-primary/50 to-primary/30",
                               "text-primary-foreground",
                               "group-hover:shadow-lg",
                             ].join(" ")}
                           >
-                            <span className="text-xl">✍️</span>
+                            <span className="text-lg">✍️</span>
                           </div>
+                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Write draft
+                        </span>
+                        </div>
 
-                          <span className="font-medium text-foreground text-center leading-tight px-2 pt-1">
-                          Write your draft and submit
+                        {/* Arrow */}
+                        <div className="w-8 flex justify-center">
+                          <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/50 to-primary/30" />
+                        </div>
+
+                        {/* Step 2 */}
+                        <div className="flex flex-col items-center gap-1 flex-1 group">
+                          <div
+                            className={[
+                              "w-10 h-10 rounded-2xl flex items-center justify-center",
+                              "border border-border/60 shadow-md transition-all",
+                              "bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40",
+                              "text-primary-foreground",
+                              "group-hover:shadow-lg",
+                            ].join(" ")}
+                          >
+                            <span className="text-lg">🔓</span>
+                          </div>
+                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Unlock AI (50+ chars)
+                        </span>
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="w-8 flex justify-center">
+                          <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/50 to-primary/30" />
+                        </div>
+
+                        {/* Step 3 */}
+                        <div className="flex flex-col items-center gap-1 flex-1 group">
+                          <div
+                            className={[
+                              "w-10 h-10 rounded-2xl flex items-center justify-center",
+                              "border border-border/60 shadow-md transition-all",
+                              "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50",
+                              "text-primary-foreground",
+                              "group-hover:shadow-lg",
+                            ].join(" ")}
+                          >
+                            <span className="text-lg">🤖</span>
+                          </div>
+                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Chat & pick edit
+                        </span>
+                        </div>
+
+                        {/* Arrow */}
+                        <div className="w-8 flex justify-center">
+                          <div className="w-6 h-1.5 rounded-full bg-gradient-to-r from-primary/50 to-primary/30" />
+                        </div>
+
+                        {/* Step 4 */}
+                        <div className="flex flex-col items-center gap-1 flex-1 group">
+                          <div
+                            className={[
+                              "w-10 h-10 rounded-2xl flex items-center justify-center",
+                              "border border-border/60 shadow-md transition-all",
+                              "bg-gradient-to-r from-primary via-primary/80 to-primary/60",
+                              "text-primary-foreground",
+                              "group-hover:shadow-lg",
+                            ].join(" ")}
+                          >
+                            <span className="text-lg">✅</span>
+                          </div>
+                          <span className="font-medium text-foreground text-center leading-tight min-h-[2.5ex] px-1">
+                          Submit
                         </span>
                         </div>
                       </div>
                     </div>
                   </section>
+
+                  <div id="tut-task">
+                    <TaskDetails taskId={run.taskId!} />
+                  </div>
+
+                  <AiChatBox
+                    workflow="human_ai"
+                    aiLocked={aiLocked}
+                    onDraft={(draft) => {setText(draft);}}
+                    tutorialId="tut-ai-chat"
+                  />
 
                   <section className="mt-4">
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
@@ -333,7 +426,7 @@ export default function TutorialPage() {
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <div id="tut-timer">
                 <TimerBadge
-                  workflow="Human only"
+                  workflow="Human→AI"
                   demo
                 />
               </div>
@@ -344,7 +437,7 @@ export default function TutorialPage() {
           <div className="md:hidden fixed right-4 top-40 z-40">
             <div id="tut-timer">
               <TimerBadge
-                workflow="Human only"
+                workflow="Human→AI"
                 demo
               />
             </div>

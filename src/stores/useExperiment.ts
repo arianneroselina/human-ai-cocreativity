@@ -15,6 +15,7 @@ type Event =
   | { type: "START_ROUND_FEEDBACK" }
   | { type: "NEXT_ROUND" }
   | { type: "START_FINAL_FEEDBACK" }
+  | { type: "FINISH_SESSION" }
   | { type: "RESET" };
 
 interface Store {
@@ -82,6 +83,9 @@ export const useExperiment = create<Store>()(
 
           case "START_FINAL_FEEDBACK":
             return run.phase === "round_feedback" && run.roundIndex >= run.totalRounds + run.totalPracticeRounds;
+
+          case "FINISH_SESSION":
+            return run.phase === "feedback";
 
           case "RESET":
             return true;
@@ -220,6 +224,12 @@ export const useExperiment = create<Store>()(
             case "START_FINAL_FEEDBACK": {
               if (!can("START_FINAL_FEEDBACK")) return state;
               s.phase = "feedback";
+              return { run: s };
+            }
+
+            case "FINISH_SESSION": {
+              if (!can("FINISH_SESSION")) return state;
+              s.phase = "finish";
               return { run: s };
             }
 

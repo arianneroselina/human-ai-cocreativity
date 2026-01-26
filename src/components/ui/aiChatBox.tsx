@@ -17,8 +17,8 @@ type Props = {
   onDraft: (draftText: string) => void;
   baseHumanText?: string;
   storageKey?: string;
-  defaultOpen?: boolean;
   run?: { sessionId: string; roundIndex: number; participantId: string };
+  tutorialId?: string;
 };
 
 const WIDTH_STORAGE_KEY = "ai_chat_width";
@@ -48,10 +48,10 @@ export default function AiChatBox({
                                     onDraft,
                                     baseHumanText,
                                     storageKey,
-                                    defaultOpen = true,
                                     run,
+                                    tutorialId,
                                   }: Props) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
@@ -64,15 +64,6 @@ export default function AiChatBox({
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const baseMessagePersistedRef = useRef(false);
-
-  /* ------------------------------------------------------------
-   * Open AI chat automatically
-   * ------------------------------------------------------------ */
-  useEffect(() => {
-    const openChat = () => setOpen(true);
-    document.addEventListener("open-ai-chat", openChat);
-    return () => document.removeEventListener("open-ai-chat", openChat);
-  }, []);
 
   /* ------------------------------------------------------------
    * Mirror draft (while AI is locked)
@@ -391,6 +382,14 @@ export default function AiChatBox({
     ].join("\n");
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key !== "Enter") return;
+    if (e.shiftKey) return;
+
+    e.preventDefault(); // prevent newline
+    send();
+  };
+
   /* ------------------------------------------------------------
    * Draft selection
    * ------------------------------------------------------------ */
@@ -493,9 +492,7 @@ export default function AiChatBox({
   };
 
   useEffect(() => {
-    if (!aiLocked) {
-      setOpen(true);
-    }
+    setOpen(!aiLocked);
   }, [aiLocked]);
 
   const isAiOnly = workflow === Ai;
@@ -511,7 +508,7 @@ export default function AiChatBox({
 
   return (
     <>
-      <div className="fixed bottom-4 right-4 z-50">
+      <div id={tutorialId} className="fixed bottom-4 right-4 z-50">
         {/* Collapsed pill */}
         {!open && (
           <button
@@ -732,12 +729,9 @@ export default function AiChatBox({
                   rows={3}
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
-                  placeholder={
-                    aiLocked
-                      ? "Locked."
-                      : "Type something..."
-                  }
+                  placeholder={aiLocked ? "Locked." : "Type something..."}
                   readOnly={aiLocked || loading}
+                  onKeyDown={handleKeyDown}
                   onCopy={handleCopyPaste}
                   onPaste={handleCopyPaste}
                   onCut={handleCopyPaste}

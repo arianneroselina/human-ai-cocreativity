@@ -85,6 +85,7 @@ export default function TimerBadge({
     const tick = () => {
       if (paused) return;
       if (!endAtRef.current) return;
+      if (demo) return;
 
       const left = Math.max(
         0,
