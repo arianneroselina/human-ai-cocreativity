@@ -142,7 +142,6 @@ model Feedback {
   clarity            Int?
   effort             Int?
   frustration        Int?
-  recommendation     Int?
   bestWorkflow       Workflow?
   bestWorkflowReason String?
   comments           String?

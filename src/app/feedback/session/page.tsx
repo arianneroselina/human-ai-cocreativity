@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
 import Progress from "@/components/ui/progress";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
-import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, RefreshCw, ChevronDown } from "lucide-react";
+import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, ChevronDown } from "lucide-react";
 import { Workflow, Workflows } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 
@@ -20,7 +19,6 @@ export default function FeedbackPage() {
   const [clarity, setClarity] = useState<Likert | null>(null);
   const [effort, setEffort] = useState<Likert | null>(null);
   const [frustration, setFrustration] = useState<Likert | null>(null);
-  const [recommendation, setRecommendation] = useState<Likert | null>(null);
   const [bestWorkflow, setBestWorkflow] = useState<Workflow | null>(null);
   const [bestWorkflowReason, setBestWorkflowReason] = useState("");
   const MAX_REASON_CHARS = 200;
@@ -37,7 +35,6 @@ export default function FeedbackPage() {
     clarity !== null &&
     effort !== null &&
     frustration !== null &&
-    recommendation !== null &&
     bestWorkflow !== null &&
     bestWorkflowReason.trim().length > 0;
 
@@ -63,7 +60,6 @@ export default function FeedbackPage() {
         clarity,
         effort,
         frustration,
-        recommendation,
         bestWorkflow,
         bestWorkflowReason,
         comments: comment || null,
@@ -93,7 +89,6 @@ export default function FeedbackPage() {
         clarity,
         effort,
         frustration,
-        recommendation,
         bestWorkflow,
         bestWorkflowReason,
         comment,
@@ -106,7 +101,6 @@ export default function FeedbackPage() {
       clarity,
       effort,
       frustration,
-      recommendation,
       bestWorkflow,
       bestWorkflowReason,
       comment,
@@ -234,14 +228,6 @@ export default function FeedbackPage() {
               label="4) I felt frustrated during the study."
               value={frustration}
               onChange={setFrustration}
-              left="Strongly Disagree"
-              right="Strongly Agree"
-            />
-
-            <LikertRow
-              label="5) I would recommend this study to my friends/colleagues."
-              value={recommendation}
-              onChange={setRecommendation}
               left="Strongly Disagree"
               right="Strongly Agree"
             />

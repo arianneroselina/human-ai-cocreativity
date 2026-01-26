@@ -113,7 +113,6 @@ CREATE TABLE "Feedback" (
     "clarity" INTEGER,
     "effort" INTEGER,
     "frustration" INTEGER,
-    "recommendation" INTEGER,
     "bestWorkflow" "Workflow",
     "bestWorkflowReason" TEXT,
     "comments" TEXT,

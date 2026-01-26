@@ -8,7 +8,6 @@ export async function POST(req: Request) {
     clarity,
     effort,
     frustration,
-    recommendation,
     bestWorkflow,
     bestWorkflowReason,
     comment
@@ -23,7 +22,6 @@ export async function POST(req: Request) {
       clarity: clarity ?? null,
       effort: effort ?? null,
       frustration: frustration ?? null,
-      recommendation: recommendation ?? null,
       bestWorkflow: bestWorkflow ?? null,
       bestWorkflowReason: bestWorkflowReason ?? null,
       comments: comment ? String(comment).slice(0, 1000) : null,
