@@ -791,7 +791,7 @@ export default function AiChatBox({
         open={clearOpen}
         onOpenChange={setClearOpen}
         title="Clear chat?"
-        description="This will remove all chat messages."
+        description="This will remove all chat messages and draft selection."
         confirmLabel="Clear"
         cancelLabel="Cancel"
         onConfirm={clearChat}
