@@ -100,7 +100,7 @@ export default function PreQuestionnaire() {
       comment,
     });
 
-    send({ type: "START_TUTORIAL" } as any);
+    send({ type: "START_TUTORIAL" });
     setLoading(false);
   };
 

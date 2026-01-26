@@ -30,7 +30,7 @@ export default function PracticeStartPage() {
     if (loading) return;
     setLoading(true);
 
-    send({ type: "START_PRACTICE_ROUND" } as any);
+    send({ type: "START_PRACTICE_ROUND" });
 
     const { run, setRoundStarted } = useExperiment.getState();
 

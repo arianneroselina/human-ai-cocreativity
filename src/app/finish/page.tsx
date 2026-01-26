@@ -4,8 +4,11 @@ import { useMemo, useState } from "react";
 import { useExperiment } from "@/stores/useExperiment";
 import { Button } from "@/components/shadcn_ui/button";
 import { CheckCircle2, Clipboard, ClipboardCheck, FileDown, ChevronDown } from "lucide-react";
+import { useRouteGuard } from "@/lib/useRouteGuard";
 
-export default function FinishSession() {
+export default function FinishPage() {
+  useRouteGuard(["finish"]);
+
   const { run } = useExperiment();
   const [copied, setCopied] = useState(false);
 

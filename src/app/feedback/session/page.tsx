@@ -6,8 +6,11 @@ import { Button } from "@/components/shadcn_ui/button";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { Workflows, type Workflow } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
+import { useRouteGuard } from "@/lib/useRouteGuard";
 
-export default function FeedbackForm() {
+export default function FinalFeedbackPage() {
+  useRouteGuard(["feedback"]);
+
   const { run, send } = useExperiment();
 
   const [satisfaction, setSatisfaction] = useState<Likert | null>(null);

@@ -94,7 +94,7 @@ export default function Page() {
     try {
       setStarting(true);
 
-      send({ type: "START_SESSION" } as any);
+      send({ type: "START_SESSION" });
       const { run } = useExperiment.getState();
 
       await fetch("/api/session/start", {

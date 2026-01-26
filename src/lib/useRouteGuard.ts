@@ -29,6 +29,7 @@ export function useRouteGuard(allow: PhaseAllow) {
       }
       else if (run.phase === 'round_feedback') router.replace('/feedback/round');
       else if (run.phase === 'feedback') router.replace('/feedback/session');
+      else if (run.phase === 'finish') router.replace('/finish');
       else router.replace("/"); // fallback
     }
   }, [allow, run.phase, run.workflow, run.locked, router, run]);

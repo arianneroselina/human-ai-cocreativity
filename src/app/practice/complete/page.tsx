@@ -8,7 +8,7 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 export default function PracticeCompletePage() {
   useRouteGuard(["practice_complete"]);
 
-  const { run, send } = useExperiment();
+  const { send } = useExperiment();
 
   const continueToMain = () => {
     send({ type: "NEXT_ROUND" });
