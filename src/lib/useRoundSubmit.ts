@@ -83,7 +83,7 @@ export async function submitData(
       },
     });
 
-    useExperiment.getState().send({ type: "SUBMIT_ROUND" } as any);
+    useExperiment.getState().send({ type: "START_ROUND_FEEDBACK" } as any);
     return { ok: true };
   } catch (e: any) {
     return { ok: false, error: e?.message ?? "network error" };

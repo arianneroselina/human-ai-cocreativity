@@ -14,14 +14,16 @@ import { Textarea } from "@/components/shadcn_ui/textarea";
 export default function FeedbackPage() {
   useRouteGuard(["feedback"]);
 
-  const { run, send } = useExperiment();
+  const { run } = useExperiment();
 
   const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
   const [clarity, setClarity] = useState<Likert | null>(null);
   const [effort, setEffort] = useState<Likert | null>(null);
   const [frustration, setFrustration] = useState<Likert | null>(null);
   const [recommendation, setRecommendation] = useState<Likert | null>(null);
-  const [workflowBest, setWorkflowBest] = useState<Workflow | null>(null);
+  const [bestWorkflow, setBestWorkflow] = useState<Workflow | null>(null);
+  const [bestWorkflowReason, setBestWorkflowReason] = useState("");
+  const MAX_REASON_CHARS = 200;
 
   const [comment, setComment] = useState("");
   const commentChars = useMemo(() => comment.length, [comment]);
@@ -36,7 +38,8 @@ export default function FeedbackPage() {
     effort !== null &&
     frustration !== null &&
     recommendation !== null &&
-    workflowBest !== null;
+    bestWorkflow !== null &&
+    bestWorkflowReason.trim().length > 0;
 
   const sessionCode = useMemo(() => run.sessionId ?? "—", [run.sessionId]);
 
@@ -61,7 +64,8 @@ export default function FeedbackPage() {
         effort,
         frustration,
         recommendation,
-        workflowBest,
+        bestWorkflow,
+        bestWorkflowReason,
         comments: comment || null,
       },
     };
@@ -90,7 +94,8 @@ export default function FeedbackPage() {
         effort,
         frustration,
         recommendation,
-        workflowBest,
+        bestWorkflow,
+        bestWorkflowReason,
         comment,
       }),
     });
@@ -102,7 +107,8 @@ export default function FeedbackPage() {
       effort,
       frustration,
       recommendation,
-      workflowBest,
+      bestWorkflow,
+      bestWorkflowReason,
       comment,
     });
   };
@@ -240,17 +246,17 @@ export default function FeedbackPage() {
               right="Strongly Agree"
             />
 
-            {/* Workflow picker */}
+            {/* Best workflow */}
             <div className="space-y-2">
               <div className="text-sm text-foreground">6) Which workflow felt most useful?</div>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {Workflows.map((w) => {
-                  const active = workflowBest === w.key;
+                  const active = bestWorkflow === w.key;
                   return (
                     <button
                       key={w.key}
                       type="button"
-                      onClick={() => setWorkflowBest(w.key)}
+                      onClick={() => setBestWorkflow(w.key)}
                       aria-pressed={active}
                       className={[
                         "rounded-md border px-3 py-2 text-sm text-left transition",
@@ -267,6 +273,62 @@ export default function FeedbackPage() {
                 })}
               </div>
             </div>
+
+            {/* Best workflow reason */}
+            <div className="space-y-2">
+              <div
+                className={[
+                  "rounded-lg border p-4 transition",
+                  bestWorkflow
+                    ? "border-border bg-background"
+                    : "border-dashed border-border/60 bg-muted/40"
+                ].join(" ")}
+              >
+                <label
+                  htmlFor="best-workflow-reason"
+                  className="block text-sm text-foreground mb-2"
+                >
+                  {bestWorkflow
+                    ? `What made “${Workflows.find(w => w.key === bestWorkflow)?.title}” work best for you?`
+                    : "Select a workflow above to explain your choice"}
+                </label>
+
+                <Textarea
+                  rows={2}
+                  maxLength={MAX_REASON_CHARS}
+                  value={bestWorkflowReason}
+                  disabled={!bestWorkflow}
+                  onChange={(e) =>
+                    setBestWorkflowReason(e.target.value.slice(0, MAX_REASON_CHARS))
+                  }
+                  placeholder={
+                    bestWorkflow
+                      ? "e.g. It helped me get started faster, felt more creative, reduced effort, etc."
+                      : "Choose a workflow first"
+                  }
+                  className={[
+                    "w-full rounded-lg border bg-background p-3 text-sm text-foreground",
+                    "placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring",
+                    !bestWorkflow ? "opacity-60 cursor-not-allowed" : ""
+                  ].join(" ")}
+                />
+
+                <div className="mt-2 flex justify-end">
+                  <span
+                    className={`text-xs ${
+                      bestWorkflowReason.length >= MAX_REASON_CHARS
+                        ? "text-red-500"
+                        : "text-muted-foreground"
+                    }`}
+                    aria-live="polite"
+                    role="status"
+                  >
+                    {bestWorkflowReason.length}/{MAX_REASON_CHARS}
+                  </span>
+                </div>
+              </div>
+            </div>
+
 
             {/* Comments */}
             <div className="space-y-2">

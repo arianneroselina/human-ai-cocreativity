@@ -9,6 +9,7 @@ export const AiHuman = "ai_human"
 
 export type Workflow = 'human' | 'ai' | 'human_ai' | 'ai_human';
 export type Phase = 'idle' | 'pre-questionnaire' | 'tutorial' | 'practice' | 'practice_complete' | 'choose_workflow' | 'task' | 'round_feedback' | 'feedback';
+export type RunMode = 'practice' | 'main';
 
 export const WORKFLOW_VALUES = [Human, Ai, HumanAi, AiHuman];
 
@@ -18,7 +19,7 @@ export interface ExperimentRun {
   totalRounds:         number;
   totalPracticeRounds: number;
   phase:               Phase;
-  mode:                string | null;     // "practice" / "main"
+  mode:                RunMode;
   roundIndex:          number;            // current round index, 1-based
   assignments:         RoundAssignment[]  // task and workflow assignments
   workflow?:           Workflow;          // current round workflow
@@ -66,4 +67,8 @@ export const Workflows: Array<{
 
 export function usesAI(workflow: Workflow): boolean {
   return workflow !== "human";
+}
+
+export function isPracticeMode(mode: RunMode): boolean {
+  return mode === "practice";
 }

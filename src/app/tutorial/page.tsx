@@ -157,7 +157,7 @@ export default function TutorialPage() {
   }, []);
 
   const finish = () => {
-    send({ type: "FINISH_TUTORIAL" } as any);
+    send({ type: "START_PRACTICE" } as any);
   };
 
   const next = () => {

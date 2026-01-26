@@ -135,17 +135,18 @@ model RoundFeedback {
 }
 
 model Feedback {
-  id             String   @id @default(cuid())
-  session        Session  @relation(fields: [sessionId], references: [id])
-  sessionId      String   @unique
-  satisfaction   Int?
-  clarity        Int?
-  effort         Int?
-  frustration    Int?
-  recommendation Int?
-  workflowRating Workflow?
-  comments       String?
-  createdAt      DateTime @default(now())
+  id                 String   @id @default(cuid())
+  session            Session  @relation(fields: [sessionId], references: [id])
+  sessionId          String   @unique
+  satisfaction       Int?
+  clarity            Int?
+  effort             Int?
+  frustration        Int?
+  recommendation     Int?
+  bestWorkflow       Workflow?
+  bestWorkflowReason String?
+  comments           String?
+  createdAt          DateTime @default(now())
 }
 
 model AiChat {

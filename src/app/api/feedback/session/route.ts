@@ -9,7 +9,8 @@ export async function POST(req: Request) {
     effort,
     frustration,
     recommendation,
-    workflowBest,
+    bestWorkflow,
+    bestWorkflowReason,
     comment
   } = await req.json();
 
@@ -23,7 +24,8 @@ export async function POST(req: Request) {
       effort: effort ?? null,
       frustration: frustration ?? null,
       recommendation: recommendation ?? null,
-      workflowRating: workflowBest ?? null,
+      bestWorkflow: bestWorkflow ?? null,
+      bestWorkflowReason: bestWorkflowReason ?? null,
       comments: comment ? String(comment).slice(0, 1000) : null,
     },
   });

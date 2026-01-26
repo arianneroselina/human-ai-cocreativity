@@ -114,7 +114,8 @@ CREATE TABLE "Feedback" (
     "effort" INTEGER,
     "frustration" INTEGER,
     "recommendation" INTEGER,
-    "workflowRating" "Workflow",
+    "bestWorkflow" "Workflow",
+    "bestWorkflowReason" TEXT,
     "comments" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

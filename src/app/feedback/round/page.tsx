@@ -7,7 +7,7 @@ import { Button } from "@/components/shadcn_ui/button";
 import Progress from "@/components/ui/progress";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import { Workflows, type Workflow, usesAI } from "@/lib/experiment";
+import {Workflows, type Workflow, usesAI, isPracticeMode} from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 
 export default function RoundFeedbackPage() {
@@ -45,11 +45,11 @@ export default function RoundFeedbackPage() {
   const title = useMemo(
     () => {
       let index = run.roundIndex;
-      if (run.mode === "main") {
+      if (isPracticeMode(run.mode)) {
+        return `Practice ${index} — quick feedback`
+      } else {
         index = run.roundIndex - run.totalPracticeRounds;
         return `Round ${index} — quick feedback`
-      } else {
-        return `Practice ${index} — quick feedback`
       }
     },
     [run]
@@ -97,7 +97,7 @@ export default function RoundFeedbackPage() {
     });
 
     if (run.roundIndex >= run.totalRounds + run.totalPracticeRounds) {
-      send({ type: "FINISH_SESSION" });
+      send({ type: "START_FINAL_FEEDBACK" });
     } else {
       send({ type: "NEXT_ROUND" });
     }

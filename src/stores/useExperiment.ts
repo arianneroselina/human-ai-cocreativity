@@ -2,19 +2,19 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { ExperimentRun, Workflow } from "@/lib/experiment";
+import {ExperimentRun, isPracticeMode, Workflow} from "@/lib/experiment";
 import { createRandomAssignments } from "@/lib/roundAssignment";
 
 type Event =
   | { type: "START_SESSION" }
-  | { type: "FINISH_PREQUESTIONNAIRE" }
-  | { type: "FINISH_TUTORIAL" }
+  | { type: "START_TUTORIAL" }
   | { type: "START_PRACTICE" }
+  | { type: "START_PRACTICE_ROUND" }
   | { type: "SELECT_WORKFLOW"; workflow: Workflow }
-  | { type: "LOCK_WORKFLOW" }
-  | { type: "SUBMIT_ROUND" }
+  | { type: "START_MAIN_ROUND" }
+  | { type: "START_ROUND_FEEDBACK" }
   | { type: "NEXT_ROUND" }
-  | { type: "FINISH_SESSION" }
+  | { type: "START_FINAL_FEEDBACK" }
   | { type: "RESET" };
 
 interface Store {
@@ -59,25 +59,28 @@ export const useExperiment = create<Store>()(
           case "START_SESSION":
             return run.phase === "idle";
 
-          case "FINISH_PREQUESTIONNAIRE":
+          case "START_TUTORIAL":
             return run.phase === "pre-questionnaire";
 
-          case "FINISH_TUTORIAL":
+          case "START_PRACTICE":
             return run.phase === "tutorial";
+
+          case "START_PRACTICE_ROUND":
+            return run.phase === "practice";
 
           case "SELECT_WORKFLOW":
             return run.phase === "choose_workflow" && !run.locked;
 
-          case "LOCK_WORKFLOW":
+          case "START_MAIN_ROUND":
             return run.phase === "choose_workflow" && !!run.workflow;
 
-          case "SUBMIT_ROUND":
+          case "START_ROUND_FEEDBACK":
             return run.phase === "task";
 
           case "NEXT_ROUND":
             return run.phase === "round_feedback" || run.phase === "practice_complete";
 
-          case "FINISH_SESSION":
+          case "START_FINAL_FEEDBACK":
             return run.phase === "round_feedback" && run.roundIndex >= run.totalRounds + run.totalPracticeRounds;
 
           case "RESET":
@@ -122,22 +125,21 @@ export const useExperiment = create<Store>()(
               return { run: s };
             }
 
-            case "FINISH_PREQUESTIONNAIRE": {
-              if (!can("FINISH_PREQUESTIONNAIRE")) return state;
+            case "START_TUTORIAL": {
+              if (!can("START_TUTORIAL")) return state;
               s.phase = "tutorial";
               return { run: s };
             }
 
-            case "FINISH_TUTORIAL": {
-              if (!can("FINISH_TUTORIAL")) return state;
+            case "START_PRACTICE": {
+              if (!can("START_PRACTICE")) return state;
               s.tutorialDone = true;
-              // start practice
               s.phase = "practice";
               return { run: s };
             }
 
-            case "START_PRACTICE": {
-              if (s.phase !== "practice") return state;
+            case "START_PRACTICE_ROUND": {
+              if (!can("START_PRACTICE_ROUND")) return state;
 
               s.mode = "practice";
               s.locked = true;
@@ -145,13 +147,14 @@ export const useExperiment = create<Store>()(
               const idx = Number(s.roundIndex ?? 1) - 1;
               s.workflow = s.assignments[idx]?.workflow as Workflow;
               s.taskId = s.assignments[idx]?.taskId;
+              s.startedAt = undefined;
 
               s.phase = "task";
               return { run: s };
             }
 
-            case "SUBMIT_ROUND": {
-              if (!can("SUBMIT_ROUND")) return state;
+            case "START_ROUND_FEEDBACK": {
+              if (!can("START_ROUND_FEEDBACK")) return state;
               s.phase = "round_feedback";
               return { run: s };
             }
@@ -159,12 +162,15 @@ export const useExperiment = create<Store>()(
             case "NEXT_ROUND": {
               if (!can("NEXT_ROUND")) return state;
 
-              if (s.mode === "practice") {
+              if (isPracticeMode(s.mode)) {
                 if (s.roundIndex < s.totalPracticeRounds) {
                   s.mode = "practice";
                   s.locked = true;
-                  s.workflow = s.assignments[s.roundIndex]?.workflow as Workflow // roundIndex is not yet updated
-                  s.taskId = s.assignments[s.roundIndex]?.taskId
+
+                  const nextIdx = s.roundIndex;
+                  s.workflow = s.assignments[nextIdx]?.workflow;
+                  s.taskId = s.assignments[nextIdx]?.taskId;
+
                   s.phase = "practice";
                   s.roundIndex += 1;
                 } else {
@@ -181,8 +187,11 @@ export const useExperiment = create<Store>()(
                   s.mode = "main";
                   s.phase = "choose_workflow";
                   s.locked = false;
+
+                  const nextIdx = s.roundIndex;
                   s.workflow = undefined;
-                  s.taskId = s.assignments[s.roundIndex]?.taskId // roundIndex is not yet updated
+                  s.taskId = s.assignments[nextIdx]?.taskId
+
                   s.roundIndex += 1;
                 } else {
                   s.phase = "feedback";
@@ -199,16 +208,17 @@ export const useExperiment = create<Store>()(
               return { run: s };
             }
 
-            case "LOCK_WORKFLOW": {
-              if (!can("LOCK_WORKFLOW")) return state;
+            case "START_MAIN_ROUND": {
+              if (!can("START_MAIN_ROUND")) return state;
               s.mode = "main";
               s.locked = true;
+              s.startedAt = undefined;
               s.phase = "task";
               return { run: s };
             }
 
-            case "FINISH_SESSION": {
-              if (!can("FINISH_SESSION")) return state;
+            case "START_FINAL_FEEDBACK": {
+              if (!can("START_FINAL_FEEDBACK")) return state;
               s.phase = "feedback";
               return { run: s };
             }

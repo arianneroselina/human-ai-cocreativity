@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Progress from '@/components/ui/progress';
 import { Button } from "@/components/shadcn_ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/shadcn_ui/dialog";
@@ -25,7 +24,7 @@ export default function Choose() {
 
   const startRound = async () => {
     setOpen(false);
-    send({ type: 'LOCK_WORKFLOW' });
+    send({ type: 'START_MAIN_ROUND' });
 
     const { run, setRoundStarted } = useExperiment.getState();
 
