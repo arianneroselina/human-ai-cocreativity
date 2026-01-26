@@ -54,7 +54,7 @@ export default function Page() {
   }, [router]);
 
   const hasActiveSession = useMemo(
-    () => run.phase !== "idle" && run.phase !== "feedback",
+    () => run.phase !== "idle" && run.phase !== "finish",
     [run.phase]
   );
 
