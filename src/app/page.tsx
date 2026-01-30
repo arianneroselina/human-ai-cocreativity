@@ -18,7 +18,6 @@ import {
   ClipboardList,
   EyeOff,
 } from "lucide-react";
-import ConsentModal from "@/components/ui/consentModal";
 
 function DevResetButton() {
   const { send } = useExperiment();
@@ -45,7 +44,6 @@ function DevResetButton() {
 export default function Page() {
   const router = useRouter();
   const { run, send } = useExperiment();
-  const [showConsent, setShowConsent] = useState<boolean>(false);
   const [starting, setStarting] = useState<boolean>(false);
   const [detailsOpen, setDetailsOpen] = useState(true);
 
@@ -82,14 +80,8 @@ export default function Page() {
     }
   }, [run.phase, run.workflow, starting]);
 
-  const openConsent = () => {
+  const start = async () => {
     if (hasActiveSession || starting) return;
-    setShowConsent(true);
-  };
-
-  const handleConsent = async (consent: boolean) => {
-    setShowConsent(false);
-    if (!consent || hasActiveSession || starting) return;
 
     try {
       setStarting(true);
@@ -115,8 +107,6 @@ export default function Page() {
 
   return (
     <main className="min-h-dvh bg-background">
-      {showConsent && <ConsentModal onConsent={handleConsent} />}
-      
       <div className="mx-auto max-w-5xl p-6 space-y-6">
         {/* Hero / Start card */}
         <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
@@ -152,7 +142,7 @@ export default function Page() {
             )}
 
             <Button
-              onClick={openConsent}
+              onClick={start}
               disabled={hasActiveSession || starting}
               className="inline-flex items-center gap-2 bg-primary"
             >

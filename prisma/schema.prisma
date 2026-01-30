@@ -58,18 +58,6 @@ model Session {
   rounds           Round[]
   preQuestionnaire PreQuestionnaire?
   feedback         Feedback?
-  consent          Consent?
-}
-
-model Consent {
-  id        String   @id @default(cuid())
-  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  sessionId String   @unique
-  consented Boolean
-  consentedAt DateTime?
-  version   String
-  textHash  String
-  createdAt DateTime @default(now())
 }
 
 model PreQuestionnaire {

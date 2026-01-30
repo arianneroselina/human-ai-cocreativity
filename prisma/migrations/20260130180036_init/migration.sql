@@ -31,19 +31,6 @@ CREATE TABLE "Session" (
 );
 
 -- CreateTable
-CREATE TABLE "Consent" (
-    "id" TEXT NOT NULL,
-    "sessionId" TEXT NOT NULL,
-    "consented" BOOLEAN NOT NULL,
-    "consentedAt" TIMESTAMP(3),
-    "version" TEXT NOT NULL,
-    "textHash" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Consent_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "PreQuestionnaire" (
     "id" TEXT NOT NULL,
     "sessionId" TEXT NOT NULL,
@@ -145,9 +132,6 @@ CREATE TABLE "AiChatMessage" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Consent_sessionId_key" ON "Consent"("sessionId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "PreQuestionnaire_sessionId_key" ON "PreQuestionnaire"("sessionId");
 
 -- CreateIndex
@@ -164,9 +148,6 @@ CREATE UNIQUE INDEX "AiChat_roundId_key" ON "AiChat"("roundId");
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "Participant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Consent" ADD CONSTRAINT "Consent_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PreQuestionnaire" ADD CONSTRAINT "PreQuestionnaire_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
