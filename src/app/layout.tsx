@@ -32,15 +32,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <PauseProvider>
-          <Header />
+    <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}>
+    <PauseProvider>
+      <div className="flex h-full flex-col">
+        <Header />
+
+        <main className="flex-1 overflow-y-auto bg-background">
           {children}
-          <Footer />
-        </PauseProvider>
-        <Analytics/>
-        <SpeedInsights/>
-      </body>
+        </main>
+
+        <Footer />
+      </div>
+    </PauseProvider>
+
+    <Analytics />
+    <SpeedInsights />
+    </body>
     </html>
   );
 }

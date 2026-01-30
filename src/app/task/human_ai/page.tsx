@@ -151,7 +151,6 @@ export default function HumanAIPage() {
                     run={{
                       sessionId: run.sessionId!,
                       roundIndex: run.roundIndex,
-                      participantId: run.participantId!,
                     }}
                   />
 

@@ -48,7 +48,7 @@ export default function Page() {
   const [detailsOpen, setDetailsOpen] = useState(true);
 
   useEffect(() => {
-    router.prefetch?.("/pre-questionnaire");
+    router.prefetch?.("/id");
   }, [router]);
 
   const hasActiveSession = useMemo(
@@ -59,8 +59,8 @@ export default function Page() {
   const resumeTarget = useMemo(() => {
     if (starting) return null;
     switch (run.phase) {
-      case "pre-questionnaire":
-        return "/pre-questionnaire";
+      case "id":
+        return "/id";
       case "tutorial":
         return "/tutorial";
       case "practice":
@@ -93,13 +93,13 @@ export default function Page() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          participantId: run.participantId,
           sessionId: run.sessionId,
           totalRounds: run.totalRounds,
+          totalPracticeRounds: run.totalPracticeRounds,
         }),
       });
 
-      router.replace("/pre-questionnaire");
+      router.replace("/id");
     } finally {
       setStarting(false);
     }

@@ -17,7 +17,7 @@ type Props = {
   onDraft: (draftText: string) => void;
   baseHumanText?: string;
   storageKey?: string;
-  run?: { sessionId: string; roundIndex: number; participantId: string };
+  run?: { sessionId: string; roundIndex: number };
   tutorialId?: string;
 };
 

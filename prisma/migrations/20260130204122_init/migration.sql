@@ -1,55 +1,17 @@
 -- CreateEnum
 CREATE TYPE "Workflow" AS ENUM ('human', 'ai', 'human_ai', 'ai_human');
 
--- CreateEnum
-CREATE TYPE "Gender" AS ENUM ('female', 'male', 'other', 'prefer_not_to_say');
-
--- CreateEnum
-CREATE TYPE "Education" AS ENUM ('secondary', 'bachelor', 'master', 'phd', 'other', 'prefer_not_to_say');
-
--- CreateEnum
-CREATE TYPE "EnglishLevel" AS ENUM ('a1', 'a2', 'b1', 'b2', 'c1', 'c2', 'native', 'prefer_not_to_say');
-
--- CreateTable
-CREATE TABLE "Participant" (
-    "id" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Participant_pkey" PRIMARY KEY ("id")
-);
-
 -- CreateTable
 CREATE TABLE "Session" (
     "id" TEXT NOT NULL,
-    "participantId" TEXT NOT NULL,
     "totalRounds" INTEGER NOT NULL,
+    "totalPracticeRounds" INTEGER NOT NULL,
     "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "finishedAt" TIMESTAMP(3),
     "timeMs" INTEGER,
+    "participantId" INTEGER,
 
     CONSTRAINT "Session_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "PreQuestionnaire" (
-    "id" TEXT NOT NULL,
-    "sessionId" TEXT NOT NULL,
-    "age" INTEGER,
-    "gender" "Gender",
-    "regionDE" TEXT,
-    "education" "Education",
-    "nativeLang" TEXT,
-    "englishLevel" "EnglishLevel",
-    "writingConfidence" INTEGER,
-    "aiasLife" INTEGER,
-    "aiasWork" INTEGER,
-    "aiasFutureUse" INTEGER,
-    "aiasHumanity" INTEGER,
-    "comment" TEXT,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "PreQuestionnaire_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -132,9 +94,6 @@ CREATE TABLE "AiChatMessage" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "PreQuestionnaire_sessionId_key" ON "PreQuestionnaire"("sessionId");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Round_sessionId_index_key" ON "Round"("sessionId", "index");
 
 -- CreateIndex
@@ -145,12 +104,6 @@ CREATE UNIQUE INDEX "Feedback_sessionId_key" ON "Feedback"("sessionId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "AiChat_roundId_key" ON "AiChat"("roundId");
-
--- AddForeignKey
-ALTER TABLE "Session" ADD CONSTRAINT "Session_participantId_fkey" FOREIGN KEY ("participantId") REFERENCES "Participant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "PreQuestionnaire" ADD CONSTRAINT "PreQuestionnaire_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Round" ADD CONSTRAINT "Round_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "Session"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

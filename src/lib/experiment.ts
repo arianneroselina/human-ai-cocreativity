@@ -10,7 +10,7 @@ export const AiHuman = "ai_human"
 export type Workflow = 'human' | 'ai' | 'human_ai' | 'ai_human';
 export type Phase =
   'idle' |
-  'pre-questionnaire' |
+  'id' |
   'tutorial' |
   'practice' |
   'practice_complete' |
@@ -24,7 +24,6 @@ export type RunMode = 'practice' | 'main';
 export const WORKFLOW_VALUES = [Human, Ai, HumanAi, AiHuman];
 
 export interface ExperimentRun {
-  participantId:       string | null;
   sessionId:           string | null;
   totalRounds:         number;
   totalPracticeRounds: number;

@@ -30,7 +30,6 @@ function uuid() {
 }
 
 const initial: ExperimentRun = {
-  participantId: null,
   sessionId: null,
   totalRounds: 3,
   totalPracticeRounds: 4,
@@ -61,7 +60,7 @@ export const useExperiment = create<Store>()(
             return run.phase === "idle";
 
           case "START_TUTORIAL":
-            return run.phase === "pre-questionnaire";
+            return run.phase === "id";
 
           case "START_PRACTICE":
             return run.phase === "tutorial";
@@ -104,7 +103,6 @@ export const useExperiment = create<Store>()(
             case "START_SESSION": {
               if (!can("START_SESSION")) return state;
 
-              s.participantId = s.participantId ?? uuid();
               s.sessionId = uuid();
 
               s.totalRounds = 3;
@@ -125,7 +123,7 @@ export const useExperiment = create<Store>()(
               s.mode = "practice";
               s.totalPracticeRounds = 4;
 
-              s.phase = "pre-questionnaire";
+              s.phase = "id";
               return { run: s };
             }
 

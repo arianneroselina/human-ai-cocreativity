@@ -142,7 +142,6 @@ export default function AIPage() {
                     run={{
                       sessionId: run.sessionId!,
                       roundIndex: run.roundIndex,
-                      participantId: run.participantId!,
                     }}
                   />
 

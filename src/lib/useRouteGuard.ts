@@ -13,7 +13,7 @@ export function useRouteGuard(allow: PhaseAllow) {
   useEffect(() => {
     if (!allow.includes(run.phase)) {
       if (run.phase === 'idle') router.replace('/');
-      else if (run.phase === 'pre-questionnaire') router.replace('/pre-questionnaire');
+      else if (run.phase === 'id') router.replace('/id');
       else if (run.phase === 'tutorial') router.replace('/tutorial');
       else if (run.phase === "practice") router.replace("/practice");
       else if (run.phase === "practice_complete") router.replace("/practice/complete");

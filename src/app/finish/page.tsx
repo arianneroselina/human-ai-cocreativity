@@ -23,7 +23,6 @@ export default function FinishPage() {
   const handleDownload = () => {
     const payload = {
       sessionId: run.sessionId,
-      participantId: run.participantId,
       submittedAt: new Date().toISOString(),
     };
 
