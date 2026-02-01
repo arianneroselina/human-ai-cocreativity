@@ -44,10 +44,11 @@ export default function FinishPage() {
         <CheckCircle2 className="h-6 w-6 text-green-600" />
         <div className="flex-1">
           <h1 className="text-2xl font-semibold">
-            Thank you for your feedback!
+            Thank you for your participation!
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Your responses have been recorded.
+          <p className="mt-3 mb-6 text-sm text-muted-foreground">
+            This study examines Human-AI collaboration in creative writing tasks.
+            Some AI responses may have intentionally contained small mistakes to study trust dynamics.
           </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -61,17 +62,6 @@ export default function FinishPage() {
               Download receipt
             </Button>
           </div>
-
-          <details className="mt-6 group">
-            <summary className="flex cursor-pointer items-center gap-2 text-sm">
-              <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
-              Debrief & what happens next
-            </summary>
-            <p className="mt-3 text-sm text-muted-foreground">
-              This study examines Human-AI collaboration under time pressure.
-              Some AI responses may have intentionally contained small mistakes to study trust dynamics.
-            </p>
-          </details>
         </div>
       </div>
     </section>

@@ -7,6 +7,7 @@ import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { Workflows, type Workflow } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import { useRouteGuard } from "@/lib/useRouteGuard";
+import { GripVertical } from "lucide-react";
 
 export default function FinalFeedbackPage() {
   useRouteGuard(["feedback"]);
@@ -18,8 +19,11 @@ export default function FinalFeedbackPage() {
   const [effort, setEffort] = useState<Likert | null>(null);
   const [frustration, setFrustration] = useState<Likert | null>(null);
 
-  const [bestWorkflow, setBestWorkflow] = useState<Workflow | null>(null);
-  const [bestWorkflowReason, setBestWorkflowReason] = useState("");
+  const [ranking, setRanking] = useState<Workflow[]>(
+    Workflows.map(w => w.key)
+  );
+  const [dragged, setDragged] = useState<Workflow | null>(null);
+  const [rankingReason, setRankingReason] = useState("");
   const MAX_REASON_CHARS = 200;
 
   const [comment, setComment] = useState("");
@@ -30,8 +34,30 @@ export default function FinalFeedbackPage() {
     clarity !== null &&
     effort !== null &&
     frustration !== null &&
-    bestWorkflow !== null &&
-    bestWorkflowReason.trim().length > 0;
+    rankingReason.trim().length > 0;
+
+  const onDragStart = (workflow: Workflow) => {
+    setDragged(workflow);
+  };
+
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const onDrop = (target: Workflow) => {
+    if (!dragged || dragged === target) return;
+
+    setRanking(prev => {
+      const next = [...prev];
+      const from = next.indexOf(dragged);
+      const to = next.indexOf(target);
+      next.splice(from, 1);
+      next.splice(to, 0, dragged);
+      return next;
+    });
+
+    setDragged(null);
+  };
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -45,8 +71,8 @@ export default function FinalFeedbackPage() {
         clarity,
         effort,
         frustration,
-        bestWorkflow,
-        bestWorkflowReason,
+        workflowRanking: ranking,
+        rankingReason,
         comment,
       }),
     });
@@ -57,8 +83,8 @@ export default function FinalFeedbackPage() {
       clarity,
       effort,
       frustration,
-      bestWorkflow,
-      bestWorkflowReason,
+      workflowRanking: ranking,
+      rankingReason,
       comment,
   });
 
@@ -68,24 +94,21 @@ export default function FinalFeedbackPage() {
   return (
     <main className="min-h-dvh bg-background">
       <div className="mx-auto max-w-4xl p-6">
-        {/* Header */}
         <header className="mb-6 text-center">
-          <h1 className="text-3xl font-semibold text-foreground">Final feedback</h1>
+          <h1 className="text-3xl font-semibold text-foreground">
+            Final feedback
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Thanks for completing the study. A few questions:
+            Thanks for completing the study. A few final questions:
           </p>
         </header>
 
-        {/* Feedback form */}
-        <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
-          <h2 className="font-semibold text-xl text-foreground">Your experience</h2>
-          <p className="text-sm text-muted-foreground mt-2">
-            Please rate the following statements based on your experience during the session.
-          </p>
+        <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <h2 className="font-semibold text-xl">Your experience</h2>
 
           <div className="mt-6 space-y-6">
             <LikertRow
-              label="1) I am satisfied with my results during the session."
+              label="I am satisfied with my results during the session."
               value={satisfaction}
               onChange={setSatisfaction}
               left="Strongly Disagree"
@@ -93,7 +116,7 @@ export default function FinalFeedbackPage() {
             />
 
             <LikertRow
-              label="2) The tasks were clear and easy to understand."
+              label="The tasks were clear and easy to understand."
               value={clarity}
               onChange={setClarity}
               left="Strongly Disagree"
@@ -101,7 +124,7 @@ export default function FinalFeedbackPage() {
             />
 
             <LikertRow
-              label="3) The study required a lot of effort."
+              label="The study required a lot of effort."
               value={effort}
               onChange={setEffort}
               left="Strongly Disagree"
@@ -109,68 +132,69 @@ export default function FinalFeedbackPage() {
             />
 
             <LikertRow
-              label="4) I felt frustrated during the study."
+              label="I felt frustrated during the study."
               value={frustration}
               onChange={setFrustration}
               left="Strongly Disagree"
               right="Strongly Agree"
             />
 
-            {/* Best workflow */}
-            <div className="space-y-2">
-              <div className="text-sm text-foreground">5) Which workflow felt most useful?</div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {Workflows.map((w) => {
-                  const active = bestWorkflow === w.key;
+            <div className="space-y-3">
+              <h3 className="font-medium text-foreground">
+                Please rank the workflows from best (top) to worst (bottom)
+              </h3>
+
+              <p className="text-sm text-muted-foreground">
+                Drag and reorder the workflows to reflect your preference.
+              </p>
+
+              <div className="space-y-2">
+                {ranking.map((key, index) => {
+                  const wf = Workflows.find(w => w.key === key)!;
+
                   return (
-                    <button
-                      key={w.key}
-                      type="button"
-                      onClick={() => setBestWorkflow(w.key)}
-                      aria-pressed={active}
+                    <div
+                      key={wf.key}
+                      draggable
+                      onDragStart={() => onDragStart(wf.key)}
+                      onDragOver={onDragOver}
+                      onDrop={() => onDrop(wf.key)}
                       className={[
-                        "rounded-md border px-3 py-2 text-sm text-left transition",
-                        active
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border hover:bg-accent",
+                        "flex items-center gap-3 rounded-md border p-3 bg-background",
+                        "cursor-move transition",
+                        dragged === wf.key
+                          ? "opacity-50"
+                          : "hover:bg-accent",
                       ].join(" ")}
                     >
-                      <span className="text-base">{w.icon}</span>
-                      <span className="font-medium">{w.title}</span>
-                    </button>
+                      <GripVertical className="h-4 w-4 text-muted-foreground" />
+
+                      <div className="flex items-center gap-2 text-sm flex-1">
+                        <span className="text-base">{wf.icon}</span>
+                        <span className="font-medium">{wf.title}</span>
+                      </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        Rank {index + 1}
+                      </div>
+                    </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Reason */}
-            <div
-              className={[
-                "rounded-lg border p-4",
-                bestWorkflow
-                  ? "border-border bg-background"
-                  : "border-dashed border-border/60 bg-muted/40",
-              ].join(" ")}
-            >
-              <label className="block text-sm text-foreground mb-2">
-                {bestWorkflow
-                  ? `Why did "${Workflows.find(w => w.key === bestWorkflow)?.title}" work best for you?`
-                  : "Select a workflow above to explain your choice"}
+            <div className="space-y-2">
+              <label className="block text-sm text-foreground">
+                Why did you rank the workflows this way?
               </label>
-
               <Textarea
-                rows={2}
+                rows={3}
                 maxLength={MAX_REASON_CHARS}
-                disabled={!bestWorkflow}
-                value={bestWorkflowReason}
-                onChange={(e) =>
-                  setBestWorkflowReason(e.target.value.slice(0, MAX_REASON_CHARS))
+                value={rankingReason}
+                onChange={e =>
+                  setRankingReason(e.target.value.slice(0, MAX_REASON_CHARS))
                 }
-                placeholder={
-                  bestWorkflow
-                    ? "e.g. reduced effort, improved ideas, better control..."
-                    : "Choose a workflow first"
-                }
+                placeholder="e.g. creativity support, effort required, control, clarity..."
               />
             </div>
 
@@ -183,7 +207,7 @@ export default function FinalFeedbackPage() {
                 rows={4}
                 maxLength={MAX_COMMENT_CHARS}
                 value={comment}
-                onChange={(e) =>
+                onChange={e =>
                   setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))
                 }
               />

@@ -7,8 +7,9 @@ import { Button } from "@/components/shadcn_ui/button";
 import Progress from "@/components/ui/progress";
 import LikertRow, { Likert } from "@/components/ui/likertRow";
 import { CheckCircle2, Loader2 } from "lucide-react";
-import {Workflows, type Workflow, usesAI, isPracticeMode} from "@/lib/experiment";
+import { Workflows, type Workflow, usesAI, isPracticeMode } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
+import { TlxRow } from "@/components/ui/tlxRow";
 
 export default function RoundFeedbackPage() {
   useRouteGuard(["round_feedback"]);
@@ -20,46 +21,58 @@ export default function RoundFeedbackPage() {
   const wf = Workflows.find(w => w.key === workflowKey);
   const workflowUsesAI = usesAI(workflowKey);
 
-  const [liking, setLiking] = useState<Likert | null>(null);
-  const [trust, setTrust] = useState<Likert | null>(null); // AI only
-  const [satisfaction, setSatisfaction] = useState<Likert | null>(null);
-  const [mentalDemand, setMentalDemand] = useState<Likert | null>(null);
-  const [physicalDemand, setPhysicalDemand] = useState<Likert | null>(null);
-  const [temporalDemand, setTemporalDemand] = useState<Likert | null>(null);
-  const [effort, setEffort] = useState<Likert | null>(null);
-  const [frustration, setFrustration] = useState<Likert | null>(null);
+  /* ---------- NASA TLX (21-point) ---------- */
+  const [mentalDemand, setMentalDemand] = useState<number | null>(null);
+  const [physicalDemand, setPhysicalDemand] = useState<number | null>(null);
+  const [temporalDemand, setTemporalDemand] = useState<number | null>(null);
+  const [performance, setPerformance] = useState<number | null>(null);
+  const [effort, setEffort] = useState<number | null>(null);
+  const [frustration, setFrustration] = useState<number | null>(null);
+
+  /* ---------- AI collaboration & understanding ---------- */
+  const [aiUnderstanding, setAiUnderstanding] = useState<Likert | null>(null);
+  const [aiCollaboration, setAiCollaboration] = useState<Likert | null>(null);
+  const [aiCreativitySupport, setAiCreativitySupport] = useState<Likert | null>(null);
+  const [aiPerformanceOverall, setAiPerformanceOverall] = useState<Likert | null>(null);
+
+  /* ---------- Satisfaction & confidence ---------- */
+  const [rulesConfidence, setRulesConfidence] = useState<Likert | null>(null);
+  const [satisfactionResult, setSatisfactionResult] = useState<Likert | null>(null);
+
+  /* ---------- Optional comment ---------- */
   const [comment, setComment] = useState("");
-  const commentChars = useMemo(() => comment.length, [comment]);
   const MAX_COMMENT_CHARS = 200;
 
   const canSubmit =
-    liking !== null &&
-    satisfaction !== null &&
-    (workflowUsesAI ? trust !== null : true) &&
     mentalDemand !== null &&
     physicalDemand !== null &&
     temporalDemand !== null &&
+    performance !== null &&
     effort !== null &&
-    frustration !== null;
+    frustration !== null &&
+    (!workflowUsesAI ||
+      (aiUnderstanding &&
+        aiCollaboration &&
+        aiCreativitySupport &&
+        aiPerformanceOverall)) &&
+    rulesConfidence !== null &&
+    satisfactionResult !== null;
 
-  const title = useMemo(
-    () => {
-      let index = run.roundIndex;
-      if (isPracticeMode(run.mode)) {
-        return `Practice ${index} — quick feedback`
-      } else {
-        index = run.roundIndex - run.totalPracticeRounds;
-        return `Round ${index} — quick feedback`
-      }
-    },
-    [run]
-  );
+  const title = useMemo(() => {
+    let index = run.roundIndex;
+    if (isPracticeMode(run.mode)) {
+      return `Practice ${index} — feedback`;
+    }
+    index = run.roundIndex - run.totalPracticeRounds;
+    return `Round ${index} — feedback`;
+  }, [run]);
 
   const handleSubmit = async () => {
     if (!canSubmit || loading) return;
     setLoading(true);
 
     const { run } = useExperiment.getState();
+
     await fetch("/api/feedback/round", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -68,32 +81,24 @@ export default function RoundFeedbackPage() {
         roundIndex: run.roundIndex,
         workflow: run.workflow,
         taskId: run.taskId,
-        liking,
-        trust,
-        satisfaction,
+
         mentalDemand,
         physicalDemand,
         temporalDemand,
+        performance,
         effort,
         frustration,
+
+        aiUnderstanding,
+        aiCollaboration,
+        aiCreativitySupport,
+        aiPerformanceOverall,
+
+        rulesConfidence,
+        satisfactionResult,
+
         comment,
       }),
-    });
-
-    console.log("Round Feedback submitted:", {
-      sessionId: run.sessionId,
-      roundIndex: run.roundIndex,
-      workflow: run.workflow,
-      taskId: run.taskId,
-      liking,
-      trust,
-      satisfaction,
-      mentalDemand,
-      physicalDemand,
-      temporalDemand,
-      effort,
-      frustration,
-      comment,
     });
 
     if (run.roundIndex >= run.totalRounds + run.totalPracticeRounds) {
@@ -101,132 +106,186 @@ export default function RoundFeedbackPage() {
     } else {
       send({ type: "NEXT_ROUND" });
     }
+
     setLoading(false);
   };
 
   return (
-    <main className="min-h-dvh bg-background">
+    <main className="bg-background">
       <Progress />
 
       <div className="mx-auto max-w-3xl p-6">
-        <section className="rounded-xl border border-border bg-card text-card-foreground p-6 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="shrink-0">
-              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {(run.roundIndex >= run.totalRounds + run.totalPracticeRounds) ?
-                  "Just a few quick questions before finishing the session." :
-                  "Just a few quick questions before the next round."
-                }
-              </p>
+        <section className="rounded-xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex gap-4">
+            <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400 mt-1" />
 
-              {wf && (
-                <div className="mt-3 inline-flex items-center gap-2 rounded-md border border-border bg-muted px-2.5 py-1.5 text-xs text-muted-foreground">
-                  <span className="text-base leading-none">{wf.icon}</span>
-                  <span className="font-medium">{wf.title}</span>
-                </div>
-              )}
+            <div className="flex-1 space-y-8">
+              <div>
+                <h2 className="text-2xl font-semibold">{title}</h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Just a few questions before continuing.
+                </p>
 
-              <div className="mt-5 space-y-5">
-                <LikertRow
-                  label={`1) I liked the workflow "${wf?.title}".`}
-                  value={liking}
-                  onChange={setLiking}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-
-                {workflowUsesAI && (
-                  <LikertRow
-                    label="2) I trusted the AI during this round."
-                    value={trust}
-                    onChange={setTrust}
-                    left="Strongly Disagree"
-                    right="Strongly Agree"
-                  />
-                )}
-
-                <LikertRow
-                  label={`${workflowUsesAI ? "3" : "2"}) I am satisfied with the results of this round.`}
-                  value={satisfaction}
-                  onChange={setSatisfaction}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-
-                {/* Start of TLX metrics */}
-                <LikertRow
-                  label={`${workflowUsesAI ? "4" : "3"}) This task was mentally demanding.`}
-                  value={mentalDemand}
-                  onChange={setMentalDemand}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-                <LikertRow
-                  label={`${workflowUsesAI ? "5" : "4"}) This task was physically demanding.`}
-                  value={physicalDemand}
-                  onChange={setPhysicalDemand}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-                <LikertRow
-                  label={`${workflowUsesAI ? "6" : "5"}) I felt rushed during this round.`}
-                  value={temporalDemand}
-                  onChange={setTemporalDemand}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-                <LikertRow
-                  label={`${workflowUsesAI ? "7" : "6"}) This task required a lot of effort.`}
-                  value={effort}
-                  onChange={setEffort}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-                <LikertRow
-                  label={`${workflowUsesAI ? "8" : "7"}) I felt frustrated during this round.`}
-                  value={frustration}
-                  onChange={setFrustration}
-                  left="Strongly Disagree"
-                  right="Strongly Agree"
-                />
-
-                <div className="space-y-2">
-                  <label htmlFor="comment" className="block text-sm text-foreground">
-                    Optional short comment
-                  </label>
-
-                  <Textarea
-                    id="comment"
-                    rows={2}
-                    maxLength={MAX_COMMENT_CHARS}
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))}
-                    placeholder="Anything notable this round?"
-                    className="w-full rounded-lg border border-border bg-background p-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-
-                  <div className="flex justify-end">
-                    <span
-                      className={`text-xs ${commentChars >= MAX_COMMENT_CHARS ? "text-red-500" : "text-muted-foreground"}`}
-                      aria-live="polite"
-                      role="status"
-                    >
-                      {commentChars}/{MAX_COMMENT_CHARS}
-                    </span>
+                {wf && (
+                  <div className="mt-3 inline-flex items-center gap-2 rounded-md border bg-muted px-2.5 py-1.5 text-xs">
+                    <span>{wf.icon}</span>
+                    <span className="font-medium">{wf.title}</span>
                   </div>
+                )}
+              </div>
+
+              {/* NASA TLX */}
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    Workload (NASA-TLX)
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Please indicate your perceived workload during this round.
+                  </p>
+                </div>
+
+                <div className="space-y-6">
+                  <TlxRow
+                    title="Mental Demand"
+                    question="How mentally demanding was the task?"
+                    value={mentalDemand}
+                    onChange={setMentalDemand}
+                    left="Very Low"
+                    right="Very High"
+                  />
+
+                  <TlxRow
+                    title="Physical Demand"
+                    question="How physically demanding was the task?"
+                    value={physicalDemand}
+                    onChange={setPhysicalDemand}
+                    left="Very Low"
+                    right="Very High"
+                  />
+
+                  <TlxRow
+                    title="Temporal Demand"
+                    question="How hurried or rushed was the pace of the task?"
+                    value={temporalDemand}
+                    onChange={setTemporalDemand}
+                    left="Very Low"
+                    right="Very High"
+                  />
+
+                  <TlxRow
+                    title="Performance"
+                    question="How successful were you in accomplishing what you were asked to do?"
+                    value={performance}
+                    onChange={setPerformance}
+                    left="Perfect"
+                    right="Failure"
+                  />
+
+                  <TlxRow
+                    title="Effort"
+                    question="How hard did you have to work to accomplish your level of performance?"
+                    value={effort}
+                    onChange={setEffort}
+                    left="Very Low"
+                    right="Very High"
+                  />
+
+                  <TlxRow
+                    title="Frustration"
+                    question="How insecure, discouraged, irritated, stressed, and annoyed were you?"
+                    value={frustration}
+                    onChange={setFrustration}
+                    left="Very Low"
+                    right="Very High"
+                  />
                 </div>
               </div>
 
-              <div className="mt-6 flex justify-center">
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!canSubmit || loading}
-                  className="inline-flex items-center gap-2"
-                >
+              <hr className="border-border" />
+
+              {/* AI collaboration */}
+              {workflowUsesAI && (
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    AI collaboration
+                  </h3>
+
+                  <LikertRow
+                    label="It was easy to understand what the AI does and what I am supposed to do"
+                    value={aiUnderstanding}
+                    onChange={setAiUnderstanding}
+                    left="Strongly Disagree"
+                    right="Strongly Agree"
+                  />
+
+                  <LikertRow
+                    label="The AI collaborated well with me"
+                    value={aiCollaboration}
+                    onChange={setAiCollaboration}
+                    left="Strongly Disagree"
+                    right="Strongly Agree"
+                  />
+
+                  <LikertRow
+                    label="The AI helped me become more creative"
+                    value={aiCreativitySupport}
+                    onChange={setAiCreativitySupport}
+                    left="Strongly Disagree"
+                    right="Strongly Agree"
+                  />
+
+                  <LikertRow
+                    label="Overall, the AI’s performance was high"
+                    value={aiPerformanceOverall}
+                    onChange={setAiPerformanceOverall}
+                    left="Strongly Disagree"
+                    right="Strongly Agree"
+                  />
+                </div>
+              )}
+
+              <hr className="border-border" />
+
+              {/* Satisfaction */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  Satisfaction & confidence
+                </h3>
+
+                <LikertRow
+                  label="I am confident that I followed the task instructions correctly."
+                  value={rulesConfidence}
+                  onChange={setRulesConfidence}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+
+                <LikertRow
+                  label="I am satisfied with the final result of this round."
+                  value={satisfactionResult}
+                  onChange={setSatisfactionResult}
+                  left="Strongly Disagree"
+                  right="Strongly Agree"
+                />
+              </div>
+
+              <hr className="border-border" />
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Optional short comment</label>
+                <Textarea
+                  rows={2}
+                  maxLength={MAX_COMMENT_CHARS}
+                  value={comment}
+                  onChange={(e) =>
+                    setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))
+                  }
+                />
+              </div>
+
+              <div className="pt-4 flex justify-center">
+                <Button onClick={handleSubmit} disabled={!canSubmit || loading}>
                   {loading && <Loader2 className="h-4 w-4 animate-spin" />}
                   Continue
                 </Button>

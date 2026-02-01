@@ -48,38 +48,48 @@ model Round {
 }
 
 model RoundFeedback {
-  id             String    @id @default(cuid())
-  round          Round     @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
-  sessionId      String
-  roundIndex     Int
-  workflow       Workflow
-  taskId         String
-  liking         Int?
-  trust          Int?
-  satisfaction   Int?
-  mentalDemand   Int?
-  physicalDemand Int?
-  temporalDemand Int?
-  effort         Int?
-  frustration    Int?
-  comment        String?
-  createdAt      DateTime  @default(now())
+  id                   String    @id @default(cuid())
+  round                Round     @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
+  sessionId            String
+  roundIndex           Int
+  workflow             Workflow
+  taskId               String
+
+  // NASA TLX (21-point)
+  mentalDemand         Int?
+  physicalDemand       Int?
+  temporalDemand       Int?
+  performance          Int?
+  effort               Int?
+  frustration          Int?
+
+  // Likert 1–5
+  aiUnderstanding      Int?
+  aiCollaboration      Int?
+  aiCreativitySupport  Int?
+  aiPerformanceOverall Int?
+
+  rulesConfidence      Int?
+  satisfactionResult   Int?
+
+  comment              String?
+  createdAt            DateTime   @default(now())
 
   @@unique([sessionId, roundIndex])
 }
 
 model Feedback {
-  id                 String   @id @default(cuid())
-  session            Session  @relation(fields: [sessionId], references: [id])
-  sessionId          String   @unique
-  satisfaction       Int?
-  clarity            Int?
-  effort             Int?
-  frustration        Int?
-  bestWorkflow       Workflow?
-  bestWorkflowReason String?
-  comments           String?
-  createdAt          DateTime @default(now())
+  id              String   @id @default(cuid())
+  session         Session  @relation(fields: [sessionId], references: [id])
+  sessionId       String   @unique
+  satisfaction    Int?
+  clarity         Int?
+  effort          Int?
+  frustration     Int?
+  workflowRanking Workflow[]
+  rankingReason   String?
+  comments        String?
+  createdAt       DateTime @default(now())
 }
 
 model AiChat {

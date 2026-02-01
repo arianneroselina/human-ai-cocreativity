@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { prisma } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const {
@@ -8,12 +8,16 @@ export async function POST(req: Request) {
     clarity,
     effort,
     frustration,
-    bestWorkflow,
-    bestWorkflowReason,
-    comment
+    workflowRanking,
+    rankingReason,
+    comment,
   } = await req.json();
 
   if (!sessionId) return NextResponse.json({ error: 'missing sessionId' }, { status: 400 });
+
+  if (!Array.isArray(workflowRanking) || workflowRanking.length === 0) {
+    return NextResponse.json({ error: 'workflow ranking required' }, { status: 400 });
+  }
 
   await prisma.feedback.create({
     data: {
@@ -22,14 +26,15 @@ export async function POST(req: Request) {
       clarity: clarity ?? null,
       effort: effort ?? null,
       frustration: frustration ?? null,
-      bestWorkflow: bestWorkflow ?? null,
-      bestWorkflowReason: bestWorkflowReason ?? null,
+      workflowRanking,
+      rankingReason: rankingReason ? String(rankingReason).slice(0, 300) : null,
       comments: comment ? String(comment).slice(0, 1000) : null,
     },
   });
 
   const findSession = await prisma.session.findUnique({
     where: { id: sessionId },
+    select: { startedAt: true },
   });
 
   if (!findSession) {
@@ -43,10 +48,10 @@ export async function POST(req: Request) {
   await prisma.session.update({
     where: { id: sessionId },
     data: {
-      finishedAt: finishedAt,
-      timeMs: timeMs,
+      finishedAt,
+      timeMs,
     },
   });
 
-  return NextResponse.json({ ok: true, sessionId: sessionId });
+  return NextResponse.json({ ok: true, sessionId });
 }

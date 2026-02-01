@@ -1,8 +1,14 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-const usesAI = (w: unknown) => {return w === "ai" || w === "human_ai" || w === "ai_human";}
-const isLikert = (v: unknown) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
+const usesAI = (w: unknown) =>
+  w === "ai" || w === "human_ai" || w === "ai_human";
+
+const isLikert = (v: unknown) =>
+  Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
+
+const isTlx = (v: unknown) =>
+  Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 20;
 
 export async function POST(req: Request) {
   const {
@@ -10,28 +16,59 @@ export async function POST(req: Request) {
     roundIndex,
     workflow,
     taskId,
-    liking,
-    trust,
-    satisfaction,
+
     mentalDemand,
     physicalDemand,
     temporalDemand,
+    performance,
     effort,
     frustration,
+
+    aiUnderstanding,
+    aiCollaboration,
+    aiCreativitySupport,
+    aiPerformanceOverall,
+
+    rulesConfidence,
+    satisfactionResult,
+
     comment,
   } = await req.json();
 
-  if (!sessionId || !roundIndex || !workflow || !taskId) {
+  if (!sessionId || roundIndex === undefined || !workflow || !taskId) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 
-  // Check if the trust value is required for AI workflows
-  const trustVal = usesAI(workflow) && isLikert(trust) ? Number(trust) : null;
-  if (usesAI(workflow) && trustVal === null) {
-    return NextResponse.json({ error: "trust required for AI workflows" }, { status: 400 });
+  /* ---------- Validate NASA TLX ---------- */
+  if (
+    !isTlx(mentalDemand) ||
+    !isTlx(physicalDemand) ||
+    !isTlx(temporalDemand) ||
+    !isTlx(performance) ||
+    !isTlx(effort) ||
+    !isTlx(frustration)
+  ) {
+    return NextResponse.json({ error: 'invalid NASA-TLX values' }, { status: 400 });
   }
 
-  // Fetch round details to ensure it exists
+  /* ---------- Validate AI collaboration ---------- */
+  if (usesAI(workflow)) {
+    if (
+      !isLikert(aiUnderstanding) ||
+      !isLikert(aiCollaboration) ||
+      !isLikert(aiCreativitySupport) ||
+      !isLikert(aiPerformanceOverall)
+    ) {
+      return NextResponse.json({ error: 'AI collaboration ratings required for AI workflows' }, { status: 400 });
+    }
+  }
+
+  /* ---------- Validate satisfaction & confidence ---------- */
+  if (!isLikert(rulesConfidence)! || isLikert(satisfactionResult)) {
+    return NextResponse.json({ error: 'invalid satisfaction or confidence values' }, { status: 400 });
+  }
+
+  /* ---------- Ensure round exists ---------- */
   const round = await prisma.round.findUnique({
     where: { sessionId_index: { sessionId, index: roundIndex } },
     select: { id: true },
@@ -41,7 +78,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "round not found" }, { status: 404 });
   }
 
-  // Upsert the feedback data for the round
+  /* ---------- Upsert feedback ---------- */
   await prisma.roundFeedback.upsert({
     where: { sessionId_roundIndex: { sessionId, roundIndex } },
     create: {
@@ -49,27 +86,43 @@ export async function POST(req: Request) {
       roundIndex,
       workflow,
       taskId,
-      liking: liking ?? null,
-      trust: trustVal, // null for human-only workflows
-      satisfaction: satisfaction ?? null,
-      mentalDemand: mentalDemand ?? null,
-      physicalDemand: physicalDemand ?? null,
-      temporalDemand: temporalDemand ?? null,
-      effort: effort ?? null,
-      frustration: frustration ?? null,
+
+      mentalDemand,
+      physicalDemand,
+      temporalDemand,
+      performance,
+      effort,
+      frustration,
+
+      aiUnderstanding: usesAI(workflow) ? aiUnderstanding : null,
+      aiCollaboration: usesAI(workflow) ? aiCollaboration : null,
+      aiCreativitySupport: usesAI(workflow) ? aiCreativitySupport : null,
+      aiPerformanceOverall: usesAI(workflow) ? aiPerformanceOverall : null,
+
+      rulesConfidence,
+      satisfactionResult,
+
       comment: comment ? String(comment).slice(0, 200) : null,
     },
     update: {
       workflow,
       taskId,
-      liking: liking ?? null,
-      trust: trustVal,
-      satisfaction: satisfaction ?? null,
-      mentalDemand: mentalDemand ?? null,
-      physicalDemand: physicalDemand ?? null,
-      temporalDemand: temporalDemand ?? null,
-      effort: effort ?? null,
-      frustration: frustration ?? null,
+
+      mentalDemand,
+      physicalDemand,
+      temporalDemand,
+      performance,
+      effort,
+      frustration,
+
+      aiUnderstanding: usesAI(workflow) ? aiUnderstanding : null,
+      aiCollaboration: usesAI(workflow) ? aiCollaboration : null,
+      aiCreativitySupport: usesAI(workflow) ? aiCreativitySupport : null,
+      aiPerformanceOverall: usesAI(workflow) ? aiPerformanceOverall : null,
+
+      rulesConfidence,
+      satisfactionResult,
+
       comment: comment ? String(comment).slice(0, 200) : null,
     },
   });
