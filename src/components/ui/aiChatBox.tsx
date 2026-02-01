@@ -330,8 +330,6 @@ export default function AiChatBox({
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        console.error("Error in AI message", err);
         alert("AI request failed. Please try again.");
         return;
       }

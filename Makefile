@@ -1,3 +1,4 @@
+include .env
 .DEFAULT_GOAL := help
 
 .PHONY: run
@@ -31,6 +32,10 @@ clean:
 .PHONY: rebuild
 rebuild: clean reset gen migrate
 
+.PHONY: export-db
+export-db:
+	bash ./scripts/export_db.sh ${PRISMA_DATABASE_URL} "exports"
+
 .PHONY: help
 help:
 	@echo "Available commands:"
@@ -41,3 +46,4 @@ help:
 	@echo "studio     Open Prisma Studio"
 	@echo "clean      Clean Prisma directories (migrations, generated)"
 	@echo "rebuild    Clean, generate Prisma Client, and apply migrations"
+	@echo "export_db  Export Prisma database"

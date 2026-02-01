@@ -62,7 +62,7 @@ export const POEM_TASKS: PoemTask[] = [
   // TASK 1 - University
   {
     id: "t1-university",
-    title: "University poem",
+    title: "University",
     intro: "Write a short poem about a tired student at university.",
     uiItems: [
       { icon: "📏", heading: "Form", text: "Exactly 4 lines.\nMax 8 words per line.\nMax 32 words total." },
