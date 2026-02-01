@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   }
 
   /* ---------- Validate satisfaction & confidence ---------- */
-  if (!isLikert(rulesConfidence)! || isLikert(satisfactionResult)) {
+  if (!isLikert(rulesConfidence) || !isLikert(satisfactionResult)) {
     return NextResponse.json({ error: 'invalid satisfaction or confidence values' }, { status: 400 });
   }
 
