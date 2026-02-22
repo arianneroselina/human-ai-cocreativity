@@ -43,6 +43,17 @@ export default function TutorialPage() {
 
   const words = countWords(text);
 
+  // disable scrolling
+  useEffect(() => {
+    const el = document.getElementById("app-main");
+    if (!el) return;
+
+    const prev = el.style.overflowY;
+    el.style.overflowY = "hidden";
+
+    return () => { el.style.overflowY = prev; };
+  }, []);
+
   const steps: CoachStep[] = useMemo(
     () => [
       {
@@ -218,17 +229,6 @@ export default function TutorialPage() {
         : clamp(rect.top - pad - 150, 16, vp.h - 200);
 
     return { top, left } as React.CSSProperties;
-  })();
-
-  const highlightStyle = (() => {
-    if (!rect) return { display: "none" } as React.CSSProperties;
-    const pad = 8;
-    return {
-      top: rect.top - pad,
-      left: rect.left - pad,
-      width: rect.width + pad * 2,
-      height: rect.height + pad * 2,
-    } as React.CSSProperties;
   })();
 
   const isFirst = stepIdx === 0;
@@ -407,52 +407,100 @@ export default function TutorialPage() {
 
       {/* Coach overlay */}
       <div className="fixed inset-0 z-[9999] pointer-events-none">
-        <div className="absolute inset-0 bg-black/40" />
+        {/* Spotlight */}
+        <svg className="absolute inset-0 h-full w-full">
+          <defs>
+            <mask id="spotlight-mask">
+              <rect x="0" y="0" width="100%" height="100%" fill="white" />
+              {/* Transparent hole (black in mask means "hide") */}
+              {rect && coachVisible && (
+                <rect
+                  x={Math.max(0, rect.left - 10)}
+                  y={Math.max(0, rect.top - 10)}
+                  width={Math.max(0, rect.width + 20)}
+                  height={Math.max(0, rect.height + 20)}
+                  rx="14"
+                  ry="14"
+                  fill="black"
+                />
+              )}
+            </mask>
 
-        {coachVisible && (
-          <>
-            <div
-              className="absolute rounded-xl border-2 border-primary shadow-[0_0_0_9999px_rgba(0,0,0,0.0)]"
-              style={highlightStyle}
+            {/* Optional soft glow filter */}
+            <filter id="spotlight-glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          {/* Dim layer, with mask hole */}
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="rgba(0,0,0,0.55)"
+            mask="url(#spotlight-mask)"
+          />
+
+          {/* Stroke ring around hole */}
+          {rect && coachVisible && (
+            <rect
+              x={Math.max(0, rect.left - 10)}
+              y={Math.max(0, rect.top - 10)}
+              width={Math.max(0, rect.width + 20)}
+              height={Math.max(0, rect.height + 20)}
+              rx="14"
+              ry="14"
+              fill="transparent"
+              stroke="hsl(var(--primary))"
+              strokeWidth="2"
+              filter="url(#spotlight-glow)"
             />
+          )}
+        </svg>
 
-            <div
-              className="absolute w-[360px] rounded-xl border border-border bg-card p-4 shadow-lg pointer-events-auto"
-              style={tooltipStyle}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-sm font-semibold text-foreground">{step.title}</div>
-                  <div className="mt-1 text-sm text-muted-foreground">{step.text}</div>
-                </div>
-                <div className="text-xs text-muted-foreground shrink-0">
-                  {stepIdx + 1}/{steps.length}
-                </div>
+        {/* Tooltip */}
+        {coachVisible && (
+          <div
+            className="absolute w-[360px] rounded-xl border border-border bg-card p-4 shadow-lg pointer-events-auto"
+            style={tooltipStyle}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-foreground">{step.title}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{step.text}</div>
               </div>
-
-              <div className="mt-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {!isFirst && (
-                    <Button
-                      variant="secondary"
-                      onClick={prev}
-                      className="inline-flex items-center gap-2"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      Back
-                    </Button>
-                  )}
-
-                  <Button onClick={next} className="inline-flex items-center gap-2">
-                    {isLast ? "Finish" : "Next"}
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
+              <div className="text-xs text-muted-foreground shrink-0">
+                {stepIdx + 1}/{steps.length}
               </div>
             </div>
-          </>
-          )}
-        </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {!isFirst && (
+                  <Button
+                    variant="secondary"
+                    onClick={prev}
+                    className="inline-flex items-center gap-2"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    Back
+                  </Button>
+                )}
+
+                <Button onClick={next} className="inline-flex items-center gap-2">
+                  {isLast ? "Finish" : "Next"}
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </main>
   );
 }

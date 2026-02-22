@@ -37,7 +37,7 @@ export default function RootLayout({
       <div className="flex h-full flex-col">
         <Header />
 
-        <main className="flex-1 overflow-y-auto bg-background">
+        <main id="app-main" className="flex-1 overflow-y-auto bg-background">
           {children}
         </main>
 
