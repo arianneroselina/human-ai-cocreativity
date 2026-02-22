@@ -22,6 +22,7 @@ import AiChatBox from "@/components/ui/aiChatBox";
 import { Sparkles } from "lucide-react";
 import {Workflows} from "@/lib/experiment";
 import WorkflowDetails from "@/components/ui/workflowDetails";
+import StartModal from "@/components/ui/startModal";
 
 export default function HumanAIPage() {
   useRouteGuard(["task"]);
@@ -29,6 +30,8 @@ export default function HumanAIPage() {
 
   const { run } = useExperiment();
   const router = useRouter();
+
+  const [introOpen, setIntroOpen] = useState(true);
 
   const [text, setText] = useState("");
   const [aiLocked, setAiLocked] = useState(true);
@@ -53,6 +56,11 @@ export default function HumanAIPage() {
     return checkPoemAgainstRound(text, run.taskId);
   }, [run.taskId, text]);
 
+  const startTimer = async () => {
+    if (!introOpen) return;
+    setIntroOpen(false);
+  };
+
   const clearDraft = () => setText("");
 
   useSubmitHotkey(() => setSubmitOpen(true), [setSubmitOpen]);
@@ -75,6 +83,8 @@ export default function HumanAIPage() {
 
   return (
     <main className="min-h-dvh bg-background">
+      <StartModal open={introOpen} workflow={run.workflow} onStart={startTimer}/>
+
       <div className="mx-auto w-full max-w-7xl p-6">
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)_220px] items-start gap-3">

@@ -21,6 +21,7 @@ import { usePreventBack } from "@/lib/usePreventBack";
 import { useRoundSubmit } from "@/lib/useRoundSubmit";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import WorkflowDetails from "@/components/ui/workflowDetails";
+import StartModal from "@/components/ui/startModal";
 
 export default function AIHumanWorkPage() {
   useRouteGuard(['task']);
@@ -28,6 +29,8 @@ export default function AIHumanWorkPage() {
 
   const { run } = useExperiment();
   const router = useRouter();
+
+  const [introOpen, setIntroOpen] = useState(true);
 
   const [text, setText] = useState("");
   const [aiLocked, setAiLocked] = useState(false);
@@ -47,6 +50,11 @@ export default function AIHumanWorkPage() {
     if (!run.taskId) return null;
     return checkPoemAgainstRound(text, run.taskId);
   }, [run.taskId, text]);
+
+  const startTimer = async () => {
+    if (!introOpen) return;
+    setIntroOpen(false);
+  };
 
   const clearDraft = () => setText("");
 
@@ -72,6 +80,8 @@ export default function AIHumanWorkPage() {
 
   return (
     <main className="min-h-dvh bg-background">
+      <StartModal open={introOpen} workflow={run.workflow} onStart={startTimer}/>
+
       <div className="mx-auto w-full max-w-7xl p-6">
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)_220px] items-start gap-3">
