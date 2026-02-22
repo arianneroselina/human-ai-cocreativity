@@ -17,7 +17,7 @@ import {
   EyeOff,
 } from "lucide-react";
 
-/*function DevResetButton() {
+function DevResetButton() {
   const { send } = useExperiment();
 
   const resetAll = () => {
@@ -37,7 +37,7 @@ import {
       Reset
     </button>
   );
-}*/
+}
 
 export default function Page() {
   const router = useRouter();
@@ -119,7 +119,7 @@ export default function Page() {
                 <span className="font-medium text-foreground">3 main rounds</span>.
               </p>
             </div>
-            {/*<DevResetButton />*/}
+            <DevResetButton />
           </div>
 
           {/* CTA row */}
