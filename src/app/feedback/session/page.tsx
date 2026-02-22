@@ -196,6 +196,9 @@ export default function FinalFeedbackPage() {
                 }
                 placeholder="e.g. creativity support, effort required, control, clarity..."
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                {comment.length} / {MAX_REASON_CHARS}
+              </div>
             </div>
 
             {/* Optional comments */}
@@ -211,6 +214,9 @@ export default function FinalFeedbackPage() {
                   setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))
                 }
               />
+              <div className="flex justify-end text-xs text-muted-foreground">
+                {comment.length} / {MAX_COMMENT_CHARS}
+              </div>
             </div>
           </div>
 

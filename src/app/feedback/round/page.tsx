@@ -282,6 +282,9 @@ export default function RoundFeedbackPage() {
                     setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))
                   }
                 />
+                <div className="flex justify-end text-xs text-muted-foreground">
+                  {comment.length} / {MAX_COMMENT_CHARS}
+                </div>
               </div>
 
               <div className="pt-4 flex justify-center">
