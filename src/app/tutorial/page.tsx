@@ -92,6 +92,8 @@ export default function TutorialPage() {
   const [stepIdx, setStepIdx] = useState(0);
   const step = steps[stepIdx];
 
+  const [coachVisible, setCoachVisible] = useState(true);
+
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [placement, setPlacement] = useState<"top" | "bottom">("bottom");
   const rafRef = useRef<number | null>(null);
@@ -130,10 +132,12 @@ export default function TutorialPage() {
 
   useEffect(() => {
     const onScroll = () => {
+      if (!coachVisible) return;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(measure);
     };
     const onResize = () => {
+      if (!coachVisible) return;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(measure);
     };
@@ -146,26 +150,30 @@ export default function TutorialPage() {
       window.removeEventListener("resize", onResize);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepIdx]);
+  }, [coachVisible, stepIdx]);
 
   useEffect(() => {
     const el = document.getElementById(step.targetId);
+    setCoachVisible(false);
 
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!el) {
+      setRect(null);
+      setCoachVisible(true);
+      return;
+    }
 
-      const t = window.setTimeout(() => measure(), 250);
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const t = window.setTimeout(() => {
+      measure();
+      setCoachVisible(true);
 
       if (step.targetId === "tut-editor") {
-        window.setTimeout(() => draftRef.current?.focus(), 280);
+        draftRef.current?.focus();
       }
+    }, 300);
 
-      return () => window.clearTimeout(t);
-    } else {
-      setRect(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => window.clearTimeout(t);
   }, [stepIdx]);
 
   useEffect(() => {
@@ -178,6 +186,7 @@ export default function TutorialPage() {
   };
 
   const next = () => {
+    setCoachVisible(false);
     if (stepIdx >= steps.length - 1) finish();
     else setStepIdx((s) => s + 1);
   };
@@ -400,46 +409,50 @@ export default function TutorialPage() {
       <div className="fixed inset-0 z-[9999] pointer-events-none">
         <div className="absolute inset-0 bg-black/40" />
 
-        <div
-          className="absolute rounded-xl border-2 border-primary shadow-[0_0_0_9999px_rgba(0,0,0,0.0)]"
-          style={highlightStyle}
-        />
+        {coachVisible && (
+          <>
+            <div
+              className="absolute rounded-xl border-2 border-primary shadow-[0_0_0_9999px_rgba(0,0,0,0.0)]"
+              style={highlightStyle}
+            />
 
-        <div
-          className="absolute w-[360px] rounded-xl border border-border bg-card p-4 shadow-lg pointer-events-auto"
-          style={tooltipStyle}
-        >
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-sm font-semibold text-foreground">{step.title}</div>
-              <div className="mt-1 text-sm text-muted-foreground">{step.text}</div>
-            </div>
-            <div className="text-xs text-muted-foreground shrink-0">
-              {stepIdx + 1}/{steps.length}
-            </div>
-          </div>
+            <div
+              className="absolute w-[360px] rounded-xl border border-border bg-card p-4 shadow-lg pointer-events-auto"
+              style={tooltipStyle}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-foreground">{step.title}</div>
+                  <div className="mt-1 text-sm text-muted-foreground">{step.text}</div>
+                </div>
+                <div className="text-xs text-muted-foreground shrink-0">
+                  {stepIdx + 1}/{steps.length}
+                </div>
+              </div>
 
-          <div className="mt-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              {!isFirst && (
-                <Button
-                  variant="secondary"
-                  onClick={prev}
-                  className="inline-flex items-center gap-2"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Back
-                </Button>
-              )}
+              <div className="mt-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {!isFirst && (
+                    <Button
+                      variant="secondary"
+                      onClick={prev}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      Back
+                    </Button>
+                  )}
 
-              <Button onClick={next} className="inline-flex items-center gap-2">
-                {isLast ? "Finish" : "Next"}
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+                  <Button onClick={next} className="inline-flex items-center gap-2">
+                    {isLast ? "Finish" : "Next"}
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </div>
-          </div>
+          </>
+          )}
         </div>
-      </div>
     </main>
   );
 }
