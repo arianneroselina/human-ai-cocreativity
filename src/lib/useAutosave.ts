@@ -33,7 +33,8 @@ export function useAutosave(
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === "object") {
           if (typeof parsed.text === "string") setters.setText(parsed.text);
-          if (typeof parsed.aiLocked === "boolean" && setters.setAiLocked) setters.setAiLocked(parsed.aiLocked);
+          if (typeof parsed.aiLocked === "boolean" && setters.setAiLocked)
+            setters.setAiLocked(parsed.aiLocked);
         }
       }
     } catch {

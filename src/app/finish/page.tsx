@@ -45,17 +45,19 @@ export default function FinishPage() {
           <div className="flex items-start gap-3">
             <CheckCircle2 className="h-6 w-6 text-green-600" />
             <div className="flex-1">
-              <h1 className="text-2xl font-semibold">
-                Thank you for your participation!
-              </h1>
+              <h1 className="text-2xl font-semibold">Thank you for your participation!</h1>
               <p className="mt-3 mb-6 text-sm text-muted-foreground">
-                This study examines Human-AI collaboration in creative writing tasks.
-                Some AI responses may have intentionally contained small mistakes to study trust dynamics.
+                This study examines Human-AI collaboration in creative writing tasks. Some AI
+                responses may have intentionally contained small mistakes to study trust dynamics.
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button variant="secondary" onClick={handleCopy}>
-                  {copied ? <ClipboardCheck className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
+                  {copied ? (
+                    <ClipboardCheck className="h-4 w-4" />
+                  ) : (
+                    <Clipboard className="h-4 w-4" />
+                  )}
                   {copied ? "Copied" : "Copy session code"}
                 </Button>
 

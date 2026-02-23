@@ -5,22 +5,23 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails from "@/components/ui/taskDetails";
-import ConfirmDialog from "@/components/ui/confirm";
+import TaskDetails from "@/components/ui/task/taskDetails";
+import ConfirmDialog from "@/components/ui/common/confirm";
 import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
-import Rules from "@/components/ui/rules";
-import Progress from "@/components/ui/progress";
-import TimerBadge from "@/components/ui/timerBadge";
-import { useSubmitHotkey } from "@/components/ui/shortcut";
+import Rules from "@/components/ui/common/rules";
+import Progress from "@/components/ui/layout/progress";
+import TimerBadge from "@/components/ui/task/timerBadge";
+import { useSubmitHotkey } from "@/components/ui/common/shortcut";
 import { useAutosave } from "@/lib/useAutosave";
-import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
+import AutoSaveIndicator from "@/components/ui/common/autosaveIndicator";
 import { useRoundSubmit } from "@/lib/useRoundSubmit";
-import {Workflows} from "@/lib/experiment";
-import WorkflowDetails from "@/components/ui/workflowDetails";
-import StartModal from "@/components/ui/startModal";
+import { Workflows } from "@/lib/experiment";
+import WorkflowDetails from "@/components/ui/task/workflowDetails";
+import StartModal from "@/components/ui/task/startModal";
+import { PauseProvider } from "@/components/ui/task/pauseContext";
 
 export default function HumanPage() {
   useRouteGuard(["task"]);
@@ -74,8 +75,8 @@ export default function HumanPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-background">
-      <StartModal open={introOpen} workflow={run.workflow} onStart={startTimer}/>
+    <PauseProvider initialPaused={true}>
+      <StartModal open={introOpen} workflow={run.workflow} onStart={startTimer} />
 
       <div className="mx-auto w-full max-w-7xl p-6">
         <div className="relative">
@@ -164,7 +165,11 @@ export default function HumanPage() {
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <TimerBadge
-                workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
+                workflow={
+                  run.workflow
+                    ? Workflows.find((w) => w.key === run.workflow)?.label || "Task"
+                    : "Task"
+                }
                 startedAt={run.startedAt!}
                 onTimeUp={forceSubmit}
               />
@@ -174,13 +179,17 @@ export default function HumanPage() {
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
             <TimerBadge
-              workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
+              workflow={
+                run.workflow
+                  ? Workflows.find((w) => w.key === run.workflow)?.label || "Task"
+                  : "Task"
+              }
               startedAt={run.startedAt!}
               onTimeUp={forceSubmit}
             />
           </div>
         </div>
       </div>
-    </main>
+    </PauseProvider>
   );
 }

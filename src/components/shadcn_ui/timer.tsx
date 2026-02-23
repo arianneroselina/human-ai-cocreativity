@@ -29,8 +29,7 @@ const timerBadgeVariants = cva(
 );
 
 export interface TimerBadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof timerBadgeVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof timerBadgeVariants> {
   asChild?: boolean;
   seconds?: number;
   running?: boolean;
@@ -77,11 +76,7 @@ const TimerBadge = React.forwardRef<HTMLDivElement, TimerBadgeProps>(
     const ss = String(left % 60).padStart(2, "0");
 
     return (
-      <Comp
-        ref={ref}
-        className={cn(timerBadgeVariants({ intent, size }), className)}
-        {...props}
-      >
+      <Comp ref={ref} className={cn(timerBadgeVariants({ intent, size }), className)} {...props}>
         {showIcon && <span className="opacity-70">⏱</span>}
         <span className="time">
           {mm}:{ss}

@@ -4,9 +4,7 @@ import { useCallback, useRef } from "react";
 import { useExperiment } from "@/stores/useExperiment";
 import { CheckResult, RequirementResult } from "@/lib/taskChecker";
 
-type SubmitResult =
-  | { ok: true }
-  | { ok: false; error: string };
+type SubmitResult = { ok: true } | { ok: false; error: string };
 
 export type SubmitRoundPayload = {
   sessionId?: string | null;

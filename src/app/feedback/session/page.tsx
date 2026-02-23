@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useExperiment } from "@/stores/useExperiment";
 import { Button } from "@/components/shadcn_ui/button";
-import LikertRow, { Likert } from "@/components/ui/likertRow";
+import LikertRow, { Likert } from "@/components/ui/feedback/likertRow";
 import { Workflows, type Workflow } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
 import { useRouteGuard } from "@/lib/useRouteGuard";
@@ -19,9 +19,7 @@ export default function FinalFeedbackPage() {
   const [effort, setEffort] = useState<Likert | null>(null);
   const [frustration, setFrustration] = useState<Likert | null>(null);
 
-  const [ranking, setRanking] = useState<Workflow[]>(
-    Workflows.map(w => w.key)
-  );
+  const [ranking, setRanking] = useState<Workflow[]>(Workflows.map((w) => w.key));
   const [dragged, setDragged] = useState<Workflow | null>(null);
   const [rankingReason, setRankingReason] = useState("");
   const MAX_REASON_CHARS = 200;
@@ -47,7 +45,7 @@ export default function FinalFeedbackPage() {
   const onDrop = (target: Workflow) => {
     if (!dragged || dragged === target) return;
 
-    setRanking(prev => {
+    setRanking((prev) => {
       const next = [...prev];
       const from = next.indexOf(dragged);
       const to = next.indexOf(target);
@@ -86,7 +84,7 @@ export default function FinalFeedbackPage() {
       workflowRanking: ranking,
       rankingReason,
       comment,
-  });
+    });
 
     send({ type: "FINISH_SESSION" });
   };
@@ -95,9 +93,7 @@ export default function FinalFeedbackPage() {
     <main className="min-h-dvh bg-background">
       <div className="mx-auto max-w-4xl p-6">
         <header className="mb-6 text-center">
-          <h1 className="text-3xl font-semibold text-foreground">
-            Final feedback
-          </h1>
+          <h1 className="text-3xl font-semibold text-foreground">Final feedback</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Thanks for completing the study. A few final questions:
           </p>
@@ -150,7 +146,7 @@ export default function FinalFeedbackPage() {
 
               <div className="space-y-2">
                 {ranking.map((key, index) => {
-                  const wf = Workflows.find(w => w.key === key)!;
+                  const wf = Workflows.find((w) => w.key === key)!;
 
                   return (
                     <div
@@ -162,9 +158,7 @@ export default function FinalFeedbackPage() {
                       className={[
                         "flex items-center gap-3 rounded-md border p-3 bg-background",
                         "cursor-move transition",
-                        dragged === wf.key
-                          ? "opacity-50"
-                          : "hover:bg-accent",
+                        dragged === wf.key ? "opacity-50" : "hover:bg-accent",
                       ].join(" ")}
                     >
                       <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -174,9 +168,7 @@ export default function FinalFeedbackPage() {
                         <span className="font-medium">{wf.title}</span>
                       </div>
 
-                      <div className="text-xs text-muted-foreground">
-                        Rank {index + 1}
-                      </div>
+                      <div className="text-xs text-muted-foreground">Rank {index + 1}</div>
                     </div>
                   );
                 })}
@@ -191,9 +183,7 @@ export default function FinalFeedbackPage() {
                 rows={3}
                 maxLength={MAX_REASON_CHARS}
                 value={rankingReason}
-                onChange={e =>
-                  setRankingReason(e.target.value.slice(0, MAX_REASON_CHARS))
-                }
+                onChange={(e) => setRankingReason(e.target.value.slice(0, MAX_REASON_CHARS))}
                 placeholder="e.g. creativity support, effort required, control, clarity..."
               />
               <div className="flex justify-end text-xs text-muted-foreground">
@@ -210,9 +200,7 @@ export default function FinalFeedbackPage() {
                 rows={4}
                 maxLength={MAX_COMMENT_CHARS}
                 value={comment}
-                onChange={e =>
-                  setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))
-                }
+                onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))}
               />
               <div className="flex justify-end text-xs text-muted-foreground">
                 {comment.length} / {MAX_COMMENT_CHARS}

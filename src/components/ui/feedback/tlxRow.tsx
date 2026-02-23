@@ -1,13 +1,13 @@
 "use client";
 
 export function TlxRow({
-                  title,
-                  question,
-                  value,
-                  onChange,
-                  left,
-                  right,
-                }: {
+  title,
+  question,
+  value,
+  onChange,
+  left,
+  right,
+}: {
   title: string;
   question: string;
   value: number | null;

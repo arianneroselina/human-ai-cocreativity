@@ -1,11 +1,11 @@
-import { prisma } from '@/lib/db';
-import { NextResponse } from 'next/server';
+import { prisma } from "@/lib/db";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const { sessionId, participantId } = await req.json();
 
   if (!sessionId || !participantId) {
-    return NextResponse.json({ error: 'missing fields' }, { status: 400 });
+    return NextResponse.json({ error: "missing fields" }, { status: 400 });
   }
 
   const findSession = await prisma.session.findUnique({
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const session = await prisma.session.update({
     where: { id: findSession.id },
     data: {
-      participantId: participantId
+      participantId: participantId,
     },
   });
 

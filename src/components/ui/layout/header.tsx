@@ -66,7 +66,7 @@ export default function Header() {
   return (
     <>
       <header data-app-header className="relative w-full bg-primary text-white py-2">
-      {/* Right utilities (absolute) */}
+        {/* Right utilities (absolute) */}
         <div className="absolute right-4 top-3/4 -translate-y-1/2 flex items-center gap-2">
           {process.env.NEXT_PUBLIC_APP_TAG && (
             <span className="hidden sm:inline rounded-md border border-white/25 bg-white/10 px-2 py-1 text-xs">
@@ -106,7 +106,13 @@ export default function Header() {
             title="View source on GitHub"
             aria-label="View source on GitHub"
           >
-            <Image src="/github_dark.png" alt="Github" width="16" height="16" className="object-contain" />
+            <Image
+              src="/github_dark.png"
+              alt="Github"
+              width="16"
+              height="16"
+              className="object-contain"
+            />
             Github
           </Link>
 
@@ -127,7 +133,9 @@ export default function Header() {
           </div>
 
           <div className="text-center">
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Human-AI Co-Creativity</h1>
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">
+              Human-AI Co-Creativity
+            </h1>
             <p className="mt-1 text-sm text-white/80">Experimental study interface</p>
           </div>
         </div>

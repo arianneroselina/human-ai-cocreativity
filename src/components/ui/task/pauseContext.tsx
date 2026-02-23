@@ -7,13 +7,16 @@ const PauseContext = createContext<{
   setPaused: (v: boolean) => void;
 } | null>(null);
 
-export function PauseProvider({ children }: { children: React.ReactNode }) {
-  const [paused, setPaused] = useState(true); // initially true because of start modal
-  return (
-    <PauseContext.Provider value={{ paused, setPaused }}>
-      {children}
-    </PauseContext.Provider>
-  );
+export function PauseProvider({
+  children,
+  initialPaused = false,
+}: {
+  children: React.ReactNode;
+  initialPaused?: boolean;
+}) {
+  const [paused, setPaused] = useState(initialPaused);
+
+  return <PauseContext.Provider value={{ paused, setPaused }}>{children}</PauseContext.Provider>;
 }
 
 export function usePause() {

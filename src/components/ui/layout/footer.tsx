@@ -1,7 +1,12 @@
 "use client";
 
 import { Mail } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/shadcn_ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/shadcn_ui/tooltip";
 
 export default function Footer() {
   const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "vincentiarianne@gmail.com";

@@ -12,7 +12,10 @@ function timeAgo(ts: number) {
   return `${h}h ago`;
 }
 
-export default function AutoSaveIndicator({saving, lastSavedAt}: {
+export default function AutoSaveIndicator({
+  saving,
+  lastSavedAt,
+}: {
   saving: boolean;
   lastSavedAt: number | null;
 }) {

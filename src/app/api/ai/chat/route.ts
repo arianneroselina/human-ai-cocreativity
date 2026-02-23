@@ -2,14 +2,7 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const {
-    sessionId,
-    roundIndex,
-    role,
-    content,
-    action,
-    selected,
-  } = await req.json();
+  const { sessionId, roundIndex, role, content, action, selected } = await req.json();
 
   if (!sessionId || !roundIndex) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });

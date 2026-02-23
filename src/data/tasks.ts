@@ -9,44 +9,44 @@ export type RequirementSpec =
   | { type: "wordCount"; id: string; label: string; min?: number; max?: number }
   | { type: "maxWordsPerLine"; id: string; label: string; max: number }
   | {
-  type: "mustIncludeWords";
-  id: string;
-  label: string;
-  words: string[];
-  mode: "all" | "atLeast";
-  atLeast?: number;
-  caseSensitive?: boolean;
-  wholeWord?: boolean;
-}
+      type: "mustIncludeWords";
+      id: string;
+      label: string;
+      words: string[];
+      mode: "all" | "atLeast";
+      atLeast?: number;
+      caseSensitive?: boolean;
+      wholeWord?: boolean;
+    }
   | {
-  type: "wordOccursExactly";
-  id: string;
-  label: string;
-  word: string;
-  exactly: number;
-  caseSensitive?: boolean;
-  wholeWord?: boolean;
-}
+      type: "wordOccursExactly";
+      id: string;
+      label: string;
+      word: string;
+      exactly: number;
+      caseSensitive?: boolean;
+      wholeWord?: boolean;
+    }
   | {
-  type: "mustNotIncludeWords";
-  id: string;
-  label: string;
-  words: string[];
-  caseSensitive?: boolean;
-  wholeWord?: boolean;
-}
+      type: "mustNotIncludeWords";
+      id: string;
+      label: string;
+      words: string[];
+      caseSensitive?: boolean;
+      wholeWord?: boolean;
+    }
   | { type: "noPunctuation"; id: string; label: string; chars: string[] }
   | { type: "punctuationExactCount"; id: string; label: string; char: string; count: number }
   | { type: "everyLineStartsWithTimestamp"; id: string; label: string }
   | { type: "hasTimestampOneWordLine"; id: string; label: string }
   | {
-  type: "eachLineContainsOneOf";
-  id: string;
-  label: string;
-  words: string[];
-  caseSensitive?: boolean;
-  wholeWord?: boolean;
-}
+      type: "eachLineContainsOneOf";
+      id: string;
+      label: string;
+      words: string[];
+      caseSensitive?: boolean;
+      wholeWord?: boolean;
+    }
   | { type: "hasLineWithExactWordCount"; id: string; label: string; words: number };
 
 export type PoemTask = {
@@ -65,9 +65,21 @@ export const POEM_TASKS: PoemTask[] = [
     title: "University",
     intro: "Write a short poem about a tired student at university.",
     uiItems: [
-      { icon: "📏", heading: "Form", text: "Exactly 4 lines.\nMax 8 words per line.\nMax 32 words total." },
-      { icon: "🔑", heading: "Must include", text: 'Include "Coffee" and "Midnight" (exact spelling and case).' },
-      { icon: "❌", heading: "Avoid", text: 'Do not use the word "study" or name specific subjects.' },
+      {
+        icon: "📏",
+        heading: "Form",
+        text: "Exactly 4 lines.\nMax 8 words per line.\nMax 32 words total.",
+      },
+      {
+        icon: "🔑",
+        heading: "Must include",
+        text: 'Include "Coffee" and "Midnight" (exact spelling and case).',
+      },
+      {
+        icon: "❌",
+        heading: "Avoid",
+        text: 'Do not use the word "study" or name specific subjects.',
+      },
     ],
     taskLines: [
       "Write a short poem about a tired student at university.",
@@ -102,10 +114,14 @@ export const POEM_TASKS: PoemTask[] = [
   // TASK 2 - Rainy bus stop
   {
     id: "t2-rainy",
-    title: 'Rainy bus stop',
-    intro: 'Write a short poem about waiting at a rainy bus stop.',
+    title: "Rainy bus stop",
+    intro: "Write a short poem about waiting at a rainy bus stop.",
     uiItems: [
-      { icon: "🧩", heading: "Form", text: "Exactly 5 lines.\nMax 7 words per line.\nMax 35 words total." },
+      {
+        icon: "🧩",
+        heading: "Form",
+        text: "Exactly 5 lines.\nMax 7 words per line.\nMax 35 words total.",
+      },
       { icon: "🔑", heading: "Must include", text: 'Include "umbrella" and "puddle".' },
       { icon: "🚫", heading: "Avoid", text: 'Do not use the words "wet" or "soaked"' },
     ],
@@ -145,10 +161,22 @@ export const POEM_TASKS: PoemTask[] = [
     title: "Lost keys at midnight",
     intro: "Write a short poem about realizing your keys are missing.",
     uiItems: [
-      { icon: "🧱", heading: "Form", text: "Exactly 6 lines.\nMax 10 words per line.\nMax 60 words total." },
-      { icon: "🔑", heading: "Exact words", text: 'Use "keys" exactly once and "pocket" exactly once.' },
+      {
+        icon: "🧱",
+        heading: "Form",
+        text: "Exactly 6 lines.\nMax 10 words per line.\nMax 60 words total.",
+      },
+      {
+        icon: "🔑",
+        heading: "Exact words",
+        text: 'Use "keys" exactly once and "pocket" exactly once.',
+      },
       { icon: "🔊", heading: "Sound", text: 'Include at least 2 of: "jingle", "clink", "click".' },
-      { icon: "🚫", heading: "Avoid", text: 'Do not use the words that include "stress", "panic", or "scared".' },
+      {
+        icon: "🚫",
+        heading: "Avoid",
+        text: 'Do not use the words that include "stress", "panic", or "scared".',
+      },
     ],
     taskLines: [
       "Write a short poem about realizing your keys are missing at midnight.",
@@ -207,7 +235,11 @@ export const POEM_TASKS: PoemTask[] = [
     intro: "Write a short poem about a cat judging the room.",
     uiItems: [
       { icon: "🧩", heading: "Form", text: "Exactly 5 lines." },
-      { icon: "🐾", heading: "Cat words", text: "Each line must include one of: whiskers, paws, purr, tail, nap, meow." },
+      {
+        icon: "🐾",
+        heading: "Cat words",
+        text: "Each line must include one of: whiskers, paws, purr, tail, nap, meow.",
+      },
       { icon: "📌", heading: "Special line", text: "At least one line must be exactly 2 words." },
       { icon: "🚫", heading: "Avoid", text: 'Do not include the word "cute".' },
     ],
@@ -228,7 +260,12 @@ export const POEM_TASKS: PoemTask[] = [
         caseSensitive: false,
         wholeWord: false,
       },
-      { type: "hasLineWithExactWordCount", id: "line-2words", label: "Has a 2-word line", words: 2 },
+      {
+        type: "hasLineWithExactWordCount",
+        id: "line-2words",
+        label: "Has a 2-word line",
+        words: 2,
+      },
       {
         type: "mustNotIncludeWords",
         id: "avoid-cute",
@@ -246,7 +283,11 @@ export const POEM_TASKS: PoemTask[] = [
     title: "Cooking eggs at 2am",
     intro: "Write a short poem about cooking eggs late at night.",
     uiItems: [
-      { icon: "🍳", heading: "Form", text: "Exactly 5 lines.\nMax 10 words per line.\nMax 50 words total." },
+      {
+        icon: "🍳",
+        heading: "Form",
+        text: "Exactly 5 lines.\nMax 10 words per line.\nMax 50 words total.",
+      },
       { icon: "🧂", heading: "Must include", text: 'Include "pan" and "salt".' },
       { icon: "✂️", heading: "Punctuation", text: "Use exactly 2 commas total.\nNo ! and no ?." },
       { icon: "🚫", heading: "Avoid", text: 'Do not use the word "fridge", "healthy", or "oil".' },
@@ -272,7 +313,13 @@ export const POEM_TASKS: PoemTask[] = [
         caseSensitive: true,
         wholeWord: true,
       },
-      { type: "punctuationExactCount", id: "commas-2", label: "Exactly 2 commas", char: ",", count: 2 },
+      {
+        type: "punctuationExactCount",
+        id: "commas-2",
+        label: "Exactly 2 commas",
+        char: ",",
+        count: 2,
+      },
       { type: "noPunctuation", id: "no-!-?", label: "No ! and no ?", chars: ["!", "?"] },
       {
         type: "mustNotIncludeWords",
@@ -291,8 +338,16 @@ export const POEM_TASKS: PoemTask[] = [
     title: "Train station at dawn",
     intro: "Write a short poem about a train station at dawn.",
     uiItems: [
-      { icon: "🚉", heading: "Form", text: "Exactly 6 lines.\nMax 11 words per line.\nMax 66 words total." },
-      { icon: "🎨", heading: "Colors", text: "Use at least 3 color-words: gray, gold, blue, green, black, white." },
+      {
+        icon: "🚉",
+        heading: "Form",
+        text: "Exactly 6 lines.\nMax 11 words per line.\nMax 66 words total.",
+      },
+      {
+        icon: "🎨",
+        heading: "Colors",
+        text: "Use at least 3 color-words: gray, gold, blue, green, black, white.",
+      },
       { icon: "✂️", heading: "Punctuation", text: "No commas allowed." },
       { icon: "📌", heading: "Special line", text: "At least one line must be exactly 3 words." },
     ],
@@ -318,7 +373,12 @@ export const POEM_TASKS: PoemTask[] = [
         wholeWord: false,
       },
       { type: "punctuationExactCount", id: "comma-0", label: "No commas", char: ",", count: 0 },
-      { type: "hasLineWithExactWordCount", id: "line-3words", label: "Has a 3-word line", words: 3 },
+      {
+        type: "hasLineWithExactWordCount",
+        id: "line-3words",
+        label: "Has a 3-word line",
+        words: 3,
+      },
     ],
   },
 
@@ -328,10 +388,22 @@ export const POEM_TASKS: PoemTask[] = [
     title: "Power outage timeline (timestamps)",
     intro: "Write a short poem as a timeline during a power outage.",
     uiItems: [
-      { icon: "⏱️", heading: "Form", text: "Exactly 5 lines.\nMax 7 words per line.\nMax 35 words total." },
+      {
+        icon: "⏱️",
+        heading: "Form",
+        text: "Exactly 5 lines.\nMax 7 words per line.\nMax 35 words total.",
+      },
       { icon: "🏷️", heading: "Prefix", text: "Each line starts with HH:MM (24h)." },
-      { icon: "🕯️", heading: "Exact words", text: 'Mention "candle" exactly once and "silence" exactly once.' },
-      { icon: "📌", heading: "Special line", text: "One line must be: timestamp + exactly ONE word." },
+      {
+        icon: "🕯️",
+        heading: "Exact words",
+        text: 'Mention "candle" exactly once and "silence" exactly once.',
+      },
+      {
+        icon: "📌",
+        heading: "Special line",
+        text: "One line must be: timestamp + exactly ONE word.",
+      },
     ],
     taskLines: [
       "Write a short poem as a timeline during a power outage.",
@@ -363,7 +435,11 @@ export const POEM_TASKS: PoemTask[] = [
         caseSensitive: false,
         wholeWord: false,
       },
-      { type: "hasTimestampOneWordLine", id: "ts-oneword", label: "Has a timestamp + one-word line" },
+      {
+        type: "hasTimestampOneWordLine",
+        id: "ts-oneword",
+        label: "Has a timestamp + one-word line",
+      },
     ],
   },
 ];

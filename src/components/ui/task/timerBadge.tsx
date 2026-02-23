@@ -2,8 +2,8 @@
 
 import { Pause, Play, AlertTriangle } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePauseResumeHotkeys } from "@/components/ui/shortcut";
-import { usePause } from "@/components/ui/pauseContext";
+import { usePauseResumeHotkeys } from "@/components/ui/common/shortcut";
+import { usePause } from "@/components/ui/task/pauseContext";
 
 interface TimerBadgeProps {
   workflow: string;
@@ -20,12 +20,12 @@ function formatMMSS(totalSeconds: number) {
 }
 
 export default function TimerBadge({
-                                     workflow,
-                                     seconds = 300,
-                                     startedAt,
-                                     demo,
-                                     onTimeUp,
-                                   }: TimerBadgeProps) {
+  workflow,
+  seconds = 300,
+  startedAt,
+  demo,
+  onTimeUp,
+}: TimerBadgeProps) {
   const { paused, setPaused } = usePause();
 
   const [remaining, setRemaining] = useState(seconds);
@@ -60,15 +60,21 @@ export default function TimerBadge({
   useEffect(() => {
     if (paused) {
       pausedAtRef.current = Date.now();
+      console.log("Pausing timer..., pausedAt: ", pausedAtRef.current);
     } else {
       if (pausedAtRef.current !== null && endAtRef.current !== null) {
         const pausedDuration = Date.now() - pausedAtRef.current;
         endAtRef.current += pausedDuration;
+        console.log(
+          "Resuming timer..., pausedDuration: ",
+          pausedDuration,
+          "new endAt: ",
+          endAtRef.current
+        );
       }
       pausedAtRef.current = null;
     }
   }, [paused]);
-
 
   // Reset warning flags if task changes
   useEffect(() => {
@@ -101,10 +107,7 @@ export default function TimerBadge({
       if (!endAtRef.current) return;
       if (demo) return;
 
-      const left = Math.max(
-        0,
-        Math.ceil((endAtRef.current - Date.now()) / 1000)
-      );
+      const left = Math.max(0, Math.ceil((endAtRef.current - Date.now()) / 1000));
 
       setRemaining(left);
 
@@ -130,19 +133,17 @@ export default function TimerBadge({
   const showFinal = remaining <= 10 && remaining > 0;
   const showSubmitting = remaining === 0;
 
-  const warningText =
-    showOneMinute
-      ? "1 minute left."
-      : showFinal
-        ? `Auto-submit in ${remaining}s.`
-        : showSubmitting
-          ? "Submitting now..."
-          : null;
+  const warningText = showOneMinute
+    ? "1 minute left."
+    : showFinal
+      ? `Auto-submit in ${remaining}s.`
+      : showSubmitting
+        ? "Submitting now..."
+        : null;
 
   const timeBadgeClasses = useMemo(() => {
     if (showFinal) return "border-red-300 bg-red-50 text-red-700 animate-pulse";
-    if (remaining <= 60)
-      return "border-yellow-300 bg-yellow-50 text-yellow-800";
+    if (remaining <= 60) return "border-yellow-300 bg-yellow-50 text-yellow-800";
     return "border-border bg-background text-foreground";
   }, [showFinal, remaining]);
 
@@ -153,9 +154,7 @@ export default function TimerBadge({
         <div className="text-sm font-semibold">{workflow}</div>
 
         <div className="flex justify-between items-center">
-          <span
-            className={`tabular-nums rounded-lg p-2 text-xs font-semibold ${timeBadgeClasses}`}
-          >
+          <span className={`tabular-nums rounded-lg p-2 text-xs font-semibold ${timeBadgeClasses}`}>
             {formatMMSS(remaining)}
           </span>
 
@@ -166,10 +165,10 @@ export default function TimerBadge({
             }}
             className={`inline-flex items-center justify-center rounded-full border border-border p-2 hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring
               ${
-              paused
-                ? "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700"
-                : ""
-            }`}
+                paused
+                  ? "bg-yellow-50 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700"
+                  : ""
+              }`}
             aria-label={paused ? "Resume" : "Pause"}
             title={paused ? "Resume" : "Pause"}
           >
@@ -184,10 +183,10 @@ export default function TimerBadge({
           <div
             className={`inline-flex items-center gap-2 rounded-full border px-6 py-3 text-sm shadow-lg
               ${
-              showFinal || showSubmitting
-                ? "border-red-300 bg-red-50 text-red-700 animate-pulse"
-                : "border-yellow-300 bg-yellow-50 text-yellow-800"
-            }`}
+                showFinal || showSubmitting
+                  ? "border-red-300 bg-red-50 text-red-700 animate-pulse"
+                  : "border-yellow-300 bg-yellow-50 text-yellow-800"
+              }`}
           >
             <AlertTriangle className="h-3 w-3" />
             <span>{warningText}</span>
@@ -223,14 +222,8 @@ export default function TimerBadge({
 
             <p className="mt-4 text-xs text-muted-foreground text-center">
               Tip: Press{" "}
-              <kbd className="rounded border border-border bg-muted px-2 py-1">
-                Space
-              </kbd>{" "}
-              or{" "}
-              <kbd className="rounded border border-border bg-muted px-2 py-1">
-                Esc
-              </kbd>{" "}
-              to resume.
+              <kbd className="rounded border border-border bg-muted px-2 py-1">Space</kbd> or{" "}
+              <kbd className="rounded border border-border bg-muted px-2 py-1">Esc</kbd> to resume.
             </p>
           </div>
         </div>

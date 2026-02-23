@@ -28,14 +28,11 @@ export async function POST(req: Request) {
   const submittedAt = new Date();
   const timeMs = submittedAt.getTime() - startedAt.getTime();
 
-  const wordCount =
-    typeof metrics.wordCount === "number" ? metrics.wordCount : null;
+  const wordCount = typeof metrics.wordCount === "number" ? metrics.wordCount : null;
 
-  const charCount =
-    typeof metrics.charCount === "number" ? metrics.charCount : null;
+  const charCount = typeof metrics.charCount === "number" ? metrics.charCount : null;
 
-  const passed =
-    typeof evaluation.passed === "boolean" ? evaluation.passed : null;
+  const passed = typeof evaluation.passed === "boolean" ? evaluation.passed : null;
 
   const requirementResults =
     evaluation.requirementResults != null ? evaluation.requirementResults : null;

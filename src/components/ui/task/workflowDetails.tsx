@@ -3,10 +3,8 @@
 import { Human, Ai, AiHuman, HumanAi, Workflow, Workflows } from "@/lib/experiment";
 import React from "react";
 
-export default function WorkflowDetails({ workflow }: {
-  workflow: Workflow | undefined
-}) {
-  if (workflow === Human){
+export default function WorkflowDetails({ workflow }: { workflow: Workflow | undefined }) {
+  if (workflow === Human) {
     return (
       <div
         className={[
@@ -18,10 +16,10 @@ export default function WorkflowDetails({ workflow }: {
         {/* Title + description */}
         <div className="text-center mb-3">
           <p className="font-semibold text-sm text-foreground">
-            {Workflows.find(w => w.key === workflow)?.label} workflow
+            {Workflows.find((w) => w.key === workflow)?.label} workflow
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {Workflows.find(w => w.key === workflow)?.desc}
+            {Workflows.find((w) => w.key === workflow)?.desc}
           </p>
         </div>
 
@@ -57,10 +55,10 @@ export default function WorkflowDetails({ workflow }: {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
-  if (workflow === Ai){
+  if (workflow === Ai) {
     return (
       <div
         className={[
@@ -72,10 +70,10 @@ export default function WorkflowDetails({ workflow }: {
         {/* Title + description */}
         <div className="text-center mb-3">
           <p className="font-semibold text-sm text-foreground">
-            {Workflows.find(w => w.key === workflow)?.label} workflow
+            {Workflows.find((w) => w.key === workflow)?.label} workflow
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {Workflows.find(w => w.key === workflow)?.desc}
+            {Workflows.find((w) => w.key === workflow)?.desc}
           </p>
         </div>
 
@@ -111,10 +109,10 @@ export default function WorkflowDetails({ workflow }: {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
-  if (workflow === AiHuman){
+  if (workflow === AiHuman) {
     return (
       <div
         className={[
@@ -126,10 +124,10 @@ export default function WorkflowDetails({ workflow }: {
         {/* Title + description */}
         <div className="text-center mb-3">
           <p className="font-semibold text-sm text-foreground">
-            {Workflows.find(w => w.key === workflow)?.label} workflow
+            {Workflows.find((w) => w.key === workflow)?.label} workflow
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {Workflows.find(w => w.key === workflow)?.desc}
+            {Workflows.find((w) => w.key === workflow)?.desc}
           </p>
         </div>
 
@@ -167,10 +165,10 @@ export default function WorkflowDetails({ workflow }: {
           ))}
         </div>
       </div>
-    )
+    );
   }
 
-  if (workflow === HumanAi){
+  if (workflow === HumanAi) {
     return (
       <div
         className={[
@@ -182,10 +180,10 @@ export default function WorkflowDetails({ workflow }: {
         {/* Title + description */}
         <div className="text-center mb-3">
           <p className="font-semibold text-sm text-foreground">
-            {Workflows.find(w => w.key === workflow)?.label} workflow
+            {Workflows.find((w) => w.key === workflow)?.label} workflow
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {Workflows.find(w => w.key === workflow)?.desc}
+            {Workflows.find((w) => w.key === workflow)?.desc}
           </p>
         </div>
 
@@ -223,6 +221,6 @@ export default function WorkflowDetails({ workflow }: {
           ))}
         </div>
       </div>
-    )
+    );
   }
 }

@@ -13,10 +13,10 @@ export async function POST(req: Request) {
     comment,
   } = await req.json();
 
-  if (!sessionId) return NextResponse.json({ error: 'missing sessionId' }, { status: 400 });
+  if (!sessionId) return NextResponse.json({ error: "missing sessionId" }, { status: 400 });
 
   if (!Array.isArray(workflowRanking) || workflowRanking.length === 0) {
-    return NextResponse.json({ error: 'workflow ranking required' }, { status: 400 });
+    return NextResponse.json({ error: "workflow ranking required" }, { status: 400 });
   }
 
   await prisma.feedback.create({
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   });
 
   if (!findSession) {
-    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    return NextResponse.json({ error: "Session not found" }, { status: 404 });
   }
 
   const startedAt = findSession.startedAt;

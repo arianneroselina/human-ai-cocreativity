@@ -4,18 +4,19 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import TaskDetails from "@/components/ui/taskDetails";
+import TaskDetails from "@/components/ui/task/taskDetails";
 import { countWords } from "@/lib/taskChecker";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
-import Rules from "@/components/ui/rules";
-import Progress from "@/components/ui/progress";
-import TimerBadge from "@/components/ui/timerBadge";
+import Rules from "@/components/ui/common/rules";
+import Progress from "@/components/ui/layout/progress";
+import TimerBadge from "@/components/ui/task/timerBadge";
 import { useAutosave } from "@/lib/useAutosave";
-import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
+import AutoSaveIndicator from "@/components/ui/common/autosaveIndicator";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Workflows } from "@/lib/experiment";
-import AiChatBox from "@/components/ui/aiChatBox";
+import AiChatBox from "@/components/ui/task/aiChatBox";
+import { PauseProvider } from "@/components/ui/task/pauseContext";
 
 type CoachStep = {
   targetId: string;
@@ -51,7 +52,9 @@ export default function TutorialPage() {
     const prev = el.style.overflowY;
     el.style.overflowY = "hidden";
 
-    return () => { el.style.overflowY = prev; };
+    return () => {
+      el.style.overflowY = prev;
+    };
   }, []);
 
   const steps: CoachStep[] = useMemo(
@@ -115,9 +118,9 @@ export default function TutorialPage() {
 
   useEffect(() => {
     if (step.targetId === "tut-ai-chat") {
-      setAiLocked(false)
+      setAiLocked(false);
     } else if (!aiLocked) {
-      setAiLocked(true)
+      setAiLocked(true);
     }
   }, [aiLocked, step.targetId]);
 
@@ -235,7 +238,7 @@ export default function TutorialPage() {
   const isLast = stepIdx === steps.length - 1;
 
   return (
-    <main className="min-h-dvh bg-background">
+    <PauseProvider>
       <div className="tut-page mx-auto w-full max-w-7xl p-6">
         <div className="relative">
           <div className="grid grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)_220px] items-start gap-3">
@@ -262,10 +265,10 @@ export default function TutorialPage() {
                       {/* Title + description */}
                       <div className="text-center mb-3">
                         <p className="font-semibold text-sm text-foreground">
-                          {Workflows.find(w => w.key === "human_ai")?.label} workflow
+                          {Workflows.find((w) => w.key === "human_ai")?.label} workflow
                         </p>
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                          {Workflows.find(w => w.key === "human_ai")?.desc}
+                          {Workflows.find((w) => w.key === "human_ai")?.desc}
                         </p>
                       </div>
 
@@ -290,8 +293,8 @@ export default function TutorialPage() {
                                 {step.icon}
                               </div>
                               <span className="font-medium text-foreground leading-tight text-center">
-                              {step.label}
-                            </span>
+                                {step.label}
+                              </span>
                             </div>
 
                             {i < 3 && (
@@ -312,7 +315,9 @@ export default function TutorialPage() {
                   <AiChatBox
                     workflow="human_ai"
                     aiLocked={aiLocked}
-                    onDraft={(draft) => {setText(draft);}}
+                    onDraft={(draft) => {
+                      setText(draft);
+                    }}
                     tutorialId="tut-ai-chat"
                   />
 
@@ -374,7 +379,8 @@ export default function TutorialPage() {
 
                       {showSubmitMsg && (
                         <div className="mt-3 rounded-md border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
-                          Tutorial only — in real rounds, Submit is enabled even if requirements aren&#39;t met.
+                          Tutorial only — in real rounds, Submit is enabled even if requirements
+                          aren&#39;t met.
                         </div>
                       )}
                     </div>
@@ -385,10 +391,7 @@ export default function TutorialPage() {
 
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <div id="tut-timer">
-                <TimerBadge
-                  workflow="Human→AI"
-                  demo
-                />
+                <TimerBadge workflow="Human→AI" demo />
               </div>
             </div>
           </div>
@@ -396,10 +399,7 @@ export default function TutorialPage() {
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
             <div id="tut-timer">
-              <TimerBadge
-                workflow="Human→AI"
-                demo
-              />
+              <TimerBadge workflow="Human→AI" demo />
             </div>
           </div>
         </div>
@@ -501,6 +501,6 @@ export default function TutorialPage() {
           </div>
         )}
       </div>
-    </main>
+    </PauseProvider>
   );
 }

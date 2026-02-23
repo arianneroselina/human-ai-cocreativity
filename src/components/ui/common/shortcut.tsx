@@ -16,10 +16,7 @@ export function useSubmitHotkey(onSubmit: () => void, deps: any[] = []) {
   }, deps);
 }
 
-export function usePauseResumeHotkeys(
-  paused: boolean,
-  setPaused: (value: boolean) => void
-) {
+export function usePauseResumeHotkeys(paused: boolean, setPaused: (value: boolean) => void) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!paused) return;

@@ -22,23 +22,21 @@ type ConfirmProps = {
 };
 
 export default function ConfirmDialog({
-                                        open,
-                                        onOpenChange,
-                                        title = "Are you sure?",
-                                        description,
-                                        confirmLabel = "Yes",
-                                        cancelLabel = "Cancel",
-                                        onConfirm,
-                                      }: ConfirmProps) {
+  open,
+  onOpenChange,
+  title = "Are you sure?",
+  description,
+  confirmLabel = "Yes",
+  cancelLabel = "Cancel",
+  onConfirm,
+}: ConfirmProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description ? (
-            <DialogDescription className="text-muted-foreground">
-              {description}
-            </DialogDescription>
+            <DialogDescription className="text-muted-foreground">{description}</DialogDescription>
           ) : null}
         </DialogHeader>
 

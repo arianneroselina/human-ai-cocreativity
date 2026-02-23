@@ -12,9 +12,7 @@ export default function IdPage() {
   const [participantId, setParticipantId] = useState("");
 
   const isValidParticipantId =
-    participantId.length > 0 &&
-    participantId.length <= 3 &&
-    /^\d+$/.test(participantId);
+    participantId.length > 0 && participantId.length <= 3 && /^\d+$/.test(participantId);
 
   const handleSubmit = async () => {
     if (!isValidParticipantId) return;
@@ -26,13 +24,13 @@ export default function IdPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         sessionId: run.sessionId,
-        participantId: Number(participantId)
+        participantId: Number(participantId),
       }),
     });
 
     console.log("ID submitted:", {
       sessionId: run.sessionId,
-      participantId: Number(participantId)
+      participantId: Number(participantId),
     });
 
     send({ type: "START_TUTORIAL" });
@@ -41,9 +39,7 @@ export default function IdPage() {
   return (
     <main className="h-full flex items-center justify-center bg-background">
       <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-sm space-y-4">
-        <h1 className="text-xl font-semibold tracking-tight">
-          Enter Participant ID
-        </h1>
+        <h1 className="text-xl font-semibold tracking-tight">Enter Participant ID</h1>
 
         <p className="text-sm text-muted-foreground">
           Please enter your participant ID provided by the researcher.
@@ -64,11 +60,7 @@ export default function IdPage() {
           required
         />
 
-        <Button
-          onClick={handleSubmit}
-          disabled={!isValidParticipantId}
-          className="w-full"
-        >
+        <Button onClick={handleSubmit} disabled={!isValidParticipantId} className="w-full">
           Continue
         </Button>
       </div>

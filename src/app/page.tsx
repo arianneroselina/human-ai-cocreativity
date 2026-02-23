@@ -114,8 +114,8 @@ export default function Page() {
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 This session includes{" "}
-                <span className="font-medium text-foreground">4 practice rounds</span>{" "}
-                (to experience all workflows) and{" "}
+                <span className="font-medium text-foreground">4 practice rounds</span> (to
+                experience all workflows) and{" "}
                 <span className="font-medium text-foreground">3 main rounds</span>.
               </p>
             </div>
@@ -141,20 +141,27 @@ export default function Page() {
               disabled={hasActiveSession || starting}
               className="inline-flex items-center gap-2 bg-primary"
             >
-              {starting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              {starting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
               Start session
             </Button>
 
             {hasActiveSession && (
               <span className="ml-1 text-xs text-muted-foreground">
-                Session in progress — please <span className="font-medium text-foreground">Resume</span>.
+                Session in progress — please{" "}
+                <span className="font-medium text-foreground">Resume</span>.
               </span>
             )}
 
             {!hasActiveSession && (
               <div className="mt-1 inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                <span className="text-xs text-foreground">This whole session takes ~30-50 minutes</span>
+                <span className="text-xs text-foreground">
+                  This whole session takes ~30-50 minutes
+                </span>
               </div>
             )}
           </div>
@@ -167,9 +174,14 @@ export default function Page() {
             <div className="flex-1">
               <h3 className="text-xl font-semibold tracking-tight">About the study</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                In this study, you’ll complete short, time-boxed creative writing tasks under different
-                <span className="font-medium text-foreground"> human-AI collaboration workflows</span>.
-                We compare how workflows influence <span className="font-medium text-foreground">efficiency</span>,{" "}
+                In this study, you’ll complete short, time-boxed creative writing tasks under
+                different
+                <span className="font-medium text-foreground">
+                  {" "}
+                  human-AI collaboration workflows
+                </span>
+                . We compare how workflows influence{" "}
+                <span className="font-medium text-foreground">efficiency</span>,{" "}
                 <span className="font-medium text-foreground">output quality</span>,{" "}
                 <span className="font-medium text-foreground">workflow choices</span>, and{" "}
                 <span className="font-medium text-foreground">trust in AI</span>.
@@ -177,99 +189,100 @@ export default function Page() {
             </div>
           </div>
 
-            {/* Workflows */}
-            <div className="mt-6">
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <ArrowLeftRight className="h-4 w-4" />
-                The 4 workflow types
-              </div>
+          {/* Workflows */}
+          <div className="mt-6">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+              <ArrowLeftRight className="h-4 w-4" />
+              The 4 workflow types
+            </div>
 
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {Workflows.map((w) => (
-                  <div key={w.key} className="rounded-lg border border-border bg-card p-3 text-sm">
-                    <div className="flex items-center gap-2 font-medium text-foreground">
-                      <span className="text-base">{w.icon}</span>
-                      <span>{w.title}</span>
-                    </div>
-                    <p className="mt-1 text-muted-foreground">{w.desc}</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {Workflows.map((w) => (
+                <div key={w.key} className="rounded-lg border border-border bg-card p-3 text-sm">
+                  <div className="flex items-center gap-2 font-medium text-foreground">
+                    <span className="text-base">{w.icon}</span>
+                    <span>{w.title}</span>
                   </div>
-                ))}
+                  <p className="mt-1 text-muted-foreground">{w.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Structure */}
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <TimerIcon className="h-4 w-4" />
+                Session structure
               </div>
+
+              <ol className="mt-3 space-y-2 text-sm text-muted-foreground list-decimal pl-5">
+                <li>
+                  <span className="font-medium text-foreground">Practice (4 rounds):</span> you
+                  experience each workflow once (random order).
+                </li>
+                <li>
+                  <span className="font-medium text-foreground">Main (3 rounds):</span> before each
+                  round, you choose which workflow you want to use.
+                </li>
+                <li>
+                  <span className="font-medium text-foreground">Feedback:</span> a short
+                  questionnaire follows every round, plus a brief session wrap-up at the end.
+                </li>
+              </ol>
             </div>
 
-            {/* Structure */}
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <TimerIcon className="h-4 w-4" />
-                  Session structure
-                </div>
-
-                <ol className="mt-3 space-y-2 text-sm text-muted-foreground list-decimal pl-5">
-                  <li>
-                    <span className="font-medium text-foreground">Practice (4 rounds):</span> you experience each workflow once
-                    (random order).
-                  </li>
-                  <li>
-                    <span className="font-medium text-foreground">Main (3 rounds):</span> before each round, you choose which
-                    workflow you want to use.
-                  </li>
-                  <li>
-                    <span className="font-medium text-foreground">Feedback:</span> a short questionnaire follows every round,
-                    plus a brief session wrap-up at the end.
-                  </li>
-                </ol>
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <ClipboardList className="h-4 w-4" />
+                What you’ll do each round
               </div>
 
-              <div className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <ClipboardList className="h-4 w-4" />
-                  What you’ll do each round
-                </div>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li>
+                  Read a short prompt and complete a{" "}
+                  <span className="font-medium text-foreground">timed writing task</span>.
+                </li>
+                <li>
+                  Depending on the workflow, you may write alone, use AI, or edit after AI/human.
+                </li>
+                <li>Submit your final text and answer a few quick questions.</li>
+              </ul>
+            </div>
+          </div>
 
-                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>
-                    Read a short prompt and complete a <span className="font-medium text-foreground">timed writing task</span>.
-                  </li>
-                  <li>
-                    Depending on the workflow, you may write alone, use AI, or edit after AI/human.
-                  </li>
-                  <li>
-                    Submit your final text and answer a few quick questions.
-                  </li>
-                </ul>
+          {/* Data + ethics */}
+          <div className="mt-6 grid gap-6 sm:grid-cols-2">
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <ClipboardList className="h-4 w-4" />
+                What we record (pseudonymized)
               </div>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li>Timing and duration per round.</li>
+                <li>Workflow used in each round.</li>
+                <li>Your final text output.</li>
+                <li>Round feedback and session feedback.</li>
+                <li>AI chat messages and actions (when applicable).</li>
+              </ul>
             </div>
 
-            {/* Data + ethics */}
-            <div className="mt-6 grid gap-6 sm:grid-cols-2">
-              <div className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <ClipboardList className="h-4 w-4" />
-                  What we record (pseudonymized)
-                </div>
-                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>Timing and duration per round.</li>
-                  <li>Workflow used in each round.</li>
-                  <li>Your final text output.</li>
-                  <li>Round feedback and session feedback.</li>
-                  <li>AI chat messages and actions (when applicable).</li>
-                </ul>
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <EyeOff className="h-4 w-4" />
+                Privacy
               </div>
-
-              <div className="rounded-lg border border-border bg-card p-4">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <EyeOff className="h-4 w-4" />
-                  Privacy
-                </div>
-                <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                  <li>No names or contact details are collected.</li>
-                  <li>Participation is voluntary. You can stop at any time.</li>
-                  <li>We collect basic background information (e.g., age, language level) for analysis.</li>
-                  <li>Data is handled in line with GDPR principles.</li>
-                </ul>
-              </div>
+              <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <li>No names or contact details are collected.</li>
+                <li>Participation is voluntary. You can stop at any time.</li>
+                <li>
+                  We collect basic background information (e.g., age, language level) for analysis.
+                </li>
+                <li>Data is handled in line with GDPR principles.</li>
+              </ul>
             </div>
+          </div>
         </section>
       </div>
     </main>

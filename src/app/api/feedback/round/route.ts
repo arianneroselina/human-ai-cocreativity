@@ -1,14 +1,11 @@
 import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 
-const usesAI = (w: unknown) =>
-  w === "ai" || w === "human_ai" || w === "ai_human";
+const usesAI = (w: unknown) => w === "ai" || w === "human_ai" || w === "ai_human";
 
-const isLikert = (v: unknown) =>
-  Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
+const isLikert = (v: unknown) => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 5;
 
-const isTlx = (v: unknown) =>
-  Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 20;
+const isTlx = (v: unknown) => Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 20;
 
 export async function POST(req: Request) {
   const {
@@ -48,7 +45,7 @@ export async function POST(req: Request) {
     !isTlx(effort) ||
     !isTlx(frustration)
   ) {
-    return NextResponse.json({ error: 'invalid NASA-TLX values' }, { status: 400 });
+    return NextResponse.json({ error: "invalid NASA-TLX values" }, { status: 400 });
   }
 
   /* ---------- Validate AI collaboration ---------- */
@@ -59,13 +56,19 @@ export async function POST(req: Request) {
       !isLikert(aiCreativitySupport) ||
       !isLikert(aiPerformanceOverall)
     ) {
-      return NextResponse.json({ error: 'AI collaboration ratings required for AI workflows' }, { status: 400 });
+      return NextResponse.json(
+        { error: "AI collaboration ratings required for AI workflows" },
+        { status: 400 }
+      );
     }
   }
 
   /* ---------- Validate satisfaction & confidence ---------- */
   if (!isLikert(rulesConfidence) || !isLikert(satisfactionResult)) {
-    return NextResponse.json({ error: 'invalid satisfaction or confidence values' }, { status: 400 });
+    return NextResponse.json(
+      { error: "invalid satisfaction or confidence values" },
+      { status: 400 }
+    );
   }
 
   /* ---------- Ensure round exists ---------- */

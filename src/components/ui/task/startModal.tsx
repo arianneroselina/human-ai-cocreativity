@@ -1,13 +1,13 @@
-import WorkflowDetails from "@/components/ui/workflowDetails";
+import WorkflowDetails from "@/components/ui/task/workflowDetails";
 import { Button } from "@/components/shadcn_ui/button";
 import React from "react";
-import { usePause } from "@/components/ui/pauseContext";
+import { usePause } from "@/components/ui/task/pauseContext";
 
 export default function StartModal({
-                                     open,
-                                     workflow,
-                                     onStart,
-                                   }: {
+  open,
+  workflow,
+  onStart,
+}: {
   open: boolean;
   workflow: any;
   onStart: () => void;
@@ -28,11 +28,8 @@ export default function StartModal({
       {/* Modal */}
       <div className="relative w-[min(720px,calc(100%-2rem))] rounded-2xl border border-border bg-background shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         <div className="p-8">
-
           <div className="mb-6 text-center">
-            <h2 className="text-xl font-semibold text-foreground">
-              Get Ready for This Round🚀
-            </h2>
+            <h2 className="text-xl font-semibold text-foreground">Get Ready for This Round🚀</h2>
 
             <p className="text-sm text-muted-foreground mt-2 max-w-md mx-auto">
               Please carefully read the workflow instructions below.
@@ -42,16 +39,12 @@ export default function StartModal({
           <WorkflowDetails workflow={workflow} />
 
           <div className="mt-5 rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm text-foreground">
-            ⏱️ The timer starts immediately after you click &#34;Start&#34;.
-            Make sure you fully understand the instructions before proceeding.
+            ⏱️ The timer starts immediately after you click &#34;Start&#34;. Make sure you fully
+            understand the instructions before proceeding.
           </div>
 
           <div className="mt-8 flex justify-end">
-            <Button
-              onClick={start}
-              size="lg"
-              className="px-8 text-base shadow-md"
-            >
+            <Button onClick={start} size="lg" className="px-8 text-base shadow-md">
               Start
             </Button>
           </div>

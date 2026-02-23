@@ -6,7 +6,7 @@ import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
 import { Play, Timer, Shuffle, ArrowRight, Loader2 } from "lucide-react";
 import { Workflows } from "@/lib/experiment";
-import Progress from "@/components/ui/progress";
+import Progress from "@/components/ui/layout/progress";
 
 export default function PracticeStartPage() {
   useRouteGuard(["practice"]);
@@ -34,9 +34,9 @@ export default function PracticeStartPage() {
 
     const { run, setRoundStarted } = useExperiment.getState();
 
-    const res = await fetch('/api/round/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/round/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         sessionId: run.sessionId,
         roundIndex: run.roundIndex,
@@ -59,7 +59,7 @@ export default function PracticeStartPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-background">
+    <>
       <Progress />
 
       <div className="mx-auto max-w-4xl p-6">
@@ -98,7 +98,10 @@ export default function PracticeStartPage() {
                 <div className="text-sm font-medium text-foreground">Workflows you’ll see</div>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {Workflows.map((w) => (
-                    <div key={w.key} className="rounded-lg border border-border bg-card p-3 text-sm">
+                    <div
+                      key={w.key}
+                      className="rounded-lg border border-border bg-card p-3 text-sm"
+                    >
                       <div className="flex items-center gap-2 font-medium text-foreground">
                         <span className="text-base">{w.icon}</span>
                         <span>{w.title}</span>
@@ -111,13 +114,17 @@ export default function PracticeStartPage() {
 
             <div className="mt-8 flex justify-end">
               <Button onClick={start} disabled={loading} className="inline-flex items-center gap-2">
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
                 {isFirstPracticeRound ? "Start practice" : "Continue to next round"}
               </Button>
             </div>
           </div>
         </section>
       </div>
-    </main>
+    </>
   );
 }

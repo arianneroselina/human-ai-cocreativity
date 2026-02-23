@@ -4,12 +4,12 @@ import { useState, useMemo } from "react";
 import { useExperiment } from "@/stores/useExperiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
 import { Button } from "@/components/shadcn_ui/button";
-import Progress from "@/components/ui/progress";
-import LikertRow, { Likert } from "@/components/ui/likertRow";
+import Progress from "@/components/ui/layout/progress";
+import LikertRow, { Likert } from "@/components/ui/feedback/likertRow";
 import { CheckCircle2, Loader2 } from "lucide-react";
 import { Workflows, type Workflow, usesAI, isPracticeMode } from "@/lib/experiment";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import { TlxRow } from "@/components/ui/tlxRow";
+import { TlxRow } from "@/components/ui/feedback/tlxRow";
 
 export default function RoundFeedbackPage() {
   useRouteGuard(["round_feedback"]);
@@ -18,7 +18,7 @@ export default function RoundFeedbackPage() {
   const [loading, setLoading] = useState(false);
 
   const workflowKey = run.workflow as Workflow;
-  const wf = Workflows.find(w => w.key === workflowKey);
+  const wf = Workflows.find((w) => w.key === workflowKey);
   const workflowUsesAI = usesAI(workflowKey);
 
   /* ---------- NASA TLX (21-point) ---------- */
@@ -51,10 +51,7 @@ export default function RoundFeedbackPage() {
     effort !== null &&
     frustration !== null &&
     (!workflowUsesAI ||
-      (aiUnderstanding &&
-        aiCollaboration &&
-        aiCreativitySupport &&
-        aiPerformanceOverall)) &&
+      (aiUnderstanding && aiCollaboration && aiCreativitySupport && aiPerformanceOverall)) &&
     rulesConfidence !== null &&
     satisfactionResult !== null;
 
@@ -278,9 +275,7 @@ export default function RoundFeedbackPage() {
                   rows={2}
                   maxLength={MAX_COMMENT_CHARS}
                   value={comment}
-                  onChange={(e) =>
-                    setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))
-                  }
+                  onChange={(e) => setComment(e.target.value.slice(0, MAX_COMMENT_CHARS))}
                 />
                 <div className="flex justify-end text-xs text-muted-foreground">
                   {comment.length} / {MAX_COMMENT_CHARS}

@@ -11,12 +11,12 @@ type LikertRowProps = {
 };
 
 export default function LikertRow({
-                                    label,
-                                    value,
-                                    onChange,
-                                    left = "Very low",
-                                    right = "Very high",
-                                  }: LikertRowProps) {
+  label,
+  value,
+  onChange,
+  left = "Very low",
+  right = "Very high",
+}: LikertRowProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -27,11 +27,7 @@ export default function LikertRow({
       <div className="flex items-center gap-2">
         <span className="text-[11px] text-muted-foreground">{left}</span>
 
-        <div
-          className="flex-1 grid grid-cols-5 gap-2"
-          role="radiogroup"
-          aria-label={label}
-        >
+        <div className="flex-1 grid grid-cols-5 gap-2" role="radiogroup" aria-label={label}>
           {[1, 2, 3, 4, 5].map((v) => {
             const active = value === (v as Likert);
             return (

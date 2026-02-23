@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 export async function POST(req: Request) {
-  const { input, isTrustBreakRound} = await req.json();
+  const { input, isTrustBreakRound } = await req.json();
 
   if (!input) {
     return NextResponse.json({ error: "missing fields" }, { status: 400 });
@@ -21,9 +21,7 @@ export async function POST(req: Request) {
 
   const messages = [
     { role: "user" as const, content: input },
-    ...(systemInstruction
-      ? [{ role: "system" as const, content: systemInstruction }]
-      : []),
+    ...(systemInstruction ? [{ role: "system" as const, content: systemInstruction }] : []),
   ];
 
   const resp = await client.responses.create({
@@ -33,5 +31,5 @@ export async function POST(req: Request) {
   });
 
   const text = (resp as any).output_text ?? "";
-  return NextResponse.json({text, trustBreakInjected: isTrustBreakRound});
+  return NextResponse.json({ text, trustBreakInjected: isTrustBreakRound });
 }

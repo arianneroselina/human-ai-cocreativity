@@ -1,36 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Progress from '@/components/ui/progress';
+import Progress from "@/components/ui/layout/progress";
 import { Button } from "@/components/shadcn_ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/shadcn_ui/dialog";
-import { useExperiment } from '@/stores/useExperiment';
-import { Workflow, Workflows } from '@/lib/experiment';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/shadcn_ui/dialog";
+import { useExperiment } from "@/stores/useExperiment";
+import { Workflow, Workflows } from "@/lib/experiment";
 import { useRouteGuard } from "@/lib/useRouteGuard";
-import Rules from "@/components/ui/rules";
+import Rules from "@/components/ui/common/rules";
 
 export default function Choose() {
-  useRouteGuard(['choose_workflow']);
+  useRouteGuard(["choose_workflow"]);
 
   const { run, send } = useExperiment();
   const [choice, setChoice] = useState<Workflow>("human");
   const [open, setOpen] = useState(false);
-  const selected = Workflows.find(w => w.key === choice)!;
+  const selected = Workflows.find((w) => w.key === choice)!;
 
   const pick = (wf: Workflow) => {
     setChoice(wf);
-    send({ type: 'SELECT_WORKFLOW', workflow: wf });
+    send({ type: "SELECT_WORKFLOW", workflow: wf });
   };
 
   const startRound = async () => {
     setOpen(false);
-    send({ type: 'START_MAIN_ROUND' });
+    send({ type: "START_MAIN_ROUND" });
 
     const { run, setRoundStarted } = useExperiment.getState();
 
-    const res = await fetch('/api/round/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const res = await fetch("/api/round/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         sessionId: run.sessionId,
         roundIndex: run.roundIndex,
@@ -52,7 +58,7 @@ export default function Choose() {
 
   // Re-announce the current choice when a new round starts
   useEffect(() => {
-    send({ type: 'SELECT_WORKFLOW', workflow: choice });
+    send({ type: "SELECT_WORKFLOW", workflow: choice });
   }, [run.roundIndex, send]); // intentionally not depending on `choice` to avoid double sends
 
   return (
@@ -80,9 +86,7 @@ export default function Choose() {
                   className={[
                     "text-left rounded-lg border border-border bg-card p-4 shadow-sm transition",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    active
-                      ? "border-primary ring-2 ring-primary/30"
-                      : "hover:bg-accent"
+                    active ? "border-primary ring-2 ring-primary/30" : "hover:bg-accent",
                   ].join(" ")}
                 >
                   <div className="flex items-start gap-3">
@@ -101,9 +105,7 @@ export default function Choose() {
             <Rules />
             <div className="ml-auto">
               {/* Default Button uses bg-primary/text-primary-foreground from your tokens */}
-              <Button onClick={() => setOpen(true)}>
-                Start with {selected.label}
-              </Button>
+              <Button onClick={() => setOpen(true)}>Start with {selected.label}</Button>
             </div>
           </div>
         </section>
@@ -130,7 +132,9 @@ export default function Choose() {
           </div>
 
           <DialogFooter className="mt-3">
-            <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={startRound}>Start now</Button>
           </DialogFooter>
         </DialogContent>

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import {ExperimentRun, isPracticeMode, Workflow} from "@/lib/experiment";
+import { ExperimentRun, isPracticeMode, Workflow } from "@/lib/experiment";
 import { createRandomAssignments } from "@/lib/roundAssignment";
 
 type Event =
@@ -81,7 +81,10 @@ export const useExperiment = create<Store>()(
             return run.phase === "round_feedback" || run.phase === "practice_complete";
 
           case "START_FINAL_FEEDBACK":
-            return run.phase === "round_feedback" && run.roundIndex >= run.totalRounds + run.totalPracticeRounds;
+            return (
+              run.phase === "round_feedback" &&
+              run.roundIndex >= run.totalRounds + run.totalPracticeRounds
+            );
 
           case "FINISH_SESSION":
             return run.phase === "feedback";
@@ -192,7 +195,7 @@ export const useExperiment = create<Store>()(
 
                   const nextIdx = s.roundIndex;
                   s.workflow = undefined;
-                  s.taskId = s.assignments[nextIdx]?.taskId
+                  s.taskId = s.assignments[nextIdx]?.taskId;
 
                   s.roundIndex += 1;
                 } else {

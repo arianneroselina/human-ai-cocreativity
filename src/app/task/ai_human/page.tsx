@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/shadcn_ui/button";
 import { Label } from "@/components/shadcn_ui/label";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import AiChatBox from "@/components/ui/aiChatBox";
-import AutoSaveIndicator from "@/components/ui/autosaveIndicator";
-import TaskDetails from "@/components/ui/taskDetails";
-import ConfirmDialog from "@/components/ui/confirm";
-import Progress from "@/components/ui/progress";
-import Rules from "@/components/ui/rules";
-import { useSubmitHotkey } from "@/components/ui/shortcut";
-import TimerBadge from "@/components/ui/timerBadge";
+import AiChatBox from "@/components/ui/task/aiChatBox";
+import AutoSaveIndicator from "@/components/ui/common/autosaveIndicator";
+import TaskDetails from "@/components/ui/task/taskDetails";
+import ConfirmDialog from "@/components/ui/common/confirm";
+import Progress from "@/components/ui/layout/progress";
+import Rules from "@/components/ui/common/rules";
+import { useSubmitHotkey } from "@/components/ui/common/shortcut";
+import TimerBadge from "@/components/ui/task/timerBadge";
 import { Workflows } from "@/lib/experiment";
 import { countWords, checkPoemAgainstRound } from "@/lib/taskChecker";
 import { useAutosave } from "@/lib/useAutosave";
@@ -20,11 +20,12 @@ import { useExperiment } from "@/stores/useExperiment";
 import { usePreventBack } from "@/lib/usePreventBack";
 import { useRoundSubmit } from "@/lib/useRoundSubmit";
 import { useRouteGuard } from "@/lib/useRouteGuard";
-import WorkflowDetails from "@/components/ui/workflowDetails";
-import StartModal from "@/components/ui/startModal";
+import WorkflowDetails from "@/components/ui/task/workflowDetails";
+import StartModal from "@/components/ui/task/startModal";
+import { PauseProvider } from "@/components/ui/task/pauseContext";
 
 export default function AIHumanWorkPage() {
-  useRouteGuard(['task']);
+  useRouteGuard(["task"]);
   usePreventBack(true);
 
   const { run } = useExperiment();
@@ -37,7 +38,11 @@ export default function AIHumanWorkPage() {
   const [submitOpen, setSubmitOpen] = useState(false);
 
   const saveKey = `draft:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
-  const { saving, lastSavedAt } = useAutosave(saveKey, { text, aiLocked }, { setText, setAiLocked });
+  const { saving, lastSavedAt } = useAutosave(
+    saveKey,
+    { text, aiLocked },
+    { setText, setAiLocked }
+  );
   const chatKey = `ai-chat:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
 
   // readOnly until AI is locked; afterward editable
@@ -79,8 +84,8 @@ export default function AIHumanWorkPage() {
   };
 
   return (
-    <main className="min-h-dvh bg-background">
-      <StartModal open={introOpen} workflow={run.workflow} onStart={startTimer}/>
+    <PauseProvider initialPaused={true}>
+      <StartModal open={introOpen} workflow={run.workflow} onStart={startTimer} />
 
       <div className="mx-auto w-full max-w-7xl p-6">
         <div className="relative">
@@ -103,7 +108,9 @@ export default function AIHumanWorkPage() {
                   <AiChatBox
                     workflow={run.workflow!}
                     aiLocked={aiLocked}
-                    onLockAi={() => {setAiLocked(true);}}
+                    onLockAi={() => {
+                      setAiLocked(true);
+                    }}
                     onDraft={(draft) => setText(draft)}
                     baseHumanText={text}
                     storageKey={chatKey}
@@ -188,7 +195,11 @@ export default function AIHumanWorkPage() {
             {/* Right dock */}
             <div className="hidden md:block w-[220px] justify-self-end sticky top-6">
               <TimerBadge
-                workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
+                workflow={
+                  run.workflow
+                    ? Workflows.find((w) => w.key === run.workflow)?.label || "Task"
+                    : "Task"
+                }
                 startedAt={run.startedAt!}
                 onTimeUp={forceSubmit}
               />
@@ -198,13 +209,17 @@ export default function AIHumanWorkPage() {
           {/* Mobile: keep it on the right */}
           <div className="md:hidden fixed right-4 top-40 z-40">
             <TimerBadge
-              workflow={run.workflow ? Workflows.find(w => w.key === run.workflow)?.label || "Task" : "Task"}
+              workflow={
+                run.workflow
+                  ? Workflows.find((w) => w.key === run.workflow)?.label || "Task"
+                  : "Task"
+              }
               startedAt={run.startedAt!}
               onTimeUp={forceSubmit}
             />
           </div>
         </div>
       </div>
-    </main>
+    </PauseProvider>
   );
 }

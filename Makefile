@@ -36,6 +36,10 @@ rebuild: clean reset gen migrate
 export-db:
 	bash ./scripts/export_db.sh ${PRISMA_DATABASE_URL} "exports"
 
+.PHONY: format
+format:
+	npm run format
+
 .PHONY: help
 help:
 	@echo "Available commands:"
@@ -47,3 +51,4 @@ help:
 	@echo "clean      Clean Prisma directories (migrations, generated)"
 	@echo "rebuild    Clean, generate Prisma Client, and apply migrations"
 	@echo "export_db  Export Prisma database"
+	@echo "format	  Format files using Prettier"

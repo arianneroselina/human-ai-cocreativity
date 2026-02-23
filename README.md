@@ -37,6 +37,7 @@ The outputs are later stored anonymously and analyzed.
 ## 🛠️ **Project Setup**
 
 ### 1. **Install Dependencies**
+
 Install the necessary dependencies:
 
 ```bash
@@ -44,6 +45,7 @@ npm install
 ```
 
 ### 2. **Start Development**
+
 To start the development server locally, run:
 
 ```bash
@@ -53,6 +55,7 @@ make run
 Then navigate to [http://localhost:3000](http://localhost:3000) in your browser to start interacting with the platform.
 
 ### 3. **Set up Environment Variables**
+
 Create a `.env` file in the root of your project and define the database URL:
 
 ```env
@@ -76,7 +79,7 @@ make studio
 
 ---
 
-## ⚙️ **Makefile** 
+## ⚙️ **Makefile**
 
 This project includes a **Makefile** for automating common tasks.
 
@@ -110,4 +113,3 @@ make rebuild
 ## 💡 **Acknowledgements**
 
 This project is part of a **Master Thesis** exploring human-AI collaboration and trust in AI. Special thanks to the participants for their contributions to the research!
-

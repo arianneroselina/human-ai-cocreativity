@@ -2,75 +2,75 @@
 
 import { RoundAssignment } from "@/lib/roundAssignment";
 
-export const Human = "human"
-export const Ai = "ai"
-export const HumanAi = "human_ai"
-export const AiHuman = "ai_human"
+export const Human = "human";
+export const Ai = "ai";
+export const HumanAi = "human_ai";
+export const AiHuman = "ai_human";
 
-export type Workflow = 'human' | 'ai' | 'human_ai' | 'ai_human';
+export type Workflow = "human" | "ai" | "human_ai" | "ai_human";
 export type Phase =
-  'idle' |
-  'id' |
-  'tutorial' |
-  'practice' |
-  'practice_complete' |
-  'choose_workflow' |
-  'task' |
-  'round_feedback' |
-  'feedback' |
-  'finish';
-export type RunMode = 'practice' | 'main';
+  | "idle"
+  | "id"
+  | "tutorial"
+  | "practice"
+  | "practice_complete"
+  | "choose_workflow"
+  | "task"
+  | "round_feedback"
+  | "feedback"
+  | "finish";
+export type RunMode = "practice" | "main";
 
 export const WORKFLOW_VALUES = [Human, Ai, HumanAi, AiHuman];
 
 export interface ExperimentRun {
-  sessionId:           string | null;
-  totalRounds:         number;
+  sessionId: string | null;
+  totalRounds: number;
   totalPracticeRounds: number;
-  phase:               Phase;
-  mode:                RunMode;
-  roundIndex:          number;            // current round index, 1-based
-  assignments:         RoundAssignment[]  // task and workflow assignments
-  workflow?:           Workflow;          // current round workflow
-  locked:              boolean;           // once true, workflow cannot be changed this round
-  taskId?:             string;            // current round task ID
-  startedAt?:          string;            // current round startedAt time
+  phase: Phase;
+  mode: RunMode;
+  roundIndex: number; // current round index, 1-based
+  assignments: RoundAssignment[]; // task and workflow assignments
+  workflow?: Workflow; // current round workflow
+  locked: boolean; // once true, workflow cannot be changed this round
+  taskId?: string; // current round task ID
+  startedAt?: string; // current round startedAt time
 }
 
 export const Workflows: Array<{
-  key:   Workflow;
+  key: Workflow;
   label: string;
   title: string;
-  desc:  string;
-  icon:  string;
+  desc: string;
+  icon: string;
 }> = [
   {
     key: Human,
     label: "Human",
     title: "Human only",
     desc: "Write entirely on your own without any AI assistance.",
-    icon: "✍️"
+    icon: "✍️",
   },
   {
     key: Ai,
     label: "AI",
     title: "AI only",
     desc: "Chat with the AI, pick a response as your draft, then submit.",
-    icon: "🤖"
+    icon: "🤖",
   },
   {
     key: HumanAi,
     label: "Human→AI",
     title: "You then AI",
     desc: "Write first, then unlock AI to refine or choose from its suggestions.",
-    icon: "🧠→🤖"
+    icon: "🧠→🤖",
   },
   {
     key: AiHuman,
     label: "AI→Human",
     title: "AI then you",
     desc: "Start with AI's draft, lock it, then edit and submit your version.",
-    icon: "🤖→🧠"
+    icon: "🤖→🧠",
   },
 ];
 

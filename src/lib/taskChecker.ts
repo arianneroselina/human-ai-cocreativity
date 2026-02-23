@@ -37,12 +37,22 @@ function wordRegex(word: string, wholeWord: boolean, caseSensitive: boolean): Re
   return new RegExp(body, caseSensitive ? "g" : "gi");
 }
 
-function includesWord(text: string, word: string, wholeWord: boolean, caseSensitive: boolean): boolean {
+function includesWord(
+  text: string,
+  word: string,
+  wholeWord: boolean,
+  caseSensitive: boolean
+): boolean {
   const re = wordRegex(word, wholeWord, caseSensitive);
   return re.test(text);
 }
 
-function countWordOccurrences(text: string, word: string, wholeWord: boolean, caseSensitive: boolean): number {
+function countWordOccurrences(
+  text: string,
+  word: string,
+  wholeWord: boolean,
+  caseSensitive: boolean
+): number {
   const re = wordRegex(word, wholeWord, caseSensitive);
   const matches = text.match(re);
   return matches ? matches.length : 0;
@@ -86,7 +96,10 @@ function checkRequirement(req: RequirementSpec, poem: string): RequirementResult
       const minOk = req.min == null ? true : totalWords >= req.min;
       const maxOk = req.max == null ? true : totalWords <= req.max;
       const ok = minOk && maxOk;
-      return pass(ok, `Words: ${totalWords}${req.min != null ? ` (min ${req.min})` : ""}${req.max != null ? ` (max ${req.max})` : ""}`);
+      return pass(
+        ok,
+        `Words: ${totalWords}${req.min != null ? ` (min ${req.min})` : ""}${req.max != null ? ` (max ${req.max})` : ""}`
+      );
     }
 
     case "maxWordsPerLine": {
@@ -103,7 +116,12 @@ function checkRequirement(req: RequirementSpec, poem: string): RequirementResult
       const present = req.words.filter((w) => includesWord(poem, w, ww, cs));
       if (req.mode === "all") {
         const ok = present.length === req.words.length;
-        return pass(ok, ok ? "All required words found." : `Missing: ${req.words.filter((w) => !present.includes(w)).join(", ")}`);
+        return pass(
+          ok,
+          ok
+            ? "All required words found."
+            : `Missing: ${req.words.filter((w) => !present.includes(w)).join(", ")}`
+        );
       } else {
         const need = req.atLeast ?? 1;
         const ok = present.length >= need;

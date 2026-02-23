@@ -3,10 +3,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/shadcn_ui/button";
 import { Textarea } from "@/components/shadcn_ui/textarea";
-import ConfirmDialog from "@/components/ui/confirm";
+import ConfirmDialog from "@/components/ui/common/confirm";
 import { Loader2, Sparkles, MessageSquareText, CheckCircle2 } from "lucide-react";
 import { Ai, AiHuman, HumanAi, usesAI, Workflow } from "@/lib/experiment";
-import { usePause } from "@/components/ui/pauseContext";
+import { usePause } from "@/components/ui/task/pauseContext";
 
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
@@ -42,15 +42,15 @@ function clampHistory(msgs: ChatMsg[], maxPairs: number) {
 }
 
 export default function AiChatBox({
-                                    workflow,
-                                    aiLocked,
-                                    onLockAi,
-                                    onDraft,
-                                    baseHumanText,
-                                    storageKey,
-                                    run,
-                                    tutorialId,
-                                  }: Props) {
+  workflow,
+  aiLocked,
+  onLockAi,
+  onDraft,
+  baseHumanText,
+  storageKey,
+  run,
+  tutorialId,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [prompt, setPrompt] = useState("");
@@ -119,8 +119,8 @@ export default function AiChatBox({
   }, [messages, aiLocked, workflow, run]);
 
   /* ------------------------------------------------------------
- * Restore chat (Autosave)
- * ------------------------------------------------------------ */
+   * Restore chat (Autosave)
+   * ------------------------------------------------------------ */
   useEffect(() => {
     if (!storageKey) return;
     //if (aiLocked) return;
@@ -368,16 +368,10 @@ export default function AiChatBox({
       trimmedHistory.length === 0
         ? "none"
         : trimmedHistory
-          .map((m) => `${m.role === "user" ? "User" : "AI"}: ${m.content}`)
-          .join("\n");
+            .map((m) => `${m.role === "user" ? "User" : "AI"}: ${m.content}`)
+            .join("\n");
 
-    return [
-      `CHAT HISTORY (for context):`,
-      historyBlock,
-      ``,
-      `USER REQUEST:`,
-      userMsg,
-    ].join("\n");
+    return [`CHAT HISTORY (for context):`, historyBlock, ``, `USER REQUEST:`, userMsg].join("\n");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -444,7 +438,7 @@ export default function AiChatBox({
       });
     }
 
-    setMessages([{ role: "user", content: baseHumanText },]);
+    setMessages([{ role: "user", content: baseHumanText }]);
   }
 
   /* ------------------------------------------------------------
@@ -506,7 +500,7 @@ export default function AiChatBox({
 
   return (
     <>
-      <div id={tutorialId} className="fixed bottom-4 right-4 z-50">
+      <div id={tutorialId} className="fixed bottom-16 right-8 z-50">
         {/* Collapsed pill */}
         {!open && (
           <button
@@ -516,7 +510,9 @@ export default function AiChatBox({
             className={[
               "group relative flex items-center gap-2 rounded-full px-4 py-3 shadow-2xl border border-border/60",
               "bg-gradient-to-r from-primary/90 via-primary/70 to-primary/50 text-primary-foreground",
-              !aiLocked ? "hover:from-primary hover:via-primary/80 hover:to-primary/60 transition-all" : "",
+              !aiLocked
+                ? "hover:from-primary hover:via-primary/80 hover:to-primary/60 transition-all"
+                : "",
               aiLocked ? "opacity-50 cursor-not-allowed" : "",
             ].join(" ")}
             aria-label="Open AI chat"
@@ -533,9 +529,11 @@ export default function AiChatBox({
               {hasSelection && (
                 <div className="relative">
                   <CheckCircle2 className="h-4 w-4 opacity-95" />
-                  <span className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2
+                  <span
+                    className="pointer-events-none absolute left-1/2 top-full mt-2 -translate-x-1/2
                     whitespace-nowrap rounded-md bg-black px-2 py-1 text-xs text-white
-                    opacity-0 transition-opacity group-hover:opacity-100">
+                    opacity-0 transition-opacity group-hover:opacity-100"
+                  >
                     Selection detected
                   </span>
                 </div>
@@ -547,9 +545,7 @@ export default function AiChatBox({
                 </span>
               )}
 
-              <span className="ml-1 text-[11px] opacity-80 group-hover:opacity-100">
-                Open
-              </span>
+              <span className="ml-1 text-[11px] opacity-80 group-hover:opacity-100">Open</span>
             </div>
           </button>
         )}
@@ -567,7 +563,6 @@ export default function AiChatBox({
             ].join(" ")}
             style={{ width: panelWidth, height: panelHeight }}
           >
-
             {/* Left-edge width handle */}
             <div
               onMouseDown={onResizeWidthStart}
@@ -626,7 +621,12 @@ export default function AiChatBox({
                     </Button>
                   )}
 
-                  <Button variant="ghost" size="sm" onClick={() => setOpen(false)} aria-label="Collapse chat">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setOpen(false)}
+                    aria-label="Collapse chat"
+                  >
                     ✕
                   </Button>
                 </div>
@@ -654,19 +654,13 @@ export default function AiChatBox({
                 {messages.length === 0 && !aiLocked ? (
                   <div className="flex h-full flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
                     No messages yet.
-
-                    {baseHumanText &&
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={seedMessage}
-                      >
+                    {baseHumanText && (
+                      <Button size="sm" variant="secondary" onClick={seedMessage}>
                         Start with current draft
                       </Button>
-                    }
+                    )}
                   </div>
-                )
-                : (
+                ) : (
                   <div className="space-y-3 p-1">
                     {messages.map((m, idx) => {
                       const isAssistant = m.role === "assistant";
@@ -675,10 +669,9 @@ export default function AiChatBox({
                       return (
                         <div
                           key={idx}
-                          className={[
-                            "flex",
-                            isAssistant ? "justify-start" : "justify-end",
-                          ].join(" ")}
+                          className={["flex", isAssistant ? "justify-start" : "justify-end"].join(
+                            " "
+                          )}
                         >
                           <div className={isAssistant ? "max-w-[88%]" : "max-w-[88%]"}>
                             <div className="mb-1 text-[11px] text-muted-foreground">

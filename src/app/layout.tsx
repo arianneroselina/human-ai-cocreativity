@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import { Analytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Footer from "@/components/ui/footer";
-import Header from "@/components/ui/header";
-import { PauseProvider } from "@/components/ui/pauseContext";
+import Footer from "@/components/ui/layout/footer";
+import Header from "@/components/ui/layout/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,22 +31,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-    <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}>
-    <PauseProvider>
-      <div className="flex h-full flex-col">
-        <Header />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-screen`}>
+        <div className="flex h-full flex-col">
+          <Header />
 
-        <main id="app-main" className="flex-1 overflow-y-auto bg-background">
-          {children}
-        </main>
+          <main id="app-main" className="flex-1 overflow-y-auto bg-background">
+            {children}
+          </main>
 
-        <Footer />
-      </div>
-    </PauseProvider>
+          <Footer />
+        </div>
 
-    <Analytics />
-    <SpeedInsights />
-    </body>
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

@@ -3,9 +3,7 @@
 import { useMemo } from "react";
 import { getPoemTaskById } from "@/data/tasks";
 
-export default function TaskDetails({ taskId }: {
-  taskId: string
-}) {
+export default function TaskDetails({ taskId }: { taskId: string }) {
   const task = useMemo(() => (taskId ? getPoemTaskById(taskId) : null), [taskId]);
 
   if (!task) {
@@ -21,9 +19,7 @@ export default function TaskDetails({ taskId }: {
   return (
     <section className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
       <div className="mt-2 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">
-          Title: {task.title}
-        </h2>
+        <h2 className="text-lg font-semibold text-foreground">Title: {task.title}</h2>
       </div>
 
       <div className="mt-4">
@@ -31,7 +27,10 @@ export default function TaskDetails({ taskId }: {
 
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {task.uiItems.map((item, idx) => (
-            <div key={`${task.id}-${idx}`} className="flex items-start gap-3 rounded-md border border-border/60 p-3">
+            <div
+              key={`${task.id}-${idx}`}
+              className="flex items-start gap-3 rounded-md border border-border/60 p-3"
+            >
               <span className="text-xl text-primary">{item.icon}</span>
               <div className="min-w-0">
                 <h3 className="font-medium text-foreground">{item.heading}</h3>
