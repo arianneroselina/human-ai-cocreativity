@@ -1,7 +1,6 @@
 "use client";
 
-import { Workflow } from "@prisma/client";
-import {Human, Ai, AiHuman, HumanAi, Workflows} from "@/lib/experiment";
+import { Human, Ai, AiHuman, HumanAi, Workflow, Workflows } from "@/lib/experiment";
 import React from "react";
 
 export default function WorkflowDetails({ workflow }: {

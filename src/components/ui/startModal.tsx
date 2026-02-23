@@ -1,6 +1,7 @@
 import WorkflowDetails from "@/components/ui/workflowDetails";
 import { Button } from "@/components/shadcn_ui/button";
 import React from "react";
+import { usePause } from "@/components/ui/pauseContext";
 
 export default function StartModal({
                                      open,
@@ -11,6 +12,13 @@ export default function StartModal({
   workflow: any;
   onStart: () => void;
 }) {
+  const { setPaused } = usePause();
+
+  const start = async () => {
+    setPaused(false);
+    onStart();
+  };
+
   if (!open) return null;
 
   return (
@@ -34,17 +42,17 @@ export default function StartModal({
           <WorkflowDetails workflow={workflow} />
 
           <div className="mt-5 rounded-lg border border-amber-400/40 bg-amber-400/10 p-4 text-sm text-foreground">
-            ⏱️ The timer starts immediately after you click Start.
+            ⏱️ The timer starts immediately after you click &#34;Start&#34;.
             Make sure you fully understand the instructions before proceeding.
           </div>
 
           <div className="mt-8 flex justify-end">
             <Button
-              onClick={onStart}
+              onClick={start}
               size="lg"
               className="px-8 text-base shadow-md"
             >
-              Start Round
+              Start
             </Button>
           </div>
         </div>

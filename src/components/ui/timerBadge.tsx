@@ -40,6 +40,7 @@ export default function TimerBadge({
   }, [onTimeUp]);
 
   const endAtRef = useRef<number | null>(null);
+  const pausedAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (demo) {
@@ -52,13 +53,26 @@ export default function TimerBadge({
       return;
     }
 
-    endAtRef.current =
-      new Date(startedAt).getTime() + seconds * 1000;
+    endAtRef.current = new Date(startedAt).getTime() + seconds * 1000;
   }, [startedAt, seconds, demo]);
+
+  // When pausing/resuming, shift endAt to compensate for time spent paused
+  useEffect(() => {
+    if (paused) {
+      pausedAtRef.current = Date.now();
+    } else {
+      if (pausedAtRef.current !== null && endAtRef.current !== null) {
+        const pausedDuration = Date.now() - pausedAtRef.current;
+        endAtRef.current += pausedDuration;
+      }
+      pausedAtRef.current = null;
+    }
+  }, [paused]);
 
 
   // Reset warning flags if task changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDidWarn1Min(false);
     setDidForceSubmit(false);
   }, [startedAt, seconds]);
