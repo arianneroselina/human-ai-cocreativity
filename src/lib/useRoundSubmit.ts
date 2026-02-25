@@ -26,18 +26,29 @@ export async function submitData(
 ): Promise<SubmitResult> {
   console.log("submitData", { payload, router });
 
-  // local storage (client-side)
-  localStorage.setItem("wordCount", JSON.stringify(payload.wordCount));
-  localStorage.setItem("charCount", JSON.stringify(payload.charCount));
-  localStorage.setItem("passed", JSON.stringify(payload.passed));
-  localStorage.setItem("requirementResults", JSON.stringify(payload.requirementResults));
-
   const { run } = useExperiment.getState();
 
   const sessionId = payload.sessionId ?? run.sessionId;
   const roundIndex = payload.roundIndex ?? run.roundIndex;
   const workflow = payload.workflow ?? run.workflow;
   const taskId = payload.taskId ?? run.taskId;
+
+  localStorage.setItem(
+    `round:wordCount:${sessionId}:${roundIndex}:${workflow}`,
+    JSON.stringify(payload.wordCount)
+  );
+  localStorage.setItem(
+    `round:charCount:${sessionId}:${roundIndex}:${workflow}`,
+    JSON.stringify(payload.charCount)
+  );
+  localStorage.setItem(
+    `round:passed:${sessionId}:${roundIndex}:${workflow}`,
+    JSON.stringify(payload.passed)
+  );
+  localStorage.setItem(
+    `round:requirementResults:${sessionId}:${roundIndex}:${workflow}`,
+    JSON.stringify(payload.requirementResults)
+  );
 
   try {
     const res = await fetch("/api/round/submit", {

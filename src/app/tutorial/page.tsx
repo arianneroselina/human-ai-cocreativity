@@ -39,6 +39,7 @@ export default function TutorialPage() {
 
   const draftRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // unused
   const saveKey = `tutorial:draft:${run.sessionId ?? "no-session"}`;
   const { saving, lastSavedAt } = useAutosave(saveKey, { text }, { setText });
 
@@ -313,7 +314,11 @@ export default function TutorialPage() {
                   </div>
 
                   <AiChatBox
-                    workflow="human_ai"
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      workflow: "human_ai",
+                    }}
                     aiLocked={aiLocked}
                     onDraft={(draft) => {
                       setText(draft);

@@ -11,22 +11,23 @@ import { usePause } from "@/components/ui/task/pauseContext";
 type ChatMsg = { role: "user" | "assistant"; content: string };
 
 type Props = {
-  workflow: Workflow;
   aiLocked: boolean;
   onLockAi?: () => void;
   onDraft: (draftText: string) => void;
   baseHumanText?: string;
   storageKey?: string;
-  run?: { sessionId: string; roundIndex: number };
+  run: {
+    sessionId: string;
+    roundIndex: number;
+    workflow: Workflow;
+  };
   tutorialId?: string;
 };
 
-const WIDTH_STORAGE_KEY = "ai_chat_width";
 const DEFAULT_W = 340;
 const MIN_W = 300;
 const MAX_W = 780;
 
-const HEIGHT_STORAGE_KEY = "ai_chat_height";
 const DEFAULT_H = 520;
 const MIN_H = 360;
 const MAX_H = 780;
@@ -42,7 +43,6 @@ function clampHistory(msgs: ChatMsg[], maxPairs: number) {
 }
 
 export default function AiChatBox({
-  workflow,
   aiLocked,
   onLockAi,
   onDraft,
@@ -64,12 +64,16 @@ export default function AiChatBox({
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const baseMessagePersistedRef = useRef(false);
+  const didRestoreRef = useRef(false);
+
+  const widthStorageKey = `ai-chat:width:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
+  const heightStorageKey = `ai-chat:height:${run.sessionId}:${run.roundIndex}:${run.workflow || "n/a"}`;
 
   /* ------------------------------------------------------------
    * Mirror draft (while AI is locked)
    * ------------------------------------------------------------ */
   useEffect(() => {
-    if (workflow !== "human_ai") return;
+    if (run.workflow !== "human_ai") return;
     if (!aiLocked) return;
 
     const text = baseHumanText?.trim() ?? "";
@@ -95,11 +99,11 @@ export default function AiChatBox({
 
       return [{ ...prev[0], content: text }];
     });
-  }, [workflow, baseHumanText, aiLocked]);
+  }, [run.workflow, baseHumanText, aiLocked]);
 
   useEffect(() => {
     if (!run) return;
-    if (workflow !== "human_ai") return;
+    if (run.workflow !== "human_ai") return;
     if (aiLocked) return;
     if (baseMessagePersistedRef.current) return;
 
@@ -116,34 +120,43 @@ export default function AiChatBox({
       action: "seed_with_draft",
       content: first.content,
     });
-  }, [messages, aiLocked, workflow, run]);
+  }, [messages, aiLocked, run.workflow, run]);
 
   /* ------------------------------------------------------------
    * Restore chat (Autosave)
    * ------------------------------------------------------------ */
   useEffect(() => {
+    console.log("refreshed. storageKey:", storageKey);
     if (!storageKey) return;
     //if (aiLocked) return;
 
     try {
       const raw = localStorage.getItem(storageKey);
+      console.log("refreshed. raw:", raw);
       if (!raw) return;
 
       const parsed = JSON.parse(raw);
+      console.log("refreshed. parsed:", parsed);
       if (Array.isArray(parsed.messages)) {
         setMessages(parsed.messages);
+        console.log("refreshed. setMessages:", parsed.messages);
       }
       if (typeof parsed.selectedAssistantIndex === "number") {
         setSelectedAssistantIndex(parsed.selectedAssistantIndex);
       }
     } catch {
       // ignore corrupt storage
+    } finally {
+      didRestoreRef.current = true;
     }
   }, [storageKey, aiLocked]);
 
   useEffect(() => {
+    console.log("saving. storageKey:", storageKey, "messages:", messages);
     if (!storageKey) return;
     if (aiLocked) return;
+
+    if (!didRestoreRef.current) return;
 
     try {
       localStorage.setItem(
@@ -172,7 +185,7 @@ export default function AiChatBox({
 
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(WIDTH_STORAGE_KEY);
+      const raw = window.localStorage.getItem(widthStorageKey);
       if (raw) {
         const parsed = Number(raw);
         if (Number.isFinite(parsed)) setPanelWidth(clamp(parsed, MIN_W, MAX_W));
@@ -182,13 +195,13 @@ export default function AiChatBox({
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(WIDTH_STORAGE_KEY, String(panelWidth));
+      window.localStorage.setItem(widthStorageKey, String(panelWidth));
     } catch {}
   }, [panelWidth]);
 
   useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(HEIGHT_STORAGE_KEY);
+      const raw = window.localStorage.getItem(heightStorageKey);
       if (raw) {
         const parsed = Number(raw);
         if (Number.isFinite(parsed)) setPanelHeight(clamp(parsed, MIN_H, MAX_H));
@@ -198,7 +211,7 @@ export default function AiChatBox({
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(HEIGHT_STORAGE_KEY, String(panelHeight));
+      window.localStorage.setItem(heightStorageKey, String(panelHeight));
     } catch {}
   }, [panelHeight]);
 
@@ -316,7 +329,7 @@ export default function AiChatBox({
     try {
       let isTrustBreakRound = false;
       if (run) {
-        isTrustBreakRound = run.roundIndex === 5 && usesAI(workflow);
+        isTrustBreakRound = run.roundIndex === 5 && usesAI(run.workflow);
       }
 
       const res = await fetch("/api/ai", {
@@ -487,9 +500,9 @@ export default function AiChatBox({
     setOpen(!aiLocked);
   }, [aiLocked]);
 
-  const isAiOnly = workflow === Ai;
-  const isAiToHuman = workflow === AiHuman;
-  const isHumanToAi = workflow === HumanAi;
+  const isAiOnly = run.workflow === Ai;
+  const isAiToHuman = run.workflow === AiHuman;
+  const isHumanToAi = run.workflow === HumanAi;
 
   const assistantCount = messages.filter((m) => m.role === "assistant").length;
   const hasSelection = selectedAssistantIndex !== null;

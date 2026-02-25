@@ -19,6 +19,50 @@ function formatMMSS(totalSeconds: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function PauseOverlay({
+  resumeBtnRef,
+  setPaused,
+}: {
+  resumeBtnRef: React.RefObject<HTMLButtonElement | null>;
+  setPaused: (paused: boolean) => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="paused-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+    >
+      <div className="mx-4 max-w-md rounded-xl bg-card text-card-foreground p-6 shadow-xl border border-border">
+        <h2 id="paused-title" className="text-xl font-semibold">
+          Paused
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">Timer is stopped. Resume to continue.</p>
+
+        <div className="mt-6 flex items-center justify-center">
+          <button
+            ref={resumeBtnRef}
+            onClick={() => setPaused(false)}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-transparent px-4 py-3 text-sm font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <Play className="h-4 w-4" /> Resume
+          </button>
+        </div>
+
+        <p className="mt-4 text-xs text-muted-foreground text-center">
+          Tip: Press <kbd className="rounded border border-border bg-muted px-2 py-1">Space</kbd> or{" "}
+          <kbd className="rounded border border-border bg-muted px-2 py-1">Esc</kbd> to resume.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+type PersistedTimerState = {
+  endAt: number | null;
+  pausedAt: number | null;
+};
+
 export default function TimerBadge({
   workflow,
   seconds = 300,
@@ -42,43 +86,91 @@ export default function TimerBadge({
   const endAtRef = useRef<number | null>(null);
   const pausedAtRef = useRef<number | null>(null);
 
+  const storageKey = useMemo(() => {
+    return `timer:state:${startedAt ?? "no-start"}:${seconds}:${workflow}`;
+  }, [startedAt, seconds, workflow]);
+
+  const writeState = useCallback(
+    (next: PersistedTimerState) => {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(next));
+      } catch {
+        // ignore (storage disabled)
+      }
+    },
+    [storageKey]
+  );
+
+  const readState = useCallback((): PersistedTimerState | null => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as PersistedTimerState;
+      return {
+        endAt: typeof parsed?.endAt === "number" ? parsed.endAt : null,
+        pausedAt: typeof parsed?.pausedAt === "number" ? parsed.pausedAt : null,
+      };
+    } catch {
+      return null;
+    }
+  }, [storageKey]);
+
   useEffect(() => {
     if (demo) {
       endAtRef.current = Date.now() + seconds * 1000;
+      pausedAtRef.current = null;
       return;
     }
 
+    // 1) restore
+    const restored = readState();
+    if (restored?.endAt) {
+      endAtRef.current = restored.endAt;
+      pausedAtRef.current = restored.pausedAt ?? null;
+
+      // if paused during page reloads, keep it paused
+      if (pausedAtRef.current !== null) {
+        setPaused(true);
+      }
+      return;
+    }
+
+    // 2) compute fresh
     if (!startedAt) {
       endAtRef.current = null;
+      pausedAtRef.current = null;
       return;
     }
 
     endAtRef.current = new Date(startedAt).getTime() + seconds * 1000;
-  }, [startedAt, seconds, demo]);
+    pausedAtRef.current = null;
+    writeState({ endAt: endAtRef.current, pausedAt: null });
+  }, [readState, writeState, startedAt, seconds, demo, setPaused]);
 
   // When pausing/resuming, shift endAt to compensate for time spent paused
   useEffect(() => {
+    if (demo) return;
+
     if (paused) {
-      pausedAtRef.current = Date.now();
-      console.log("Pausing timer..., pausedAt: ", pausedAtRef.current);
-    } else {
-      if (pausedAtRef.current !== null && endAtRef.current !== null) {
-        const pausedDuration = Date.now() - pausedAtRef.current;
-        endAtRef.current += pausedDuration;
-        console.log(
-          "Resuming timer..., pausedDuration: ",
-          pausedDuration,
-          "new endAt: ",
-          endAtRef.current
-        );
+      // already have pausedAt (e.g. restored from refresh), don't overwrite
+      if (pausedAtRef.current === null) {
+        pausedAtRef.current = Date.now();
       }
-      pausedAtRef.current = null;
+      writeState({ endAt: endAtRef.current, pausedAt: pausedAtRef.current });
+      return;
     }
-  }, [paused]);
+
+    // resuming
+    if (pausedAtRef.current !== null && endAtRef.current !== null) {
+      const pausedDuration = Date.now() - pausedAtRef.current;
+      endAtRef.current += pausedDuration;
+    }
+    pausedAtRef.current = null;
+    writeState({ endAt: endAtRef.current, pausedAt: null });
+  }, [paused, demo, writeState]);
 
   // Reset warning flags if task changes
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDidWarn1Min(false);
     setDidForceSubmit(false);
   }, [startedAt, seconds]);
@@ -108,7 +200,6 @@ export default function TimerBadge({
       if (demo) return;
 
       const left = Math.max(0, Math.ceil((endAtRef.current - Date.now()) / 1000));
-
       setRemaining(left);
 
       if (left <= 60 && left > 10 && !didWarn1Min) {
@@ -127,7 +218,7 @@ export default function TimerBadge({
     tick();
     const id = window.setInterval(tick, 250);
     return () => window.clearInterval(id);
-  }, [paused, didWarn1Min, didForceSubmit]);
+  }, [paused, didWarn1Min, didForceSubmit, demo]);
 
   const showOneMinute = didWarn1Min && remaining <= 60 && remaining > 10;
   const showFinal = remaining <= 10 && remaining > 0;
@@ -195,39 +286,7 @@ export default function TimerBadge({
       )}
 
       {/* Pause overlay */}
-      {paused && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="paused-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
-        >
-          <div className="mx-4 max-w-md rounded-xl bg-card text-card-foreground p-6 shadow-xl border border-border">
-            <h2 id="paused-title" className="text-xl font-semibold">
-              Paused
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Timer is stopped. Resume to continue.
-            </p>
-
-            <div className="mt-6 flex items-center justify-center">
-              <button
-                ref={resumeBtnRef}
-                onClick={() => setPaused(false)}
-                className="inline-flex items-center gap-2 rounded-lg border border-border bg-transparent px-4 py-3 text-sm font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <Play className="h-4 w-4" /> Resume
-              </button>
-            </div>
-
-            <p className="mt-4 text-xs text-muted-foreground text-center">
-              Tip: Press{" "}
-              <kbd className="rounded border border-border bg-muted px-2 py-1">Space</kbd> or{" "}
-              <kbd className="rounded border border-border bg-muted px-2 py-1">Esc</kbd> to resume.
-            </p>
-          </div>
-        </div>
-      )}
+      {paused && <PauseOverlay resumeBtnRef={resumeBtnRef} setPaused={setPaused} />}
     </>
   );
 }

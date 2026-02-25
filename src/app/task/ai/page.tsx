@@ -99,15 +99,15 @@ export default function AIPage() {
                   <TaskDetails taskId={run.taskId!} />
 
                   <AiChatBox
-                    workflow={run.workflow!}
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      workflow: run.workflow!,
+                    }}
                     aiLocked={false}
                     onDraft={(draft) => setText(draft)}
                     baseHumanText={text}
                     storageKey={chatKey}
-                    run={{
-                      sessionId: run.sessionId!,
-                      roundIndex: run.roundIndex,
-                    }}
                   />
 
                   {/* Editor (read-only) */}

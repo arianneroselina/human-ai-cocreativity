@@ -106,7 +106,11 @@ export default function AIHumanWorkPage() {
                   <TaskDetails taskId={run.taskId!} />
 
                   <AiChatBox
-                    workflow={run.workflow!}
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      workflow: run.workflow!,
+                    }}
                     aiLocked={aiLocked}
                     onLockAi={() => {
                       setAiLocked(true);
@@ -114,10 +118,6 @@ export default function AIHumanWorkPage() {
                     onDraft={(draft) => setText(draft)}
                     baseHumanText={text}
                     storageKey={chatKey}
-                    run={{
-                      sessionId: run.sessionId!,
-                      roundIndex: run.roundIndex,
-                    }}
                   />
 
                   {/* Editor */}

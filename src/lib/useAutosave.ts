@@ -6,7 +6,7 @@ type DraftSnapshot = { text: string; aiLocked?: boolean };
 type DraftSetters = { setText: (v: string) => void; setAiLocked?: (v: boolean) => void };
 
 export function useAutosave(
-  key: string | null | undefined,
+  storageKey: string | null | undefined,
   snapshot: DraftSnapshot,
   setters: DraftSetters,
   delay = 500
@@ -25,9 +25,9 @@ export function useAutosave(
 
   // Restore once when key is ready
   useEffect(() => {
-    if (!key) return;
+    if (!storageKey) return;
     try {
-      const raw = localStorage.getItem(key);
+      const raw = localStorage.getItem(storageKey);
       rawStoredRef.current = raw;
       if (raw !== null) {
         const parsed = JSON.parse(raw);
@@ -42,11 +42,11 @@ export function useAutosave(
     }
     restoredRef.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [storageKey]);
 
   // Debounced save — but *first* short-circuit if already up to date
   useEffect(() => {
-    if (!key || !restoredRef.current) return;
+    if (!storageKey || !restoredRef.current) return;
 
     const isUpToDate = rawStoredRef.current === payload;
 
@@ -66,7 +66,7 @@ export function useAutosave(
 
     timer.current = window.setTimeout(() => {
       try {
-        localStorage.setItem(key, payload);
+        localStorage.setItem(storageKey, payload);
         rawStoredRef.current = payload;
         setLastSavedAt(Date.now());
       } catch {}
@@ -80,7 +80,7 @@ export function useAutosave(
         timer.current = null;
       }
     };
-  }, [key, payload, delay, saving]);
+  }, [storageKey, payload, delay, saving]);
 
   return { saving, lastSavedAt };
 }

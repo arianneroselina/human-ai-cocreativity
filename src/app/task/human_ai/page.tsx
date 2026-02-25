@@ -109,7 +109,11 @@ export default function HumanAIPage() {
                   <TaskDetails taskId={run.taskId!} />
 
                   <AiChatBox
-                    workflow={run.workflow!}
+                    run={{
+                      sessionId: run.sessionId!,
+                      roundIndex: run.roundIndex,
+                      workflow: run.workflow!,
+                    }}
                     aiLocked={aiLocked}
                     onLockAi={() => {
                       setAiLocked(true);
@@ -119,10 +123,6 @@ export default function HumanAIPage() {
                     }}
                     baseHumanText={text}
                     storageKey={chatKey}
-                    run={{
-                      sessionId: run.sessionId!,
-                      roundIndex: run.roundIndex,
-                    }}
                   />
 
                   {/* Editor */}
