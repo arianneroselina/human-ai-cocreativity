@@ -24,12 +24,11 @@ export async function POST(req: Request) {
 
   // ensure chat exists
   const chat = await prisma.aiChat.upsert({
-    where: {
-      roundId: round.id,
-    },
+    where: { sessionId_roundIndex: { sessionId, roundIndex } },
     update: {},
     create: {
-      roundId: round.id,
+      sessionId: sessionId,
+      roundIndex: roundIndex,
     },
   });
 

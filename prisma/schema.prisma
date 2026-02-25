@@ -1,6 +1,6 @@
 datasource db {
-  provider  = "postgresql"
-  url       = env("PRISMA_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("PRISMA_DATABASE_URL")
 }
 
 generator client {
@@ -15,10 +15,10 @@ enum Workflow {
 }
 
 model Session {
-  id                  String           @id @default(cuid())
+  id                  String    @id @default(cuid())
   totalRounds         Int
   totalPracticeRounds Int
-  startedAt           DateTime         @default(now())
+  startedAt           DateTime  @default(now())
   finishedAt          DateTime?
   timeMs              Int?
   rounds              Round[]
@@ -48,20 +48,20 @@ model Round {
 }
 
 model RoundFeedback {
-  id                   String    @id @default(cuid())
-  round                Round     @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
-  sessionId            String
-  roundIndex           Int
-  workflow             Workflow
-  taskId               String
+  id         String   @id @default(cuid())
+  round      Round    @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
+  sessionId  String
+  roundIndex Int
+  workflow   Workflow
+  taskId     String
 
   // NASA TLX (21-point)
-  mentalDemand         Int?
-  physicalDemand       Int?
-  temporalDemand       Int?
-  performance          Int?
-  effort               Int?
-  frustration          Int?
+  mentalDemand   Int?
+  physicalDemand Int?
+  temporalDemand Int?
+  performance    Int?
+  effort         Int?
+  frustration    Int?
 
   // Likert 1–5
   aiUnderstanding      Int?
@@ -69,19 +69,19 @@ model RoundFeedback {
   aiCreativitySupport  Int?
   aiPerformanceOverall Int?
 
-  rulesConfidence      Int?
-  satisfactionResult   Int?
+  rulesConfidence    Int?
+  satisfactionResult Int?
 
-  comment              String?
-  createdAt            DateTime   @default(now())
+  comment   String?
+  createdAt DateTime @default(now())
 
   @@unique([sessionId, roundIndex])
 }
 
 model Feedback {
-  id              String   @id @default(cuid())
-  session         Session  @relation(fields: [sessionId], references: [id])
-  sessionId       String   @unique
+  id              String     @id @default(cuid())
+  session         Session    @relation(fields: [sessionId], references: [id])
+  sessionId       String     @unique
   satisfaction    Int?
   clarity         Int?
   effort          Int?
@@ -89,25 +89,28 @@ model Feedback {
   workflowRanking Workflow[]
   rankingReason   String?
   comments        String?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime   @default(now())
 }
 
 model AiChat {
-  id        String   @id @default(cuid())
-  round     Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
-  roundId   String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages  AiChatMessage[]
+  id         String          @id @default(cuid())
+  round      Round           @relation(fields: [sessionId, roundIndex], references: [sessionId, index], onDelete: Cascade)
+  sessionId  String
+  roundIndex Int
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  messages   AiChatMessage[]
+
+  @@unique([sessionId, roundIndex])
 }
 
 model AiChatMessage {
-  id         String   @id @default(cuid())
-  chat       AiChat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  chatId     String
-  role       String   // "user" | "assistant" | "system"
-  content    String?
-  action     String?  // "select" | "clear" | "seed_with_draft" | "trust_break"
-  selected   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id        String   @id @default(cuid())
+  chat      AiChat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId    String
+  role      String // "user" | "assistant" | "system"
+  content   String?
+  action    String? // "select" | "clear" | "seed_with_draft" | "trust_break"
+  selected  Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
