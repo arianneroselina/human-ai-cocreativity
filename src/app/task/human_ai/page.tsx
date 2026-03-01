@@ -130,8 +130,18 @@ export default function HumanAIPage() {
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
                       <div className="mb-2 flex items-center justify-between">
                         <Label htmlFor="draft" className="text-sm font-medium">
-                          Draft {aiLocked ? " (you can edit)" : " (read-only)"}
+                          Draft
+                          <span
+                            className={`ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs border ${
+                              aiLocked
+                                ? "bg-secondary text-secondary-foreground border-border"
+                                : "bg-muted text-muted-foreground border-border"
+                            }`}
+                          >
+                            {aiLocked ? "Manual writing" : "AI mode"}
+                          </span>
                         </Label>
+
                         <div className="flex items-center gap-3">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
                           <span className="text-xs text-muted-foreground">
@@ -175,7 +185,7 @@ export default function HumanAIPage() {
                             ].join(" ")}
                             onClick={() => setUnlockAi(true)}
                           >
-                            Unlock AI Chat
+                            Send to AI (locks editing)
                             <Sparkles className="h-4 w-4 opacity-95" />
                           </Button>
 
@@ -216,7 +226,7 @@ export default function HumanAIPage() {
 
                         <ConfirmDialog
                           open={unlockAi}
-                          onOpenChange={setAiLocked}
+                          onOpenChange={setUnlockAi}
                           title="Unlock AI Chat?"
                           description="After unlocking, you won't be able to edit your draft manually anymore."
                           confirmLabel="Unlock AI"

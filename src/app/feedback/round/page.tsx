@@ -239,10 +239,10 @@ export default function RoundFeedbackPage() {
                     left="Strongly Disagree"
                     right="Strongly Agree"
                   />
+
+                  <hr className="border-border" />
                 </div>
               )}
-
-              <hr className="border-border" />
 
               {/* Satisfaction */}
               <div className="space-y-4">

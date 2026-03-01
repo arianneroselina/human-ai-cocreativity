@@ -102,6 +102,12 @@ export default function HumanPage() {
                       <div className="mb-2 flex items-center justify-between">
                         <Label htmlFor="draft" className="text-sm font-medium">
                           Draft
+                          <span
+                            className="ml-2 inline-flex items-center rounded-full px-2 py-0.5
+                            text-xs border bg-secondary text-secondary-foreground border-border"
+                          >
+                            Manual writing
+                          </span>
                         </Label>
                         <div className="flex items-center gap-3">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />

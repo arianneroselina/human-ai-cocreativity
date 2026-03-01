@@ -115,8 +115,15 @@ export default function AIPage() {
                     <div className="rounded-lg border border-border bg-card p-4 text-card-foreground shadow-sm">
                       <div className="mb-2 flex items-center justify-between">
                         <Label htmlFor="draft" className="text-sm font-medium">
-                          Draft (read-only)
+                          Draft
+                          <span
+                            className="ml-2 inline-flex items-center rounded-full px-2 py-0.5
+                            text-xs border bg-secondary text-secondary-foreground border-border"
+                          >
+                            AI mode
+                          </span>
                         </Label>
+
                         <div className="flex items-center gap-3">
                           <AutoSaveIndicator saving={saving} lastSavedAt={lastSavedAt} />
                           <span className="text-xs text-muted-foreground">

@@ -28,7 +28,7 @@ const DEFAULT_W = 340;
 const MIN_W = 300;
 const MAX_W = 780;
 
-const DEFAULT_H = 520;
+const DEFAULT_H = 500;
 const MIN_H = 360;
 const MAX_H = 780;
 
