@@ -81,7 +81,7 @@ run_copy "AiChatMessage_flat" \
       m."createdAt"
     FROM "AiChatMessage" m
     JOIN "AiChat" c  ON c.id = m."chatId"
-    JOIN "Round" r   ON r.id = c."roundId"
+    JOIN "Round" r   ON r.index = c."roundIndex"
     JOIN "Session" s ON s.id = r."sessionId"
     ORDER BY s.id, r.index, m."createdAt"
   ) TO '"$OUT_DIR"'/AiChatMessage_flat.csv CSV HEADER'
