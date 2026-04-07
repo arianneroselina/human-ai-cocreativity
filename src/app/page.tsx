@@ -160,7 +160,7 @@ export default function Page() {
               <div className="mt-1 inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
                 <span className="text-xs text-foreground">
-                  This whole session takes ~30-50 minutes
+                  This whole session takes ~50-60 minutes
                 </span>
               </div>
             )}
