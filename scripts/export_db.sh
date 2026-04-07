@@ -20,11 +20,14 @@ if [[ -z "$DB_URL" ]]; then
   exit 1
 fi
 
-OUT_DIR="${2:-exports}"
+BASE_OUT_DIR="${2:-exports}"
+TS="$(date +"%Y-%m-%d_%H-%M-%S")"
+OUT_DIR="${BASE_OUT_DIR%/}/$TS"
 mkdir -p "$OUT_DIR"
 
 echo "Exporting database to CSV → $OUT_DIR"
 echo
+
 
 declare -A COUNTS
 TOTAL_ROWS=0
